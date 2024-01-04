@@ -5,6 +5,9 @@ x-envs: &env
     - .env
 
 networks:
+  internal:
+    name: 'hict-internal'
+    driver: bridge
   db-net:
     name: 'hict-db-net'
     driver: bridge
@@ -16,6 +19,35 @@ volumes:
 name: 'hict-service'
 
 services:
+
+############### BACKEND ###############
+
+  authorization:
+    container_name: 'hict-authorization'
+    image: 'hict/authorization:${PROJECT_VERSION}'
+    build:
+      context: backend
+      dockerfile: authorization/Dockerfile
+    restart: on-failure
+    <<: *env
+    expose:
+      - '8090'
+    ports:
+      - '8090:8090'
+    networks:
+      internal:
+        aliases:
+          - '${AUTHORIZATION_HOST}'
+      db-net:
+    healthcheck:
+      test: 'wget --no-verbose --tries=1 --spider http://localhost:8090/actuator/health || exit 1'
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 ############### DATA STORAGE ###############
 
