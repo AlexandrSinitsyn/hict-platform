@@ -12,15 +12,17 @@ import org.springframework.web.bind.annotation.RestController
 import ru.itmo.hict.authorization.exceptions.ValidationException
 import ru.itmo.hict.authorization.form.EnterForm
 import ru.itmo.hict.authorization.form.RegisterForm
+import ru.itmo.hict.authorization.service.JwtService
 import ru.itmo.hict.authorization.service.UserService
 import ru.itmo.hict.authorization.validators.EnterFormValidator
 import ru.itmo.hict.authorization.validators.RegisterFormValidator
-import ru.itmo.hict.entity.User
+import ru.itmo.hict.dto.Jwt
 
 @RestController
 @RequestMapping("/api/v1/auth")
 class UserController(
     private val userService: UserService,
+    private val jwtService: JwtService,
     private val registerFormValidator: RegisterFormValidator,
     private val enterFormValidator: EnterFormValidator,
 ) {
@@ -35,22 +37,22 @@ class UserController(
     }
 
     @PostMapping("/register")
-    fun register(@RequestBody @Valid registerForm: RegisterForm, bindingResult: BindingResult): ResponseEntity<User> {
+    fun register(@RequestBody @Valid registerForm: RegisterForm, bindingResult: BindingResult): ResponseEntity<Jwt> {
         if (bindingResult.hasErrors()) {
             throw ValidationException(bindingResult)
         }
 
         return userService.register(registerForm.username, registerForm.login, registerForm.email, registerForm.passwordSha)
-            .run { ResponseEntity.ok(this) }
+            .run { ResponseEntity.ok(jwtService.create(this)) }
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody @Valid enterForm: EnterForm, bindingResult: BindingResult): ResponseEntity<User> {
+    fun login(@RequestBody @Valid enterForm: EnterForm, bindingResult: BindingResult): ResponseEntity<Jwt> {
         if (bindingResult.hasErrors()) {
             throw ValidationException(bindingResult)
         }
 
         return userService.findByCredentials(enterForm.login, enterForm.email, enterForm.passwordSha).get()
-            .run { ResponseEntity.ok(this) }
+            .run { ResponseEntity.ok(jwtService.create(this)) }
     }
 }
