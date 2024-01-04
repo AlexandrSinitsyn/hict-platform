@@ -1,0 +1,43 @@
+version: '3.9'
+
+x-envs: &env
+  env_file:
+    - .env
+
+networks:
+  db-net:
+    name: 'hict-db-net'
+    driver: bridge
+
+volumes:
+  hict-postgres-data:
+    name: 'hict-postgres-data'
+
+name: 'hict-service'
+
+services:
+
+############### DATA STORAGE ###############
+
+  postgres:
+    container_name: 'hict-database'
+    image: postgres:${POSTGRES_VERSION}-alpine
+    restart: always
+    user: '${POSTGRES_USER}'
+    <<: *env
+    expose:
+      - '5432'
+    ports:
+      - '5432:5432'
+    networks:
+      db-net:
+        aliases:
+          - '${POSTGRES_HOST}'
+    healthcheck:
+      test: 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    volumes:
+      - hict-postgres-data:/var/lib/postgresql/data
