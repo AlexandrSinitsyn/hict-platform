@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RestController
 import ru.itmo.hict.authorization.exceptions.ValidationException
 import ru.itmo.hict.authorization.form.EnterForm
 import ru.itmo.hict.authorization.form.RegisterForm
-import ru.itmo.hict.authorization.service.JwtService
 import ru.itmo.hict.authorization.service.UserService
 import ru.itmo.hict.authorization.validators.EnterFormValidator
 import ru.itmo.hict.authorization.validators.RegisterFormValidator
 import ru.itmo.hict.dto.Jwt
+import ru.itmo.hict.dto.JwtService
+import ru.itmo.hict.dto.UserInfoDto.Companion.toInfoDto
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -43,7 +44,7 @@ class UserController(
         }
 
         return userService.register(registerForm.username, registerForm.login, registerForm.email, registerForm.passwordSha)
-            .run { ResponseEntity.ok(jwtService.create(this)) }
+            .run { ResponseEntity.ok(jwtService.create(this.toInfoDto())) }
     }
 
     @PostMapping("/login")
@@ -53,6 +54,6 @@ class UserController(
         }
 
         return userService.findByCredentials(enterForm.login, enterForm.email, enterForm.passwordSha).get()
-            .run { ResponseEntity.ok(jwtService.create(this)) }
+            .run { ResponseEntity.ok(jwtService.create(this.toInfoDto())) }
     }
 }
