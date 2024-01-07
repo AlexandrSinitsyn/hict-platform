@@ -1,5 +1,6 @@
 package ru.itmo.hict.server.controller
 
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
@@ -15,14 +16,21 @@ import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.HiCMapCreationForm
 import ru.itmo.hict.server.service.HiCMapService
+import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
 
 @RestController
 @RequestMapping("/api/v1/hi-c")
 class HiCMapController(
     private val hiCMapService: HiCMapService,
+    private val hiCMapCreationFormValidator: HiCMapCreationFormValidator,
 ) {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
+
+    @InitBinder("hiCMapCreationForm")
+    fun initRegisterBinder(webDataBinder: WebDataBinder) {
+        webDataBinder.addValidators(hiCMapCreationFormValidator)
+    }
 
     @GetMapping("/all")
     fun getAll(): ResponseEntity<List<HiCMapInfoDto>> =
@@ -34,7 +42,7 @@ class HiCMapController(
             ?: ResponseEntity.notFound().build()
 
     @PostMapping("/publish")
-    fun publish(@RequestBody hiCMapCreationForm: HiCMapCreationForm,
+    fun publish(@RequestBody @Valid hiCMapCreationForm: HiCMapCreationForm,
                 bindingResult: BindingResult): ResponseEntity<HiCMapInfoDto> {
         val user = requestUserInfo.user
 
