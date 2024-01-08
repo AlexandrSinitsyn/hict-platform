@@ -11,10 +11,15 @@ networks:
   db-net:
     name: 'hict-db-net'
     driver: bridge
+  minio-net:
+    name: 'hict-minio-net'
+    driver: bridge
 
 volumes:
   hict-postgres-data:
     name: 'hict-postgres-data'
+  hict-minio-data:
+    name: 'hict-minio-data'
 
 name: 'hict-service'
 
@@ -35,12 +40,36 @@ services:
     ports:
       - '8090:8090'
     networks:
-      internal:
-        aliases:
-          - '${AUTHORIZATION_HOST}'
-      db-net:
+      - internal
+      - db-net
     healthcheck:
       test: 'wget --no-verbose --tries=1 --spider http://localhost:8090/actuator/health || exit 1'
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  server:
+    container_name: 'hict-server'
+    image: 'hict/server:${PROJECT_VERSION}'
+    build:
+      context: backend
+      dockerfile: server/Dockerfile
+    restart: on-failure
+    <<: *env
+    expose:
+      - '8080'
+    ports:
+      - '8080:8080'
+    networks:
+      - internal
+      - db-net
+      - minio-net
+    healthcheck:
+      test: 'wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1'
       interval: 5s
       timeout: 10s
       retries: 3
@@ -73,3 +102,26 @@ services:
       start_period: 15s
     volumes:
       - hict-postgres-data:/var/lib/postgresql/data
+
+  minio:
+    container_name: 'hict-minio'
+    image: 'minio/minio:${MINIO_VERSION}'
+    command: server --address ":9000" --console-address ":9001" /data
+    restart: always
+    <<: *env
+    expose:
+      - '9000'
+    ports:
+      - '9000:9000'
+      - '${MINIO_UI_PORT}:9001'
+    networks:
+      minio-net:
+        aliases:
+          - '${MINIO_HOST}'
+    healthcheck:
+      test: 'curl -f http://localhost:${MINIO_UI_PORT}/minio/health/live'
+      interval: 5s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - hict-minio-data:/data

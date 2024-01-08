@@ -8,7 +8,7 @@ plugins {
 	kotlin("plugin.jpa") version "1.9.21"
 }
 
-group = "ru.itmo.hict.entity"
+group = "ru.itmo.hict.server"
 version = "1.0.0"
 
 java {
@@ -22,12 +22,23 @@ repositories {
 extra["springCloudVersion"] = "2023.0.0"
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-    api("com.auth0:java-jwt:4.4.0")
-	runtimeOnly("org.postgresql:postgresql")
+    implementation("io.minio:minio:8.5.7")
+    implementation(project(":entity"))
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    runtimeOnly("org.postgresql:postgresql")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+	}
 }
 
 tasks.withType<KotlinCompile> {
@@ -35,4 +46,12 @@ tasks.withType<KotlinCompile> {
 		freeCompilerArgs += "-Xjsr305=strict"
 		jvmTarget = "17"
 	}
+}
+
+tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
 }
