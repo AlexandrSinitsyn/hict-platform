@@ -25,6 +25,23 @@ name: 'hict-service'
 
 services:
 
+############### PROXY ###############
+
+  proxy:
+    container_name: 'hict-nginx'
+    image: nginx:${NGINX_VERSION}-alpine-perl
+    restart: always
+    <<: *env
+    ports:
+      - '${APP_HOST}:80'
+    networks:
+      - internal
+    depends_on:
+      authorization:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+
 ############### BACKEND ###############
 
   authorization:
