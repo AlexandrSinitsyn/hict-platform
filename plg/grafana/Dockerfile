@@ -24,5 +24,7 @@ RUN grafana-cli --pluginUrl https://github.com/yesoreyeram/yesoreyeram-boomtheme
     plugins install yesoreyeram-boomtheme-panel # themes
 RUN grafana-cli --pluginUrl https://grafana.com/api/plugins/ryantxu-ajax-panel/versions/0.1.0/download \
     plugins install ryantxu-ajax-panel # ajax
+RUN grafana-cli --pluginUrl https://grafana.com/api/plugins/simpod-json-datasource/versions/0.6.3/download \
+    plugins install simpod-json-datasource # json
 
-ENV GF_INSTALL_PLUGINS='cloudspout-button-panel,yesoreyeram-boomtheme-panel,ryantxu-ajax-panel'
+ENV GF_INSTALL_PLUGINS='cloudspout-button-panel,yesoreyeram-boomtheme-panel,ryantxu-ajax-panel,simpod-json-datasource'
