@@ -1,0 +1,95 @@
+version: '3.9'
+
+x-envs: &env
+  env_file:
+    - .env
+
+networks:
+  loki:
+    name: 'hict-loki'
+    driver: bridge
+  db-net:
+  minio-net:
+
+volumes:
+  logs:
+    name: 'hict-logs'
+  loki-data:
+    name: 'hict-loki-data'
+  promtail-data:
+    name: 'hict-promtail-data'
+  grafana-data:
+    name: 'hict-grafana-data'
+
+name: 'hict-service'
+
+services:
+  authorization:
+    user: root
+    volumes:
+      - logs:/home/app/logs
+
+  server:
+    user: root
+    volumes:
+      - logs:/home/app/logs
+
+  loki:
+    container_name: 'hict-logger-loki'
+    image: hict-service/loki:${PROJECT_VERSION}
+    build:
+      context: plg/loki
+      dockerfile: Dockerfile
+    restart: on-failure
+    <<: *env
+    expose:
+      - '3100'
+      - '9096'
+    networks:
+      - minio-net
+      - loki
+    healthcheck:
+      test: 'wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:3100/ready || exit 1'
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    volumes:
+      - loki-data:/etc/loki
+    depends_on:
+      minio:
+        condition: service_healthy
+
+  promtail:
+    container_name: 'hict-logger-promtail'
+    image: hict-service/promtail:${PROJECT_VERSION}
+    build:
+      context: plg/promtail
+      dockerfile: Dockerfile
+    restart: on-failure
+    <<: *env
+    expose:
+      - '9080'
+    networks:
+      - loki
+    volumes:
+      - promtail-data:/etc/promtail
+      - logs:/var/log
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  grafana:
+    container_name: 'hict-logger-grafana'
+    image: hict-service/grafana:${PROJECT_VERSION}
+    build:
+      context: plg/grafana
+      dockerfile: Dockerfile
+    <<: *env
+    ports:
+      - '${GRAFANA_PORT}:3000'
+    networks:
+      - db-net
+      - loki
+    volumes:
+      - grafana-data:/var/lib/grafana

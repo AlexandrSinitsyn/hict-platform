@@ -4,11 +4,23 @@
 <configuration>
     <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
     <import class="ch.qos.logback.core.ConsoleAppender"/>
+    <import class="ch.qos.logback.core.FileAppender"/>
 
     <appender name="STDOUT" class="ConsoleAppender">
         <encoder class="PatternLayoutEncoder">
             <charset>UTF-8</charset>
             <pattern>%white(%date{yyyy-MM-dd HH:mm:ss}) %highlight(%-5level) --- [%-20thread] %50logger{36} -%kvp- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILEOUT" class="FileAppender">
+        <param name="file" value="./logs/authorization.log" />
+        <param name="MaxFileSize" value="10MB" />
+        <param name="MaxBackupIndex" value="4" />
+
+        <encoder class="PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>### %date{yyyy-MM-dd HH:mm:ss} %-5level --- [%-20thread] %50logger{36} -%kvp- %msg @@@%n</pattern>
         </encoder>
     </appender>
 
@@ -20,5 +32,6 @@
 
     <logger name="authorization" level="INFO">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILEOUT"/>
     </logger>
 </configuration>
