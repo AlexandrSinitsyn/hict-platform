@@ -373,8 +373,8 @@
         },
         {
             "datasource": {
-                "type": "datasource",
-                "uid": "grafana"
+                "type": "loki",
+                "uid": "ds_loki_id"
             },
             "description": "Authorization logs",
             "gridPos": {
@@ -388,19 +388,31 @@
                 "dedupStrategy": "none",
                 "enableLogDetails": true,
                 "prettifyLogMessage": true,
-                "showCommonLabels": true,
-                "showLabels": true,
-                "showTime": true,
+                "showCommonLabels": false,
+                "showLabels": false,
+                "showTime": false,
                 "sortOrder": "Descending",
                 "wrapLogMessage": true
             },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "loki",
+                        "uid": "ds_loki_id"
+                    },
+                    "editorMode": "code",
+                    "expr": "{job=\"authorization-logs\"}",
+                    "queryType": "range",
+                    "refId": "Query"
+                }
+            ],
             "title": "Authorization logs",
             "type": "logs"
         },
         {
             "datasource": {
-                "type": "datasource",
-                "uid": "grafana"
+                "type": "loki",
+                "uid": "ds_loki_id"
             },
             "description": "Authorization server attendance",
             "fieldConfig": {
@@ -477,13 +489,25 @@
                     "sort": "none"
                 }
             },
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "loki",
+                        "uid": "ds_loki_id"
+                    },
+                    "editorMode": "code",
+                    "expr": "count_over_time({jobs=\"authotization-logs\"}[1h])",
+                    "queryType": "range",
+                    "refId": "Query"
+                }
+            ],
             "title": "Traffic",
             "type": "timeseries"
         },
         {
             "datasource": {
-                "type": "datasource",
-                "uid": "grafana"
+                "type": "loki",
+                "uid": "ds_loki_id"
             },
             "description": "Authorization logs errors",
             "fieldConfig": {
@@ -529,11 +553,23 @@
                 "wideLayout": true
             },
             "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "loki",
+                        "uid": "ds_loki_id"
+                    },
+                    "editorMode": "code",
+                    "expr": "count_over_time({jobs=\"authorization-logs\"} | level = `ERROR` [1h])",
+                    "queryType": "range",
+                    "refId": "Query"
+                }
+            ],
             "title": "Errors",
             "type": "stat"
         }
     ],
-    "refresh": false,
+    "refresh": "",
     "schemaVersion": 39,
     "tags": [
         "hict",
