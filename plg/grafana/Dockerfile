@@ -13,6 +13,8 @@ COPY provisioning /etc/grafana/provisioning
 # LOAD DASHBOARD #
 COPY dashboards /var/lib/grafana/dashboards
 
+ENV GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/grafana-hict.json
+
 USER grafana
 
 # PLUGINS #

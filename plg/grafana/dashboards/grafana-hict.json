@@ -1,0 +1,381 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "description": "HiCT Platform dashboard",
+    "editable": false,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 1,
+    "links": [],
+    "liveNow": true,
+    "panels": [
+        {
+            "datasource": {
+                "type": "dashboard",
+                "uid": "-- Dashboard --"
+            },
+            "description": "Title",
+            "gridPos": {
+                "h": 3,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 1,
+            "options": {
+                "code": {
+                    "language": "plaintext",
+                    "showLineNumbers": false,
+                    "showMiniMap": false
+                },
+                "content": "<h1 style=\"text-align: center\">HiCT Platform</h1>",
+                "mode": "html"
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "datasource",
+                        "uid": "-- Dashboard --"
+                    },
+                    "refId": "A"
+                }
+            ],
+            "title": "Title",
+            "type": "text"
+        },
+        {
+            "datasource": {
+                "type": "grafana",
+                "uid": "grafana"
+            },
+            "description": "Project version",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "displayName": "Project version",
+                    "fieldMinMax": false,
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "purple",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 0,
+                "y": 3
+            },
+            "id": 3,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {},
+                "textMode": "value_and_name",
+                "wideLayout": false
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "datasource",
+                        "uid": "grafana"
+                    },
+                    "queryType": "randomWalk",
+                    "refId": "A"
+                }
+            ],
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "grafana",
+                "uid": "grafana"
+            },
+            "description": "PostgreSQL version",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "displayName": "PostgreSQL version",
+                    "fieldMinMax": false,
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "blue",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 4,
+                "y": 3
+            },
+            "id": 4,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {},
+                "textMode": "value_and_name",
+                "wideLayout": false
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "datasource",
+                        "uid": "grafana"
+                    },
+                    "queryType": "randomWalk",
+                    "refId": "A"
+                }
+            ],
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "grafana",
+                "uid": "grafana"
+            },
+            "description": "MinIO version",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "displayName": "MinIO version",
+                    "fieldMinMax": false,
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "orange",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 8,
+                "y": 3
+            },
+            "id": 5,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {},
+                "textMode": "value_and_name",
+                "wideLayout": false
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "datasource",
+                        "uid": "grafana"
+                    },
+                    "queryType": "randomWalk",
+                    "refId": "A"
+                }
+            ],
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "grafana",
+                "uid": "grafana"
+            },
+            "description": "NGINX version",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "displayName": "NGINX version",
+                    "fieldMinMax": false,
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 12,
+                "y": 3
+            },
+            "id": 6,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "text": {},
+                "textMode": "value_and_name",
+                "wideLayout": false
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "datasource",
+                        "uid": "grafana"
+                    },
+                    "queryType": "randomWalk",
+                    "refId": "A"
+                }
+            ],
+            "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "datasource",
+                "uid": "grafana"
+            },
+            "description": "Themes",
+            "gridPos": {
+                "h": 3,
+                "w": 6,
+                "x": 18,
+                "y": 3
+            },
+            "id": 2,
+            "options": {
+                "activeTheme": "Space theme",
+                "disableThemePicker": false,
+                "themes": [
+                    {
+                        "name": "Space theme",
+                        "styles": [
+                            {
+                                "props": {
+                                    "theme": "default"
+                                },
+                                "type": "basetheme"
+                            },
+                            {
+                                "props": {
+                                    "url": "https://4kwallpapers.com/images/wallpapers/earth-sunrise-6016x3384-12523.jpg"
+                                },
+                                "type": "bgimage"
+                            },
+                            {
+                                "props": {
+                                    "url": ""
+                                },
+                                "type": "url"
+                            },
+                            {
+                                "props": {
+                                    "text": ""
+                                },
+                                "type": "style"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "pluginVersion": "0.2.1",
+            "transparent": true,
+            "type": "yesoreyeram-boomtheme-panel"
+        }
+    ],
+    "refresh": false,
+    "schemaVersion": 39,
+    "tags": [
+        "hict",
+        "logging"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-5d",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "Europe/Moscow",
+    "title": "HiCT",
+    "uid": "c603fdb9-3583-4251-b806-fdc917e84179",
+    "version": 10,
+    "weekStart": "monday"
+}
