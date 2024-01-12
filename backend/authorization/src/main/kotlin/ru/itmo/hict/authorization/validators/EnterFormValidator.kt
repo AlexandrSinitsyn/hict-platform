@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 import org.springframework.validation.Errors
 import org.springframework.validation.Validator
 import ru.itmo.hict.authorization.form.EnterForm
+import ru.itmo.hict.authorization.logging.Info
 import ru.itmo.hict.authorization.service.UserService
 
 @Component
@@ -12,6 +13,7 @@ class EnterFormValidator(
 ) : Validator {
     override fun supports(clazz: Class<*>): Boolean = EnterForm::class.java == clazz
 
+    @Info("enter", "form validation")
     override fun validate(target: Any, errors: Errors) {
         if (!errors.hasErrors()) {
             val form = target as EnterForm
