@@ -496,7 +496,7 @@
                         "uid": "ds_loki_id"
                     },
                     "editorMode": "code",
-                    "expr": "count_over_time({jobs=\"authotization-logs\"}[1h])",
+                    "expr": "count_over_time({jobs=\"authorization-logs\"}[1h])",
                     "queryType": "range",
                     "refId": "Query"
                 }
