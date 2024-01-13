@@ -24,16 +24,16 @@ scrape_configs:
                 firstline: '^\#\#\# \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
                 max_wait_time: 0.5s
             - regex:
-                expression: '^\#\#\#\s+(?P<date>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+(?P<level>\w+)\s+---\s+\[\s*(?P<thread>\S+)\s*\]\s+(?P<trigger>\S+)\s+--\s+((?P<description>.*?)|(?P<syslog>.*?))\s+(?!\@\@\@)\@\@\@'
+                expression: '^\#\#\#\s+(?P<date>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+(?P<level>\w+)\s+---\s+\[\s*(?P<thread>\S+)\s*\]\s+(?P<trigger>\S+)\s+--\s+((?P<description>.*?)|(?P<syslog>.*?))\s+\@\@\@'
             - regex:
                 source: description
-                expression: '(?P<here>\S*)\s+--\s+(?P<request>.*?(?=\s+--))\s+--\s+(?P<process>\w+)\((?P<stage>\w+)\)\>\s+(?P<message>.*)'
+                expression: '(?P<here>\S*)\s+--\s+(?P<request>.*?)\s+--\s+(?P<process>\w+)\((?P<stage>\w+)\)\>\s+(?P<message>.*)'
             - regex:
                 source: here
                 expression: '(?P<class>[\w.]+)\.(?P<method>\w+)\((?P<filename>[^:]+):(?P<lineno>\d+)\)'
             - regex:
                 source: request
-                expression: '(?P<requestType>\w+)\((?P<path>\w+(,\s*\w+)*\)'
+                expression: '(?P<requestType>\w+)\((?P<path>\w+(,\s*\w+)*)\)'
             - labels:
                 data:
                 level:
@@ -65,16 +65,16 @@ scrape_configs:
                 firstline: '^\#\#\# \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
                 max_wait_time: 0.5s
             - regex:
-                expression: '^\#\#\#\s+(?P<date>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+(?P<level>\w+)\s+---\s+\[\s*(?P<thread>\S+)\s*\]\s+(?P<trigger>\S+)\s+--\s+((?P<description>.*?)|(?P<syslog>.*?))\s+(?!\@\@\@)\@\@\@'
+                expression: '^\#\#\#\s+(?P<date>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+(?P<level>\w+)\s+---\s+\[\s*(?P<thread>\S+)\s*\]\s+(?P<trigger>\S+)\s+--\s+((?P<description>.*?)|(?P<syslog>.*?))\s+\@\@\@'
             - regex:
                 source: description
-                expression: '(?P<here>\S*)\s+--\s+(?P<request>.*?(?=\s+--))\s+--\s+(?P<process>\w+)\((?P<stage>\w+)\)\>\s+(?P<message>.*)'
+                expression: '(?P<here>\S*)\s+--\s+(?P<request>.*?)\s+--\s+(?P<process>\w+)\((?P<stage>\w+)\)\>\s+(?P<message>.*)'
             - regex:
                 source: here
                 expression: '(?P<class>[\w.]+)\.(?P<method>\w+)\((?P<filename>[^:]+):(?P<lineno>\d+)\)'
             - regex:
                 source: request
-                expression: '(?P<requestType>\w+)\((?P<path>\w+(,\s*\w+)*\)'
+                expression: '(?P<requestType>\w+)\((?P<path>\w+(,\s*\w+)*)\)'
             - labels:
                 data:
                 level:
