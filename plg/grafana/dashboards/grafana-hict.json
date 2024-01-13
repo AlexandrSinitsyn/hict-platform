@@ -935,6 +935,182 @@
             ],
             "title": "New users",
             "type": "timeseries"
+        },
+        {
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 34
+            },
+            "id": 15,
+            "title": "Hi-C map DB",
+            "type": "row"
+        },
+        {
+            "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "ds_postgresql_viewer_id"
+            },
+            "description": "List of hi-c maps",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "custom": {
+                        "align": "auto",
+                        "cellOptions": {
+                            "type": "auto"
+                        },
+                        "filterable": false,
+                        "inspect": false
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 8,
+                "x": 0,
+                "y": 35
+            },
+            "id": 16,
+            "options": {
+                "cellHeight": "sm",
+                "footer": {
+                    "countRows": false,
+                    "fields": "",
+                    "reducer": [
+                        "sum"
+                    ],
+                    "show": false
+                },
+                "showHeader": true
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "grafana-postgresql-datasource",
+                        "uid": "ds_postgresql_viewer_id"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "select hi_c_maps.id, hi_c_maps.name, users.username\r\nfrom hi_c_maps\r\n    natural join users ;",
+                    "refId": "SQL",
+                    "sql": {
+                        "columns": [
+                            {
+                                "parameters": [],
+                                "type": "function"
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "property": {
+                                    "type": "string"
+                                },
+                                "type": "groupBy"
+                            }
+                        ],
+                        "limit": 50
+                    }
+                }
+            ],
+            "title": "Hi-C Maps",
+            "type": "table"
+        },
+        {
+            "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "ds_postgresql_viewer_id"
+            },
+            "description": "Number of hi-c maps",
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 4,
+                "x": 8,
+                "y": 35
+            },
+            "id": 17,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto",
+                "wideLayout": true
+            },
+            "pluginVersion": "10.2.3",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "grafana-postgresql-datasource",
+                        "uid": "ds_postgresql_viewer_id"
+                    },
+                    "editorMode": "code",
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "select count(hi_c_maps.id)\r\nfrom hi_c_maps ;",
+                    "refId": "SQL",
+                    "sql": {
+                        "columns": [
+                            {
+                                "parameters": [],
+                                "type": "function"
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "property": {
+                                    "type": "string"
+                                },
+                                "type": "groupBy"
+                            }
+                        ],
+                        "limit": 50
+                    }
+                }
+            ],
+            "title": "Hi-C maps count",
+            "type": "stat"
         }
     ],
     "refresh": "",
@@ -954,6 +1130,6 @@
     "timezone": "Europe/Moscow",
     "title": "HiCT",
     "uid": "c603fdb9-3583-4251-b806-fdc917e84179",
-    "version": 21,
+    "version": 22,
     "weekStart": "monday"
 }
