@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component
 import org.springframework.validation.Errors
 import org.springframework.validation.Validator
 import ru.itmo.hict.server.form.HiCMapCreationForm
+import ru.itmo.hict.server.logging.Info
 import ru.itmo.hict.server.service.HiCMapService
 
 @Component
@@ -12,6 +13,7 @@ class HiCMapCreationFormValidator(
 ) : Validator {
     override fun supports(clazz: Class<*>): Boolean = HiCMapCreationForm::class.java == clazz
 
+    @Info("uploading", "form validation")
     override fun validate(target: Any, errors: Errors) {
         if (!errors.hasErrors()) {
             val form = target as HiCMapCreationForm

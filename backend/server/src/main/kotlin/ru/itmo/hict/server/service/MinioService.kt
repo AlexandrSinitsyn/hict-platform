@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import ru.itmo.hict.server.logging.Logger
 import java.io.File
 
 @Configuration
@@ -26,6 +27,7 @@ class MinioConfiguration(
 class MinioService(
     private val minioClient: MinioClient,
     private val fileService: FileService,
+    private val logger: Logger,
 ) {
     fun newBucketIfAbsent(name: String) {
         if (minioClient.bucketExists(BucketExistsArgs.builder()
@@ -49,6 +51,8 @@ class MinioService(
             .stream(file.inputStream(), file.length(), -1)
             .build())
 
+        logger.info("uploading", "minio", "uploading completed `${path(folder, file.name)}`")
+
         file.delete()
     }
 
@@ -61,6 +65,8 @@ class MinioService(
             .build())
 
         fileService.save(input, path)
+
+        logger.info("downloading", "minio", "downloading completed `${path(folder, filename)}`")
 
         return path.toFile()
     }
