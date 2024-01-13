@@ -104,7 +104,12 @@ services:
 
   postgres:
     container_name: 'hict-database'
-    image: postgres:${POSTGRES_VERSION}-alpine
+    image: 'hict/database:${PROJECT_VERSION}'
+    build:
+      context: database
+      dockerfile: Dockerfile
+      args:
+        POSTGRES_VERSION: ${POSTGRES_VERSION}
     restart: always
     user: '${POSTGRES_USER}'
     <<: *env
