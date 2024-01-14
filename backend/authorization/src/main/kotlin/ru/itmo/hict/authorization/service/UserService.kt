@@ -5,6 +5,7 @@ import ru.itmo.hict.authorization.repositories.UserRepository
 import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import java.util.Optional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserService(
@@ -21,5 +22,5 @@ class UserService(
         login: String,
         email: String,
         passwordSha: String,
-    ): User = userRepository.save(User(username, login, email, passwordSha, Role.USER))
+    ): User? = userRepository.save(User(username, login, email, passwordSha, Role.USER)).getOrNull()
 }
