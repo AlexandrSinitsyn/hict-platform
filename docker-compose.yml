@@ -73,6 +73,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      liquibase:
+        condition: service_completed_successfully
 
   server:
     container_name: 'hict-server'
@@ -99,6 +101,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      liquibase:
+        condition: service_completed_successfully
 
 ############### DATA STORAGE ###############
 
@@ -122,6 +126,20 @@ services:
       start_period: 15s
     volumes:
       - hict-postgres-data:/var/lib/postgresql/data
+
+  liquibase:
+    container_name: 'hict-liquibase'
+    image: 'hict/migrations:${PROJECT_VERSION}'
+    build:
+      context: migrations
+      dockerfile: Dockerfile
+    restart: no
+    <<: *env
+    networks:
+      - db-net
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   minio:
     container_name: 'hict-minio'

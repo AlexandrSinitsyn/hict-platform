@@ -42,8 +42,15 @@ class UserController(
             throw ValidationException(bindingResult)
         }
 
-        return userService.register(registerForm.username, registerForm.login, registerForm.email, registerForm.passwordSha)
-            .run { ResponseEntity.ok(jwtService.create(this)) }
+        val newUser = userService.register(registerForm.username, registerForm.login, registerForm.email, registerForm.passwordSha)
+
+        if (newUser == null) {
+            bindingResult.reject("invalid-login-or-email", "Invalid login or email")
+
+            throw ValidationException(bindingResult)
+        }
+
+        return ResponseEntity.ok(jwtService.create(newUser))
     }
 
     @PostMapping("/login")

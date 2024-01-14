@@ -14,7 +14,7 @@ datasources:
   type: 'postgres'
   uid: 'ds_postgresql_viewer_id'
   url: '${POSTGRES_HOST}:5432'
-  user: admin_viewer
+  user: viewer
   secureJsonData:
     password: '${POSTGRES_VIEWER_PASSWORD}'
   jsonData:
