@@ -1,1 +1,5 @@
 databaseChangeLog:
+  - include:
+      file: 1.0.0/init.sql
+  - include:
+      file: 1.0.0/users.sql

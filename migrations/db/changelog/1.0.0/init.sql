@@ -1,3 +1,8 @@
+--liquibase formatted sql
+
+--changeset AlexSin:1
+--Users and Hi-C maps
+
 create extension if not exists pgcrypto;
 
 create table users
@@ -36,3 +41,5 @@ create table hi_c_maps
 create index hi_c_map_by_id on hi_c_maps using hash (hi_c_map_id) ;
 create index hi_c_map_by_name on hi_c_maps using hash (name) ;
 create unique index hi_c_map_by_author on hi_c_maps using btree (user_id, hi_c_map_id) ;
+
+--rollback truncate table
