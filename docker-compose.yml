@@ -73,6 +73,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      liquibase:
+        condition: service_completed_successfully
 
   server:
     container_name: 'hict-server'
@@ -99,6 +101,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      liquibase:
+        condition: service_completed_successfully
 
 ############### DATA STORAGE ###############
 
