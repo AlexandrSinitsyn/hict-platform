@@ -25,5 +25,16 @@ interface UserRepository : JpaRepository<User, Long> {
 
     fun findByLoginOrEmail(login: String?, email: String?): Optional<User>
 
-    fun findByLoginOrEmailAndPasswordSha(login: String?, email: String?, passwordSha: String): Optional<User>
+    @Query(
+        value = """
+            select *
+            from users
+            where users.password_sha = crypt(:password, users.salt)
+              and (users.login = :login or users.email = :email)
+        """,
+        nativeQuery = true,
+    )
+    fun findByLoginOrEmailAndPasswordSha(@Param("login") login: String?,
+                                         @Param("email") email: String?,
+                                         @Param("password") passwordSha: String): Optional<User>
 }
