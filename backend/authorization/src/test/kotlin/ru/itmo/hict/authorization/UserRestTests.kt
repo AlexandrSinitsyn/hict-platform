@@ -9,16 +9,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.context.TestComponent
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.web.bind.annotation.ControllerAdvice
-import org.springframework.web.bind.annotation.ExceptionHandler
 import ru.itmo.hict.authorization.controller.UserController
 import ru.itmo.hict.authorization.exceptions.ValidationException
 import ru.itmo.hict.authorization.repositories.UserRepository
@@ -31,7 +27,6 @@ import ru.itmo.hict.entity.User
 import java.util.*
 
 @WebMvcTest(UserController::class)
-@Import(UserRestTests.TestExceptionHandler::class)
 @ContextConfiguration(
     classes = [UserController::class, UserService::class, RegisterFormValidator::class, EnterFormValidator::class]
 )
@@ -53,38 +48,50 @@ class UserRestTests {
     fun contextLoads() {
     }
 
-    private fun expectBadRequest(url: String, body: String) {
-        assertDoesNotThrow {
-            mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                .andExpect(status().isBadRequest)
+    private fun expectBadRequest(url: String, vararg body: String) {
+        body.forEach {
+            assertDoesNotThrow {
+                mvc.perform(post(url)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(it))
+                    .andExpect(status().isBadRequest)
+            }
         }
     }
 
-    private fun expectValidationException(url: String, body: String) {
-        assertDoesNotThrow {
-            mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
+    private fun expectValidationException(url: String, vararg test: Pair<String, List<String>>) {
+        test.forEach { (body, exceptions) ->
+            mvc.perform(
+                post(url)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body))
                 .andExpect {
                     Assertions.assertNotNull(it.resolvedException)
-                    Assertions.assertInstanceOf(ValidationException::class.java, it.resolvedException)
-                    assert((it.resolvedException!! as ValidationException).bindingResult.hasErrors())
+                    val err = it.resolvedException.run {
+                        assert(this is ValidationException)
+
+                        this as ValidationException
+                    }.bindingResult
+
+                    assert(err.hasErrors())
+                    assert(exceptions.any { err.allErrors.first().defaultMessage!!.lowercase().contains(it.lowercase()) })
                 }
         }
     }
 
+    private infix fun String.throws(exception: String): Pair<String, List<String>> = Pair(this, listOf(exception))
+    private infix fun Pair<String, List<String>>.or(exception: String) = Pair(first, second + exception)
+
     @Nested
     inner class Registration {
         private fun jsonBody(username: String?, login: String?, email: String?, password: String?) = """
-        {
-            "username": ${username?.let { "\"$it\"" }},
-            "login": ${login?.let { "\"$it\"" }},
-            "email": ${email?.let { "\"$it\"" }},
-            "passwordSha": ${password?.let { "\"$it\"" }}
-        }
-    """.trimIndent()
+            {
+                "username": ${username?.let { "\"$it\"" }},
+                "login": ${login?.let { "\"$it\"" }},
+                "email": ${email?.let { "\"$it\"" }},
+                "passwordSha": ${password?.let { "\"$it\"" }}
+            }
+        """.trimIndent()
 
         @Test
         fun `valid registration`() {
@@ -103,7 +110,9 @@ class UserRestTests {
             whenever(userRepository.findByLoginOrEmail(any(), any())).thenReturn(Optional.of(user))
             whenever(userRepository.save(any())).thenReturn(Optional.empty())
 
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, EMAIL, PASS))
+            expectValidationException("/api/v1/auth/register",
+                jsonBody(USERNAME, LOGIN, EMAIL, PASS) throws "occupied"
+            )
         }
 
         @Test
@@ -120,59 +129,68 @@ class UserRestTests {
         @Test
         fun `invalid registration form`() {
             expectBadRequest("/api/v1/auth/register", """
-            {
-                "invalid": "unsupported"
-            }
-        """.trimIndent())
+                {
+                    "invalid": "unsupported"
+                }
+            """.trimIndent())
         }
 
         @Test
         fun `null field registration form`() {
-            expectBadRequest("/api/v1/auth/register", jsonBody(null, LOGIN, EMAIL, PASS))
-            expectBadRequest("/api/v1/auth/register", jsonBody(USERNAME, null, EMAIL, PASS))
-            expectBadRequest("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, null, PASS))
-            expectBadRequest("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, EMAIL, null))
+            expectBadRequest("/api/v1/auth/register",
+                jsonBody(null, LOGIN, EMAIL, PASS),
+                jsonBody(USERNAME, null, EMAIL, PASS),
+                jsonBody(USERNAME, LOGIN, null, PASS),
+                jsonBody(USERNAME, LOGIN, EMAIL, null)
+            )
         }
 
         @Test
         fun `empty field registration form`() {
-            expectValidationException("/api/v1/auth/register", jsonBody("", LOGIN, EMAIL, PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, "", EMAIL, PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, "", PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, EMAIL, ""))
+            expectValidationException("/api/v1/auth/register",
+                jsonBody("", LOGIN, EMAIL, PASS) throws IS_BLANK or INVALID_SIZE,
+                jsonBody(USERNAME, "", EMAIL, PASS) throws IS_BLANK or INVALID_SIZE,
+                jsonBody(USERNAME, LOGIN, "", PASS) throws IS_BLANK or INVALID_SIZE or NOT_EMAIL_TYPE,
+                jsonBody(USERNAME, LOGIN, EMAIL, "") throws IS_BLANK or INVALID_SIZE
+            )
         }
 
         @Test
         fun `blank field registration form`() {
-            expectValidationException("/api/v1/auth/register", jsonBody("    ", LOGIN, EMAIL, PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, "    ", EMAIL, PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, "    ", PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, EMAIL, "    "))
+            expectValidationException("/api/v1/auth/register",
+                jsonBody("    ", LOGIN, EMAIL, PASS) throws IS_BLANK,
+                jsonBody(USERNAME, "    ", EMAIL, PASS) throws IS_BLANK,
+                jsonBody(USERNAME, LOGIN, "    ", PASS) throws IS_BLANK or NOT_EMAIL_TYPE,
+                jsonBody(USERNAME, LOGIN, EMAIL, "    ") throws IS_BLANK
+            )
         }
 
         @Test
         fun `invalid length field registration form`() {
-            expectValidationException("/api/v1/auth/register", jsonBody("x", LOGIN, EMAIL, PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, "x", EMAIL, PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, "x", PASS))
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, EMAIL, "x"))
+            expectValidationException("/api/v1/auth/register",
+                jsonBody("x", LOGIN, EMAIL, PASS) throws INVALID_SIZE,
+                jsonBody(USERNAME, "x", EMAIL, PASS) throws INVALID_SIZE,
+                jsonBody(USERNAME, LOGIN, "x", PASS) throws NOT_EMAIL_TYPE,
+                jsonBody(USERNAME, LOGIN, EMAIL, "x") throws INVALID_SIZE
+            )
         }
 
         @Test
         fun `invalid email field registration form`() {
-            expectValidationException("/api/v1/auth/register", jsonBody(USERNAME, LOGIN, "invalid", PASS))
+            expectValidationException("/api/v1/auth/register",
+                jsonBody(USERNAME, LOGIN, "invalid", PASS) throws NOT_EMAIL_TYPE)
         }
     }
 
     @Nested
     inner class Login {
         private fun jsonBody(login: String?, email: String?, password: String?) = """
-        {
-            "login": ${login?.let { "\"$it\"" }},
-            "email": ${email?.let { "\"$it\"" }},
-            "passwordSha": ${password?.let { "\"$it\"" }}
-        }
-    """.trimIndent()
+            {
+                "login": ${login?.let { "\"$it\"" }},
+                "email": ${email?.let { "\"$it\"" }},
+                "passwordSha": ${password?.let { "\"$it\"" }}
+            }
+        """.trimIndent()
 
         @Test
         fun `valid registration`() {
@@ -196,22 +214,23 @@ class UserRestTests {
         fun `invalid login`() {
             whenever(userRepository.findByLoginOrEmailAndPasswordSha(any(), any(), any())).thenReturn(Optional.empty())
 
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, EMAIL, PASS))
+            expectValidationException("/api/v1/auth/login",
+                jsonBody(LOGIN, EMAIL, PASS) throws "Invalid login or password")
         }
 
         @Test
-        fun `invalid content type registration form`() {
+        fun `invalid content type login form`() {
             mvc.perform(post("/api/v1/auth/login"))
                 .andExpect(status().isBadRequest)
         }
 
         @Test
-        fun `empty registration form`() {
+        fun `empty login form`() {
             expectBadRequest("/api/v1/auth/login", "{}")
         }
 
         @Test
-        fun `invalid registration form`() {
+        fun `invalid login form`() {
             expectBadRequest("/api/v1/auth/login", """
             {
                 "invalid": "unsupported"
@@ -220,44 +239,44 @@ class UserRestTests {
         }
 
         @Test
-        fun `null field registration form`() {
-            expectValidationException("/api/v1/auth/login", jsonBody(null, null, PASS))
-            expectBadRequest("/api/v1/auth/login", jsonBody(LOGIN, EMAIL, null))
+        fun `null field login form`() {
+            expectValidationException("/api/v1/auth/login",
+                jsonBody(null, null, PASS) throws "require at least one")
+            expectBadRequest("/api/v1/auth/login",
+                jsonBody(LOGIN, EMAIL, null))
         }
 
         @Test
-        fun `empty field registration form`() {
-            expectValidationException("/api/v1/auth/login", jsonBody("", EMAIL, PASS))
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, "", PASS))
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, EMAIL, ""))
+        fun `empty field login form`() {
+            expectValidationException("/api/v1/auth/login",
+                jsonBody("", EMAIL, PASS) throws IS_BLANK or INVALID_SIZE,
+                jsonBody(LOGIN, "", PASS) throws IS_BLANK or INVALID_SIZE or NOT_EMAIL_TYPE,
+                jsonBody(LOGIN, EMAIL, "") throws IS_BLANK or INVALID_SIZE
+            )
         }
 
         @Test
-        fun `blank field registration form`() {
-            expectValidationException("/api/v1/auth/login", jsonBody("    ", EMAIL, PASS))
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, "    ", PASS))
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, EMAIL, "    "))
+        fun `blank field login form`() {
+            expectValidationException("/api/v1/auth/login",
+                jsonBody("    ", EMAIL, PASS) throws IS_BLANK,
+                jsonBody(LOGIN, "    ", PASS) throws IS_BLANK or NOT_EMAIL_TYPE,
+                jsonBody(LOGIN, EMAIL, "    ") throws IS_BLANK
+            )
         }
 
         @Test
-        fun `invalid length field registration form`() {
-            expectValidationException("/api/v1/auth/login", jsonBody("x", EMAIL, PASS))
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, "x", PASS))
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, EMAIL, "x"))
+        fun `invalid length field login form`() {
+            expectValidationException("/api/v1/auth/login",
+                jsonBody("x", EMAIL, PASS) throws INVALID_SIZE,
+                jsonBody(LOGIN, "x", PASS) throws NOT_EMAIL_TYPE,
+                jsonBody(LOGIN, EMAIL, "x") throws INVALID_SIZE
+            )
         }
 
         @Test
-        fun `invalid email field registration form`() {
-            expectValidationException("/api/v1/auth/login", jsonBody(LOGIN, "invalid", PASS))
-        }
-    }
-
-    @TestComponent
-    @ControllerAdvice
-    class TestExceptionHandler {
-        @ExceptionHandler(ValidationException::class)
-        fun exceptionHandler(e: ValidationException) {
-            assert(e.bindingResult.hasErrors())
+        fun `invalid email field login form`() {
+            expectValidationException("/api/v1/auth/login",
+                jsonBody(LOGIN, "invalid", PASS) throws NOT_EMAIL_TYPE)
         }
     }
 
@@ -268,5 +287,9 @@ class UserRestTests {
         private const val PASS = "pass"
 
         private val user = User(USERNAME, LOGIN, EMAIL, PASS, Role.ANONYMOUS)
+        
+        private const val IS_BLANK = "blank"
+        private const val INVALID_SIZE = "size must be between"
+        private const val NOT_EMAIL_TYPE = "must be a well-formed email"
     }
 }

@@ -4,11 +4,7 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.WebDataBinder
-import org.springframework.web.bind.annotation.InitBinder
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import ru.itmo.hict.authorization.exceptions.ValidationException
 import ru.itmo.hict.authorization.form.EnterForm
 import ru.itmo.hict.authorization.form.RegisterForm
@@ -25,7 +21,7 @@ class UserController(
     private val jwtService: JwtService,
     private val registerFormValidator: RegisterFormValidator,
     private val enterFormValidator: EnterFormValidator,
-) {
+) : ApiExceptionController() {
     @InitBinder("registerForm")
     fun initRegisterBinder(webDataBinder: WebDataBinder) {
         webDataBinder.addValidators(registerFormValidator)
@@ -45,7 +41,7 @@ class UserController(
         val newUser = userService.register(registerForm.username, registerForm.login, registerForm.email, registerForm.passwordSha)
 
         if (newUser == null) {
-            bindingResult.reject("invalid-login-or-email", "Invalid login or email")
+            bindingResult.reject("occupied-login-or-email", "Already occupied login or email")
 
             throw ValidationException(bindingResult)
         }
