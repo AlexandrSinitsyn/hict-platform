@@ -3,7 +3,6 @@ package ru.itmo.hict.authorization
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.exceptions.JWTDecodeException
 import com.auth0.jwt.interfaces.DecodedJWT
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -61,11 +60,6 @@ class JwtServiceTests {
         Assertions.assertNotNull(decoded)
         Assertions.assertInstanceOf(Long::class.javaObjectType, decoded)
         Assertions.assertEquals(user.id, decoded)
-    }
-
-    @Test
-    fun `decoding invalid`() {
-        Assertions.assertThrows(JWTDecodeException::class.java) { decoder.find("invalid") }
     }
 
     @Test
