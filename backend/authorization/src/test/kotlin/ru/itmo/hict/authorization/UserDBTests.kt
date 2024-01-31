@@ -1,8 +1,5 @@
 package ru.itmo.hict.authorization
 
-import liquibase.integration.spring.SpringLiquibase
-import liquibase.integration.spring.SpringResourceAccessor
-import liquibase.resource.Resource
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -12,11 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.core.io.ResourceLoader
 import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
@@ -24,13 +18,12 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import ru.itmo.hict.authorization.repositories.UserRepository
 import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
-import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
 
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @EntityScan(basePackages = ["ru.itmo.hict.entity"])
-@Import(UserDBTests.Companion.LiquibaseConfig::class)
+@Import(LiquibaseConfig::class)
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class UserDBTests {
@@ -45,30 +38,6 @@ class UserDBTests {
                 .withUsername(DB_USER)
                 .withFileSystemBind("src/test/resources/test-data",
                     "/test-data", BindMode.READ_ONLY)
-
-        @TestConfiguration
-        class LiquibaseConfig(private val dataSource: DataSource) {
-            class MigrationsAccessor(resourceLoader: ResourceLoader) : SpringResourceAccessor(resourceLoader) {
-                override fun get(path: String): Resource? {
-                    return super.get("file:../../migrations/db/changelog/$path")
-                }
-
-            }
-
-            class CustomSpringLiquibase : SpringLiquibase() {
-                override fun createResourceOpener(): SpringResourceAccessor {
-                    return MigrationsAccessor(getResourceLoader())
-                }
-            }
-
-            @Bean
-            fun liquibase(): SpringLiquibase {
-                val liquibase = CustomSpringLiquibase()
-                liquibase.dataSource = dataSource
-                liquibase.changeLog = "db.changelog-master.yaml"
-                return liquibase
-            }
-        }
     }
 
     @Autowired
