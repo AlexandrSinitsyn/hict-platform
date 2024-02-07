@@ -50,13 +50,10 @@ class HiCMapController(
     ): ResponseEntity<HiCMapInfoDto> {
         val user = requestUserInfo.user
 
-        if (user == null) {
-            bindingResult.reject("not-authorized",
+        when {
+            user == null -> bindingResult.reject("not-authorized",
                 "You must be authorized for publishing a Hi-C map")
-        }
-
-        if (file.isEmpty) {
-            bindingResult.reject("empty-file", "File should not be empty")
+            file.isEmpty -> bindingResult.reject("empty-file", "File should not be empty")
         }
 
         if (bindingResult.hasErrors()) {
