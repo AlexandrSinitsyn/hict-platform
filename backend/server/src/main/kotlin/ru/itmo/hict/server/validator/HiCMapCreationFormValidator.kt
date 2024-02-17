@@ -18,7 +18,7 @@ class HiCMapCreationFormValidator(
         if (!errors.hasErrors()) {
             val form = target as HiCMapCreationForm
 
-            if (hiCMapService.checkUnique(form.name)) {
+            if (!hiCMapService.checkUnique(form.name)) {
                 errors.reject("unique-hi-c-map-name", "Hi-C map name must be unique")
             }
         }

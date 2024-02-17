@@ -24,12 +24,12 @@ class HiCMapController(
     private val hiCMapService: HiCMapService,
     private val hiCMapCreationFormValidator: HiCMapCreationFormValidator,
     private val fileService: FileService,
-) {
+) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
 
     @InitBinder("hiCMapCreationForm")
-    fun initRegisterBinder(webDataBinder: WebDataBinder) {
+    fun initPublishBinder(webDataBinder: WebDataBinder) {
         webDataBinder.addValidators(hiCMapCreationFormValidator)
     }
 
@@ -48,6 +48,9 @@ class HiCMapController(
         @RequestPart("form") @Valid hiCMapCreationForm: HiCMapCreationForm,
         bindingResult: BindingResult,
     ): ResponseEntity<HiCMapInfoDto> {
+        // fixme somehow for @RequestBody validator automatically works, but not for the @RequestPart
+        hiCMapCreationFormValidator.validate(hiCMapCreationForm, bindingResult)
+
         val user = requestUserInfo.user
 
         when {
@@ -66,7 +69,13 @@ class HiCMapController(
             it.write(file.bytes)
         }
 
-        return hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description, savedFile)
-            .run { ResponseEntity.ok(this.toInfoDto()) }
+        val hicMap = hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description, savedFile)
+
+        if (hicMap == null) {
+            bindingResult.reject("already-exists", "Such Hi-C map already exists")
+            throw ValidationException(bindingResult)
+        }
+
+        return ResponseEntity.ok(hicMap.toInfoDto())
     }
 }
