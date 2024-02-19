@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.mock.web.MockPart
@@ -37,7 +38,7 @@ import java.util.*
 @WebMvcTest(HiCMapController::class)
 @ContextConfiguration(
     classes = [HiCMapController::class, HiCMapService::class, FileService::class, HiCMapCreationFormValidator::class,
-        HiCRestTests.TestBeans::class]
+        HiCRestTests.RestTestBeans::class]
 )
 class HiCRestTests {
     @Autowired
@@ -262,7 +263,8 @@ class HiCRestTests {
     }
 
     @TestConfiguration
-    class TestBeans {
+    @Profile("!full-app-test")
+    class RestTestBeans {
         @Bean
         fun requestUserInfo() = RequestUserInfo("jwt", user)
     }

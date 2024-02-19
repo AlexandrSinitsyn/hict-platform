@@ -69,13 +69,7 @@ class HiCMapController(
             it.write(file.bytes)
         }
 
-        val hicMap = hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description, savedFile)
-
-        if (hicMap == null) {
-            bindingResult.reject("already-exists", "Such Hi-C map already exists")
-            throw ValidationException(bindingResult)
-        }
-
-        return ResponseEntity.ok(hicMap.toInfoDto())
+        return hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description, savedFile)
+            .run { ResponseEntity.ok(this.toInfoDto()) }
     }
 }

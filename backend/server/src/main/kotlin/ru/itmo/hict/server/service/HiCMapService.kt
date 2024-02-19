@@ -26,7 +26,7 @@ class HiCMapService(
 
     fun checkUnique(name: String): Boolean = hiCMapRepository.findByName(name).isEmpty
 
-    fun load(author: User, name: String, description: String, file: File): HiCMap? {
+    fun load(author: User, name: String, description: String, file: File): HiCMap {
         minioService.upload(bucket, "u${author.id}", file)
 
         return hiCMapRepository.save(HiCMap(author, name, description))
