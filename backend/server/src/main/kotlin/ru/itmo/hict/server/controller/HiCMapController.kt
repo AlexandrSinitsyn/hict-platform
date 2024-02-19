@@ -63,7 +63,7 @@ class HiCMapController(
             throw ValidationException(bindingResult)
         }
 
-        val savedFile = fileService.tmp(hiCMapCreationForm.name).toFile()
+        val savedFile = fileService.tmp("${hiCMapCreationForm.name}.hic").toFile()
 
         BufferedOutputStream(FileOutputStream(savedFile)).use {
             it.write(file.bytes)

@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.itmo.hict.server.logging.Logger
 import java.io.File
+import java.nio.file.Files
 
 @Configuration
 class MinioConfiguration(
@@ -53,7 +54,7 @@ class MinioService(
 
         logger.info("uploading", "minio", "uploading completed `${path(folder, file.name)}`")
 
-        file.delete()
+        Files.deleteIfExists(file.toPath())
     }
 
     fun downloadFile(bucket: String, folder: String?, filename: String): File {
@@ -74,6 +75,7 @@ class MinioService(
     fun listInBucket(bucket: String, folder: String?): List<Item> {
         return minioClient.listObjects(ListObjectsArgs.builder()
             .bucket(bucket)
+            .recursive(true)
             .build()).map { it.get() }.filter { folder?.run { it.objectName().startsWith("$this/") } ?: true }
     }
 }

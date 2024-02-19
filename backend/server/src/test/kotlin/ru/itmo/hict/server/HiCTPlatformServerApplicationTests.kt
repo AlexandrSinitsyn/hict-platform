@@ -3,6 +3,8 @@ package ru.itmo.hict.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.minio.MinioClient
+import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -34,8 +36,11 @@ import ru.itmo.hict.dto.USER_ID_CLAIM
 import ru.itmo.hict.server.form.HiCMapCreationForm
 import ru.itmo.hict.server.repository.HiCMapRepository
 import ru.itmo.hict.server.repository.UserRepository
+import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.MinioConfiguration
+import ru.itmo.hict.server.service.MinioService
 import java.net.URI
+import java.nio.file.Files
 import java.time.Duration
 
 @Testcontainers
@@ -49,7 +54,7 @@ import java.time.Duration
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class HiCTPlatformServerApplicationTests {
     companion object {
-        private const val FILENAME = "test"
+        private const val NAME = "test"
         private const val DESCRIPTION = "Example description"
         private const val FILE_CONTENT = "Hello, World!"
 
@@ -106,6 +111,12 @@ class HiCTPlatformServerApplicationTests {
     @Autowired
     private lateinit var hiCMapRepository: HiCMapRepository
 
+    @Autowired
+    private lateinit var minioService: MinioService
+
+    @Autowired
+    private lateinit var fileService: FileService
+
     @LocalServerPort
     protected var randomPort: Int = 0
 
@@ -145,7 +156,7 @@ class HiCTPlatformServerApplicationTests {
     }
 
     private fun file(content: String) = object : InputStreamResource(content.byteInputStream()) {
-        override fun getFilename() = "$FILENAME.hic"
+        override fun getFilename() = "$NAME.hic"
 
         override fun contentLength() = -1L
     }
@@ -157,7 +168,7 @@ class HiCTPlatformServerApplicationTests {
 
         val body = LinkedMultiValueMap<String, Any>()
         body.add("file", file(content ?: ""))
-        body.add("form", HiCMapCreationForm(FILENAME, DESCRIPTION))
+        body.add("form", HiCMapCreationForm(NAME, DESCRIPTION))
 
         return restTemplate.postForEntity(
             URI("$server/publish"),
@@ -168,11 +179,18 @@ class HiCTPlatformServerApplicationTests {
 
     @Test
     fun `save one Hi-C map`() {
+        Assertions.assertEquals(0, minioService.listInBucket("hi-c", null).size)
+
         publish<HiCMapInfoDto>(FILE_CONTENT, jwt).run {
             Assertions.assertTrue(statusCode.is2xxSuccessful)
             Assertions.assertNotNull(body)
             Assertions.assertEquals(body!!.author.id, userId)
         }
+
+        Assertions.assertEquals(1, minioService.listInBucket("hi-c", null).size)
+        Assertions.assertTrue(minioService.listInBucket("hi-c", null)[0].objectName().startsWith("u$userId"))
+        Assertions.assertEquals(1, minioService.listInBucket("hi-c", "u$userId").size)
+        Assertions.assertEquals("u$userId/$NAME.hic", minioService.listInBucket("hi-c", "u$userId")[0].objectName())
     }
 
     @Test
