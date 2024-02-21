@@ -54,7 +54,7 @@ class MinioService(
 
         logger.info("uploading", "minio", "uploading completed `${path(folder, file.name)}`")
 
-        Files.deleteIfExists(file.toPath())
+        file.delete()
     }
 
     fun downloadFile(bucket: String, folder: String?, filename: String): File {
