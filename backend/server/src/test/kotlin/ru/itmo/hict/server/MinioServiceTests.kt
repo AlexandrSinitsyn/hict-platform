@@ -19,10 +19,12 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import ru.itmo.hict.server.logging.Logger
 import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.MinioService
-import java.io.FileNotFoundException
+import java.nio.file.AccessDeniedException
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
+import java.nio.file.Path
 import java.time.Duration
-import kotlin.io.path.Path
+import kotlin.io.path.*
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -77,9 +79,6 @@ class MinioServiceTests {
         fun destructor() {
             Assertions.assertTrue(Files.list(fileService.tmp(".")).count() == 0L)
             Assertions.assertTrue(Files.list(fileService.minio(".")).count() == 0L)
-
-            Files.deleteIfExists(fileService.tmp("."))
-            Files.deleteIfExists(fileService.minio("."))
         }
     }
 
@@ -106,13 +105,16 @@ class MinioServiceTests {
         Assertions.assertTrue(minioService.listInBucket(BUCKET, null).isEmpty())
     }
 
+    private fun Path.toFileObject() =
+        MinioService.FileObjectInfo(fileName.pathString, toFile().length(), inputStream())
+
     @Order(1)
     @ParameterizedTest
     @ValueSource(strings = ["test-files/1.test", "test-files/2.test", "test-files/3.test"])
     fun `upload existing`(filepath: String) {
         val path = Path(RESOURCES, filepath)
 
-        minioService.upload(BUCKET, "existing", path.toFile())
+        minioService.upload(BUCKET, "existing", path.toFileObject())
 
         Assertions.assertNotNull(minioService.listInBucket(BUCKET, "existing")
             .find { "existing/${path.fileName}" == it.objectName() })
@@ -120,15 +122,15 @@ class MinioServiceTests {
 
     @Test
     fun `upload not existing`() {
-        Assertions.assertThrows(FileNotFoundException::class.java) {
-            minioService.upload(BUCKET, "not-existing", Path(RESOURCES, "unknown.file").toFile())
+        Assertions.assertThrows(NoSuchFileException::class.java) {
+            minioService.upload(BUCKET, "not-existing", Path(RESOURCES, "unknown.file").toFileObject())
         }
     }
 
     @Test
     fun `upload folder`() {
-        Assertions.assertThrows(FileNotFoundException::class.java) {
-            minioService.upload(BUCKET, "folder", Path(RESOURCES, "test-files").toFile())
+        Assertions.assertThrows(AccessDeniedException::class.java) {
+            minioService.upload(BUCKET, "folder", Path(RESOURCES, "test-files").toFileObject())
         }
     }
 
@@ -139,13 +141,9 @@ class MinioServiceTests {
 
         val downloaded = minioService.downloadFile(BUCKET, "existing", "1.test")
 
-        try {
-            Assertions.assertTrue(downloaded.exists())
-            Assertions.assertTrue("minio" in downloaded.path)
-        } finally {
-            downloaded.delete()
-        }
-        Assertions.assertFalse(downloaded.exists())
+        Assertions.assertTrue("1.test" in downloaded.name)
+        Assertions.assertTrue(downloaded.size > 0)
+        Assertions.assertNotEquals(-1, downloaded.data.read())
 
         Assertions.assertEquals(3, minioService.listInBucket(BUCKET, "existing").size)
     }

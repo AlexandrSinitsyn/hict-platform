@@ -114,9 +114,6 @@ class HiCTPlatformServerApplicationTests {
     @Autowired
     private lateinit var minioService: MinioService
 
-    @Autowired
-    private lateinit var fileService: FileService
-
     @LocalServerPort
     protected var randomPort: Int = 0
 

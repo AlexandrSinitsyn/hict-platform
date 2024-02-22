@@ -30,7 +30,6 @@ import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.repository.HiCMapRepository
 import ru.itmo.hict.server.service.*
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
-import java.io.File
 import java.nio.file.Files
 import java.sql.Timestamp
 import java.util.*
@@ -57,21 +56,13 @@ class HiCRestTests {
         Assertions.assertTrue(Files.list(fileService.minio(".")).count() == 0L)
 
         doNothing().whenever(minioService).newBucketIfAbsent(any())
-        whenever(minioService.upload(any(), any(), any())).doAnswer {
-            val tmpFile = it.arguments[2] as File
-            println("> ${tmpFile.absolutePath}")
-            tmpFile.delete()
-            Unit
-        }
+        doNothing().whenever(minioService).upload(any(), any(), any())
     }
 
     @PreDestroy
     fun destructor() {
         Assertions.assertTrue(Files.list(fileService.tmp(".")).count() == 0L)
         Assertions.assertTrue(Files.list(fileService.minio(".")).count() == 0L)
-
-        Files.deleteIfExists(fileService.tmp("."))
-        Files.deleteIfExists(fileService.minio("."))
     }
 
     @Test

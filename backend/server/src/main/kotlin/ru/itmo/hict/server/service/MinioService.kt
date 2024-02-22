@@ -8,8 +8,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.itmo.hict.server.logging.Logger
-import java.io.File
-import java.nio.file.Files
+import java.io.InputStream
 
 @Configuration
 class MinioConfiguration(
@@ -44,32 +43,35 @@ class MinioService(
 
     private fun path(folder: String?, filename: String) = (folder?.let { "$it/" } ?: "") + filename
 
+    class FileObjectInfo(val name: String,
+                         val size: Long,
+                         val data: InputStream)
+
     @Async
-    fun upload(bucket: String, folder: String?, file: File) {
+    fun upload(bucket: String, folder: String?, file: FileObjectInfo) {
         minioClient.putObject(PutObjectArgs.builder()
             .bucket(bucket)
             .`object`(path(folder, file.name))
-            .stream(file.inputStream(), file.length(), -1)
+            .stream(file.data, file.size, -1)
             .build())
 
         logger.info("uploading", "minio", "uploading completed `${path(folder, file.name)}`")
-
-        file.delete()
     }
 
-    fun downloadFile(bucket: String, folder: String?, filename: String): File {
-        val path = fileService.minio(filename)
+    fun downloadFile(bucket: String, folder: String?, filename: String): FileObjectInfo {
+        val size = minioClient.statObject(StatObjectArgs.builder()
+            .bucket(bucket)
+            .`object`(path(folder, filename))
+            .build()).size()
 
         val input = minioClient.getObject(GetObjectArgs.builder()
             .bucket(bucket)
             .`object`(path(folder, filename))
             .build())
 
-        fileService.save(input, path)
-
         logger.info("downloading", "minio", "downloading completed `${path(folder, filename)}`")
 
-        return path.toFile()
+        return FileObjectInfo(filename, size, input)
     }
 
     fun listInBucket(bucket: String, folder: String?): List<Item> {

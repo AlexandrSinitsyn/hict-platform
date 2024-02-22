@@ -14,8 +14,13 @@ class FileService {
 
     @PostConstruct
     fun init() {
-        Files.createDirectories(tmp("."))
-        Files.createDirectories(minio("."))
+        if (Files.notExists(tmp("."))) {
+            Files.createDirectories(tmp("."))
+        }
+
+        if (Files.notExists(minio("."))) {
+            Files.createDirectories(minio("."))
+        }
     }
 
     fun tmp(path: String): Path = basePath.resolve("tmp").resolve(path)

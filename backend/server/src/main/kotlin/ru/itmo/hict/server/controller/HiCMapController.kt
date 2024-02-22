@@ -12,18 +12,15 @@ import ru.itmo.hict.dto.HiCMapInfoDto.Companion.toInfoDto
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.HiCMapCreationForm
-import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.HiCMapService
+import ru.itmo.hict.server.service.MinioService
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
-import java.io.BufferedOutputStream
-import java.io.FileOutputStream
 
 @RestController
 @RequestMapping("/api/v1/hi-c")
 class HiCMapController(
     private val hiCMapService: HiCMapService,
     private val hiCMapCreationFormValidator: HiCMapCreationFormValidator,
-    private val fileService: FileService,
 ) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
@@ -63,13 +60,8 @@ class HiCMapController(
             throw ValidationException(bindingResult)
         }
 
-        val savedFile = fileService.tmp("${hiCMapCreationForm.name}.hic").toFile()
-
-        BufferedOutputStream(FileOutputStream(savedFile)).use {
-            it.write(file.bytes)
-        }
-
-        return hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description, savedFile)
+        return hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description,
+            MinioService.FileObjectInfo("${hiCMapCreationForm.name}.hic", file.size, file.inputStream))
             .run { ResponseEntity.ok(this.toInfoDto()) }
     }
 }
