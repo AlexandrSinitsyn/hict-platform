@@ -8,7 +8,7 @@ RUN apk update && apk add curl
 RUN curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /home/app/mc
 RUN chmod +x /home/app/mc
 
-COPY loki-config.yaml /etc/loki/loki-config.yml
+COPY loki-config.yml /etc/loki/loki-config.yml
 
 RUN echo "#!/bin/sh" > /home/app/run.sh
 RUN echo "/home/app/mc config host add minio http://\$MINIO_HOST:9000 \$MINIO_ROOT_USER \$MINIO_ROOT_PASSWORD" >> /home/app/run.sh
