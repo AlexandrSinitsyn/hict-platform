@@ -28,7 +28,7 @@ class LiquibaseConfig(
     fun liquibase(): SpringLiquibase {
         val liquibase = CustomSpringLiquibase()
         liquibase.dataSource = dataSource
-        liquibase.changeLog = "db.changelog-master.yaml"
+        liquibase.changeLog = "db.changelog-master.yml"
         return liquibase
     }
 }

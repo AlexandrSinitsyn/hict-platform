@@ -16,7 +16,7 @@ interface UserRepository : JpaRepository<User, Long> {
             select * from new_user(:#{#user.username},
                                    :#{#user.login},
                                    :#{#user.email},
-                                   :#{#user.passwordSha},
+                                   :#{#user.password},
                                    cast(:#{#user.role.ordinal()} as smallint))
         """,
         nativeQuery = true,
@@ -29,12 +29,12 @@ interface UserRepository : JpaRepository<User, Long> {
         value = """
             select *
             from users
-            where users.password_sha = crypt(:password, users.salt)
+            where users.password = crypt(:password, users.password)
               and (users.login = :login or users.email = :email)
         """,
         nativeQuery = true,
     )
-    fun findByLoginOrEmailAndPasswordSha(@Param("login") login: String?,
+    fun findByLoginOrEmailAndPassword(@Param("login") login: String?,
                                          @Param("email") email: String?,
-                                         @Param("password") passwordSha: String): Optional<User>
+                                         @Param("password") password: String): Optional<User>
 }

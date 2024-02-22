@@ -118,7 +118,7 @@ class HiCTPlatformServerApplicationTests {
     private val server: String
         get() = "http://localhost:$randomPort/api/v1/hi-c"
 
-    private val userId by lazy { userRepository.findByLoginAndPasswordSha("user", "user").get().id!! }
+    private val userId by lazy { userRepository.findByLoginAndPassword("user", "user").get().id!! }
 
     private val jwt by lazy { JWT.create().withClaim(USER_ID_CLAIM, userId).sign(algorithm) }
 

@@ -14,13 +14,13 @@ class UserService(
     fun checkUnique(login: String, email: String): Boolean =
         !userRepository.findByLoginOrEmail(login, email).isPresent
 
-    fun findByCredentials(login: String?, email: String?, passwordSha: String): Optional<User> =
-        userRepository.findByLoginOrEmailAndPasswordSha(login, email, passwordSha)
+    fun findByCredentials(login: String?, email: String?, password: String): Optional<User> =
+        userRepository.findByLoginOrEmailAndPassword(login, email, password)
 
     fun register(
         username: String,
         login: String,
         email: String,
-        passwordSha: String,
-    ): User? = userRepository.save(User(username, login, email, passwordSha, Role.USER)).getOrNull()
+        password: String,
+    ): User? = userRepository.save(User(username, login, email, password, Role.USER)).getOrNull()
 }

@@ -10,8 +10,6 @@ create or replace function new_user(username varchar(100),
                                     role int)
     returns setof users as
 $$
-declare
-    user_salt varchar(30);
 begin
     if exists (select 1
                from users
@@ -21,15 +19,12 @@ begin
         return;
     end if;
 
-    user_salt := gen_salt('bf');
-
-    insert into users (username, login, email, role, salt, password_sha)
+    insert into users (username, login, email, role, password)
     values (new_user.username,
             new_user.login,
             new_user.email,
             cast(new_user.role as smallint),
-            user_salt,
-            crypt(new_user.password, user_salt));
+            crypt(new_user.password, gen_salt('bf')));
 
     return query select *
                  from users

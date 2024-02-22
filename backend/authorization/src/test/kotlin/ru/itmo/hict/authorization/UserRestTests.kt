@@ -89,7 +89,7 @@ class UserRestTests {
                 "username": ${username?.let { "\"$it\"" }},
                 "login": ${login?.let { "\"$it\"" }},
                 "email": ${email?.let { "\"$it\"" }},
-                "passwordSha": ${password?.let { "\"$it\"" }}
+                "password": ${password?.let { "\"$it\"" }}
             }
         """.trimIndent()
 
@@ -188,15 +188,15 @@ class UserRestTests {
             {
                 "login": ${login?.let { "\"$it\"" }},
                 "email": ${email?.let { "\"$it\"" }},
-                "passwordSha": ${password?.let { "\"$it\"" }}
+                "password": ${password?.let { "\"$it\"" }}
             }
         """.trimIndent()
 
         @Test
         fun `valid registration`() {
-            whenever(userRepository.findByLoginOrEmailAndPasswordSha(LOGIN, EMAIL, PASS)).thenReturn(Optional.of(user))
-            whenever(userRepository.findByLoginOrEmailAndPasswordSha(null, EMAIL, PASS)).thenReturn(Optional.of(user))
-            whenever(userRepository.findByLoginOrEmailAndPasswordSha(LOGIN, null, PASS)).thenReturn(Optional.of(user))
+            whenever(userRepository.findByLoginOrEmailAndPassword(LOGIN, EMAIL, PASS)).thenReturn(Optional.of(user))
+            whenever(userRepository.findByLoginOrEmailAndPassword(null, EMAIL, PASS)).thenReturn(Optional.of(user))
+            whenever(userRepository.findByLoginOrEmailAndPassword(LOGIN, null, PASS)).thenReturn(Optional.of(user))
 
             fun expectOk(login: String?, email: String?, password: String) =
                 mvc.perform(post("/api/v1/auth/login")
@@ -212,7 +212,7 @@ class UserRestTests {
 
         @Test
         fun `invalid login`() {
-            whenever(userRepository.findByLoginOrEmailAndPasswordSha(any(), any(), any())).thenReturn(Optional.empty())
+            whenever(userRepository.findByLoginOrEmailAndPassword(any(), any(), any())).thenReturn(Optional.empty())
 
             expectValidationException("/api/v1/auth/login",
                 jsonBody(LOGIN, EMAIL, PASS) throws "Invalid login or password")

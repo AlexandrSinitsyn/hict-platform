@@ -38,7 +38,7 @@ class UserController(
             throw ValidationException(bindingResult)
         }
 
-        val newUser = userService.register(registerForm.username, registerForm.login, registerForm.email, registerForm.passwordSha)
+        val newUser = userService.register(registerForm.username, registerForm.login, registerForm.email, registerForm.password)
 
         if (newUser == null) {
             bindingResult.reject("occupied-login-or-email", "Already occupied login or email")
@@ -55,7 +55,7 @@ class UserController(
             throw ValidationException(bindingResult)
         }
 
-        return userService.findByCredentials(enterForm.login, enterForm.email, enterForm.passwordSha).get()
+        return userService.findByCredentials(enterForm.login, enterForm.email, enterForm.password).get()
             .run { ResponseEntity.ok(jwtService.create(this)) }
     }
 }

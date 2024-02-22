@@ -23,9 +23,9 @@ enum class Role {
         UniqueConstraint(columnNames = ["email"]),
     ],
     indexes = [
-        Index(name = "users_by_id", columnList = "user_id", unique = true),
-        Index(name = "users_by_login", columnList = "login,user_id", unique = true),
-        Index(name = "users_by_email", columnList = "email,user_id", unique = true),
+        Index(name = "user_by_id", columnList = "user_id", unique = true),
+        Index(name = "user_by_login", columnList = "login,user_id", unique = true),
+        Index(name = "user_by_email", columnList = "email,user_id", unique = true),
     ],
 )
 class User(
@@ -49,8 +49,8 @@ class User(
 
     @NotNull
     @NotBlank
-    @Column(name = "password_sha", nullable = false)
-    val passwordSha: String,
+    @Column(name = "password", nullable = false)
+    val password: String,
 
     @NotNull
     @Column(name = "role", columnDefinition = "TINYINT", nullable = false)
