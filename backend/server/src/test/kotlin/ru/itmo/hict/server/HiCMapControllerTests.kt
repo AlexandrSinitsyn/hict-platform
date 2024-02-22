@@ -20,12 +20,10 @@ import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.controller.HiCMapController
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.HiCMapCreationForm
-import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.HiCMapService
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.sql.Timestamp
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
@@ -44,19 +42,8 @@ class HiCMapControllerTests {
         private lateinit var hicController: HiCMapController
         private lateinit var hicService: HiCMapService
         private lateinit var creationValidator: HiCMapCreationFormValidator
-        private lateinit var fileService: FileService
 
-        private val TEMP_PATH = run {
-            tailrec fun rec(path: Path): Path {
-                if (Files.notExists(path)) {
-                    return path
-                }
-
-                return rec(path.resolve("tmp${System.currentTimeMillis()}"))
-            }
-
-            rec(Paths.get("."))
-        }
+        private val TEMP_PATH = Files.createTempDirectory("hic_controller_tests")
 
         private fun testRequestUserInfo() = RequestUserInfo("test-jwt", user)
 
@@ -81,8 +68,7 @@ class HiCMapControllerTests {
         fun init() {
             hicService = mock<HiCMapService>()
             creationValidator = mock<HiCMapCreationFormValidator>()
-            fileService = mock<FileService>()
-            hicController = HiCMapController(hicService, creationValidator, fileService)
+            hicController = HiCMapController(hicService, creationValidator)
 
             setCorrectRequestUserInfo()
         }
@@ -142,7 +128,6 @@ class HiCMapControllerTests {
         @Order(1)
         @Test
         fun `correct publish`() {
-            whenever(fileService.tmp(any())) doReturn TEMP_PATH.resolve(fileName)
             whenever(hicService.load(any(), any(), any(), any())) doReturn hicMap
 
             val response = hicController.publish(file, form, bindingResult)

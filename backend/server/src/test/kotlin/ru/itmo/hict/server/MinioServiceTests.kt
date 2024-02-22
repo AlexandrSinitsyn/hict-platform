@@ -2,7 +2,6 @@ package ru.itmo.hict.server
 
 import io.minio.MinioClient
 import io.minio.errors.ErrorResponseException
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.MethodOrderer
@@ -17,10 +16,8 @@ import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import ru.itmo.hict.server.logging.Logger
-import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.MinioService
 import java.nio.file.AccessDeniedException
-import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.time.Duration
@@ -32,9 +29,6 @@ class MinioServiceTests {
     private companion object {
         private const val RESOURCES = "src/test/resources"
         private const val BUCKET = "test"
-        private val fileService = FileService().apply {
-            init()
-        }
         private lateinit var minioService: MinioService
 
         private val accessKey by lazy { (0..10).map { ('a'..'z').random() }.joinToString("") }
@@ -64,21 +58,7 @@ class MinioServiceTests {
             val logger = mock<Logger>()
             doNothing().whenever(logger)
 
-            minioService = MinioService(minioClient, fileService, logger)
-        }
-
-        @JvmStatic
-        @BeforeAll
-        fun init() {
-            Assertions.assertTrue(Files.list(fileService.tmp(".")).count() == 0L)
-            Assertions.assertTrue(Files.list(fileService.minio(".")).count() == 0L)
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun destructor() {
-            Assertions.assertTrue(Files.list(fileService.tmp(".")).count() == 0L)
-            Assertions.assertTrue(Files.list(fileService.minio(".")).count() == 0L)
+            minioService = MinioService(minioClient, logger)
         }
     }
 

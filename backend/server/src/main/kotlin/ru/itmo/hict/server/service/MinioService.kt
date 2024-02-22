@@ -26,7 +26,6 @@ class MinioConfiguration(
 @Service
 class MinioService(
     private val minioClient: MinioClient,
-    private val fileService: FileService,
     private val logger: Logger,
 ) {
     fun newBucketIfAbsent(name: String) {

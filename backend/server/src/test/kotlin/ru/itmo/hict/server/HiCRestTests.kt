@@ -1,7 +1,5 @@
 package ru.itmo.hict.server
 
-import jakarta.annotation.PostConstruct
-import jakarta.annotation.PreDestroy
 import org.hamcrest.Matchers.`is`
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Nested
@@ -30,40 +28,22 @@ import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.repository.HiCMapRepository
 import ru.itmo.hict.server.service.*
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
-import java.nio.file.Files
 import java.sql.Timestamp
 import java.util.*
 
 @WebMvcTest(HiCMapController::class)
 @ContextConfiguration(
-    classes = [HiCMapController::class, HiCMapService::class, FileService::class, HiCMapCreationFormValidator::class,
+    classes = [HiCMapController::class, HiCMapService::class, HiCMapCreationFormValidator::class,
         HiCRestTests.RestTestBeans::class]
 )
 class HiCRestTests {
     @Autowired
     private lateinit var mvc: MockMvc
-    @Autowired
-    private lateinit var fileService: FileService
 
     @MockBean
     private lateinit var hiCMapRepository: HiCMapRepository
     @MockBean
     private lateinit var minioService: MinioService
-
-    @PostConstruct
-    fun setup() {
-        Assertions.assertTrue(Files.list(fileService.tmp(".")).count() == 0L)
-        Assertions.assertTrue(Files.list(fileService.minio(".")).count() == 0L)
-
-        doNothing().whenever(minioService).newBucketIfAbsent(any())
-        doNothing().whenever(minioService).upload(any(), any(), any())
-    }
-
-    @PreDestroy
-    fun destructor() {
-        Assertions.assertTrue(Files.list(fileService.tmp(".")).count() == 0L)
-        Assertions.assertTrue(Files.list(fileService.minio(".")).count() == 0L)
-    }
 
     @Test
     fun contextLoads() {

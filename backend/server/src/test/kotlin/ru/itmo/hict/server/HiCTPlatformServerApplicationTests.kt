@@ -36,11 +36,9 @@ import ru.itmo.hict.dto.USER_ID_CLAIM
 import ru.itmo.hict.server.form.HiCMapCreationForm
 import ru.itmo.hict.server.repository.HiCMapRepository
 import ru.itmo.hict.server.repository.UserRepository
-import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.MinioConfiguration
 import ru.itmo.hict.server.service.MinioService
 import java.net.URI
-import java.nio.file.Files
 import java.time.Duration
 
 @Testcontainers
