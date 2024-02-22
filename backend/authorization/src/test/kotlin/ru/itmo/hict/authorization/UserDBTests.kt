@@ -75,13 +75,13 @@ class UserDBTests {
 
     @Test
     fun `same user on partial {login, email} info`() {
-        val `login & email` = userRepository.findByLoginOrEmailAndPasswordSha(
+        val `login & email` = userRepository.findByLoginOrEmailAndPassword(
             "user", "user@test.com", "user").getOrNull()
-        val `login` = userRepository.findByLoginOrEmailAndPasswordSha(
+        val `login` = userRepository.findByLoginOrEmailAndPassword(
             "user", null, "user").getOrNull()
-        val `email` = userRepository.findByLoginOrEmailAndPasswordSha(
+        val `email` = userRepository.findByLoginOrEmailAndPassword(
             null, "user@test.com", "user").getOrNull()
-        val `no info` = userRepository.findByLoginOrEmailAndPasswordSha(
+        val `no info` = userRepository.findByLoginOrEmailAndPassword(
             null, null, "user").getOrNull()
 
 

@@ -49,8 +49,8 @@ class User(
 
     @NotNull
     @NotBlank
-    @Column(name = "password_sha", nullable = false)
-    val passwordSha: String,
+    @Column(name = "password", nullable = false)
+    val password: String,
 
     @NotNull
     @Column(name = "role", columnDefinition = "TINYINT", nullable = false)

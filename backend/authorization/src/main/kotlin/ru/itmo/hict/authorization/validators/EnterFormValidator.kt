@@ -22,7 +22,7 @@ class EnterFormValidator(
                 errors.reject("invalid-enter-form", "EnterForm require at least one of [login, email]")
             }
 
-            if (userService.findByCredentials(form.login, form.email, form.passwordSha).isEmpty) {
+            if (userService.findByCredentials(form.login, form.email, form.password).isEmpty) {
                 errors.reject("invalid-login-or-password", "Invalid login or password")
             }
         }

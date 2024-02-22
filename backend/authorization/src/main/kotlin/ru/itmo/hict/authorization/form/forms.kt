@@ -11,7 +11,7 @@ class RegisterForm(
     @field:[NotNull NotBlank Size(min = 3, max = 64)] val username: String,
     @field:[NotNull NotBlank Size(min = 3, max = 64)] val login: String,
     @field:[NotNull NotBlank Email                  ] val email: String,
-    @field:[NotNull NotBlank Size(min = 4, max = 32)] val passwordSha: String,
+    @field:[NotNull NotBlank Size(min = 4, max = 32)] val password: String,
 ) {
     override fun toString() = "RegisterForm(username=$username, login=$login, email=$email, password=***)"
 }
@@ -19,7 +19,7 @@ class RegisterForm(
 class EnterForm(
     @field:[Nullable NotBlankIfPresent Size(min = 3, max = 64)] val login: String?,
     @field:[Nullable NotBlankIfPresent Email                  ] val email: String?,
-    @field:[NotNull NotBlank Size(min = 4, max = 32)          ] val passwordSha: String,
+    @field:[NotNull NotBlank Size(min = 4, max = 32)          ] val password: String,
 ) {
     override fun toString() =
         (login?.let { "login=$it, " } ?: "") + (email?.let { "email=$it, " } ?: "") + "password=***"

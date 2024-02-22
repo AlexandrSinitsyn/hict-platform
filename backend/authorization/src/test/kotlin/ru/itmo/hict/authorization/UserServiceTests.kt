@@ -41,9 +41,9 @@ class UserServiceTests {
 
     @Test
     fun `find user`() {
-        whenever(userRepository.findByLoginOrEmailAndPasswordSha(LOGIN, EMAIL, PASS)) doReturn optUser
-        whenever(userRepository.findByLoginOrEmailAndPasswordSha(LOGIN, null, PASS)) doReturn optUser
-        whenever(userRepository.findByLoginOrEmailAndPasswordSha(null, EMAIL, PASS)) doReturn optUser
+        whenever(userRepository.findByLoginOrEmailAndPassword(LOGIN, EMAIL, PASS)) doReturn optUser
+        whenever(userRepository.findByLoginOrEmailAndPassword(LOGIN, null, PASS)) doReturn optUser
+        whenever(userRepository.findByLoginOrEmailAndPassword(null, EMAIL, PASS)) doReturn optUser
 
         val found = userService.findByCredentials(LOGIN, EMAIL, PASS).run {
             Assertions.assertNotNull(this.getOrNull())
@@ -80,7 +80,7 @@ class UserServiceTests {
     @Test
     fun `save new user`() {
         whenever(userRepository.findByLoginOrEmail(any(), any())) doReturn empty
-        whenever(userRepository.findByLoginOrEmailAndPasswordSha(any(), any(), any())) doReturn empty
+        whenever(userRepository.findByLoginOrEmailAndPassword(any(), any(), any())) doReturn empty
 
         Assertions.assertTrue(userService.checkUnique(LOGIN, EMAIL))
         Assertions.assertFalse(userService.findByCredentials(LOGIN, EMAIL, PASS).isPresent)
@@ -96,7 +96,7 @@ class UserServiceTests {
         Assertions.assertEquals(user, saved)
 
         whenever(userRepository.findByLoginOrEmail(LOGIN, EMAIL)) doReturn optUser
-        whenever(userRepository.findByLoginOrEmailAndPasswordSha(LOGIN, EMAIL, PASS)) doReturn optUser
+        whenever(userRepository.findByLoginOrEmailAndPassword(LOGIN, EMAIL, PASS)) doReturn optUser
 
         Assertions.assertFalse(userService.checkUnique(LOGIN, EMAIL))
         Assertions.assertTrue(userService.findByCredentials(LOGIN, EMAIL, PASS).isPresent)
@@ -117,7 +117,7 @@ class UserServiceTests {
 
         Assertions.assertNull(again)
 
-        whenever(userRepository.findByLoginOrEmailAndPasswordSha(LOGIN, EMAIL, PASS)) doReturn optUser
+        whenever(userRepository.findByLoginOrEmailAndPassword(LOGIN, EMAIL, PASS)) doReturn optUser
 
         Assertions.assertTrue(userService.findByCredentials(LOGIN, EMAIL, PASS).isPresent)
     }
