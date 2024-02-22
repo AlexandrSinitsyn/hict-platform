@@ -12,24 +12,21 @@ import ru.itmo.hict.dto.HiCMapInfoDto.Companion.toInfoDto
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.HiCMapCreationForm
-import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.HiCMapService
+import ru.itmo.hict.server.service.MinioService
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
-import java.io.BufferedOutputStream
-import java.io.FileOutputStream
 
 @RestController
 @RequestMapping("/api/v1/hi-c")
 class HiCMapController(
     private val hiCMapService: HiCMapService,
     private val hiCMapCreationFormValidator: HiCMapCreationFormValidator,
-    private val fileService: FileService,
-) {
+) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
 
     @InitBinder("hiCMapCreationForm")
-    fun initRegisterBinder(webDataBinder: WebDataBinder) {
+    fun initPublishBinder(webDataBinder: WebDataBinder) {
         webDataBinder.addValidators(hiCMapCreationFormValidator)
     }
 
@@ -48,28 +45,23 @@ class HiCMapController(
         @RequestPart("form") @Valid hiCMapCreationForm: HiCMapCreationForm,
         bindingResult: BindingResult,
     ): ResponseEntity<HiCMapInfoDto> {
+        // fixme somehow for @RequestBody validator automatically works, but not for the @RequestPart
+        hiCMapCreationFormValidator.validate(hiCMapCreationForm, bindingResult)
+
         val user = requestUserInfo.user
 
-        if (user == null) {
-            bindingResult.reject("not-authorized",
+        when {
+            user == null -> bindingResult.reject("not-authorized",
                 "You must be authorized for publishing a Hi-C map")
-        }
-
-        if (file.isEmpty) {
-            bindingResult.reject("empty-file", "File should not be empty")
+            file.isEmpty -> bindingResult.reject("empty-file", "File should not be empty")
         }
 
         if (bindingResult.hasErrors()) {
             throw ValidationException(bindingResult)
         }
 
-        val savedFile = fileService.tmp(hiCMapCreationForm.name).toFile()
-
-        BufferedOutputStream(FileOutputStream(savedFile)).use {
-            it.write(file.bytes)
-        }
-
-        return hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description, savedFile)
+        return hiCMapService.load(user!!, hiCMapCreationForm.name, hiCMapCreationForm.description,
+            MinioService.FileObjectInfo("${hiCMapCreationForm.name}.hic", file.size, file.inputStream))
             .run { ResponseEntity.ok(this.toInfoDto()) }
     }
 }

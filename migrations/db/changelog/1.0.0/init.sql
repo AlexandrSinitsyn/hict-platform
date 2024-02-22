@@ -27,7 +27,7 @@ create unique index users_by_email on users using btree (email, user_id) ;
 
 create table hi_c_maps
 (
-    hi_c_map_id   bigint                   not null,
+    hi_c_map_id   bigint                   not null generated always as identity,
     user_id       bigint                   not null,
     name          varchar(100)             not null,
     description   text                     not null,
