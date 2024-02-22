@@ -20,9 +20,9 @@ create table users
     unique (email)
 );
 
-create index users_by_id on users using hash (user_id) ;
-create unique index users_by_login on users using btree (login, user_id) ;
-create unique index users_by_email on users using btree (email, user_id) ;
+create index user_by_id on users using hash (user_id) ;
+create unique index user_by_login on users using btree (login, user_id) ;
+create unique index user_by_email on users using btree (email, user_id) ;
 
 create table hi_c_maps
 (
@@ -41,4 +41,11 @@ create index hi_c_map_by_id on hi_c_maps using hash (hi_c_map_id) ;
 create index hi_c_map_by_name on hi_c_maps using hash (name) ;
 create unique index hi_c_map_by_author on hi_c_maps using btree (user_id, hi_c_map_id) ;
 
---rollback truncate table
+--rollback drop index user_by_id
+--rollback drop index user_by_login
+--rollback drop index user_by_email
+--rollback truncate table users
+--rollback drop index hi_c_map_by_id
+--rollback drop index hi_c_map_by_name
+--rollback drop index hi_c_map_by_author
+--rollback truncate table hi_c_maps
