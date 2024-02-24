@@ -18,7 +18,7 @@ import ru.itmo.hict.server.service.UserService
 @RequestMapping("/api/v1/users")
 class UserController(
     private val userService: UserService,
-) {
+) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
 
@@ -53,7 +53,9 @@ class UserController(
 
         checkNoErrors(bindingResult)
 
-        return userService.updateUsername(user, form.username).run { ResponseEntity.ok(this) }
+        userService.updateUsername(user, form.username)
+
+        return ResponseEntity.ok(true)
     }
 
     @PatchMapping("/update/login")
@@ -65,7 +67,9 @@ class UserController(
 
         checkNoErrors(bindingResult)
 
-        return userService.updateLogin(user, form.login).run { ResponseEntity.ok(this) }
+        userService.updateLogin(user, form.login)
+
+        return ResponseEntity.ok(true)
     }
 
     @PatchMapping("/update/email")
@@ -77,7 +81,9 @@ class UserController(
 
         checkNoErrors(bindingResult)
 
-        return userService.updateEmail(user, form.email).run { ResponseEntity.ok(this) }
+        userService.updateEmail(user, form.email)
+
+        return ResponseEntity.ok(true)
     }
 
     @PatchMapping("/update/password")

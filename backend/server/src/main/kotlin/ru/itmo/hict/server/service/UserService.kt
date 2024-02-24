@@ -17,29 +17,13 @@ class UserService(
     fun checkCredentials(user: User, password: String) =
         userRepository.findByLoginAndPassword(user.login, password).isPresent
 
-    fun updateUsername(user: User, username: String): Boolean {
-        userRepository.updateUsername(user.id!!, username)
+    fun updateUsername(user: User, username: String) = userRepository.updateUsername(user.id!!, username)
 
-        return getById(user.id!!)!!.username == username
-    }
+    fun updateLogin(user: User, login: String) = userRepository.updateLogin(user.id!!, login)
 
-    fun updateLogin(user: User, login: String): Boolean {
-        userRepository.updateLogin(user.id!!, login)
+    fun updateEmail(user: User, email: String) = userRepository.updateEmail(user.id!!, email)
 
-        return getById(user.id!!)!!.login == login
-    }
-
-    fun updateEmail(user: User, email: String): Boolean {
-        userRepository.updateEmail(user.id!!, email)
-
-        return getById(user.id!!)!!.email == email
-    }
-
-    fun updateRole(user: User, role: Role): Boolean {
-        userRepository.updateRole(user.id!!, role)
-
-        return getById(user.id!!)!!.role == role
-    }
+    fun updateRole(user: User, role: Role) = userRepository.updateRole(user.id!!, role)
 
     fun updatePassword(user: User, oldPassword: String, newPassword: String): Boolean {
         userRepository.updatePassword(user.id!!, oldPassword, newPassword)

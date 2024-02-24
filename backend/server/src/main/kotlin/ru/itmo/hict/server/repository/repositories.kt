@@ -39,7 +39,7 @@ interface UserRepository : JpaRepository<User, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Modifying
     @Query("update User u set u.email = :email where u.id = :id")
-    fun updateEmail(@Param("id") id: Long, @Param("email") email: String): Int
+    fun updateEmail(@Param("id") id: Long, @Param("email") email: String)
 
     @Transactional
     @Modifying

@@ -122,21 +122,21 @@ class UserControllerTests {
     @Nested
     inner class UpdateUsername : UpdateField<UpdateUsernameForm>(
         UpdateUsernameForm("newUsername"),
-        { whenever(userService.updateUsername(any(), any())) doReturn true },
+        { doNothing().whenever(userService).updateUsername(any(), any()) },
         userController::updateUsername,
     )
 
     @Nested
     inner class UpdateLogin : UpdateField<UpdateLoginForm>(
         UpdateLoginForm("newLogin"),
-        { whenever(userService.updateLogin(any(), any())) doReturn true },
+        { doNothing().whenever(userService).updateLogin(any(), any()) },
         userController::updateLogin,
     )
 
     @Nested
     inner class UpdateEmail : UpdateField<UpdateEmailForm>(
         UpdateEmailForm("new@email.com"),
-        { whenever(userService.updateEmail(any(), any())) doReturn true },
+        { doNothing().whenever(userService).updateEmail(any(), any()) },
         userController::updateEmail,
     )
 
