@@ -96,7 +96,7 @@ class UserController(
                 "You must confirm this action with a password")
         }
 
-        notSame("password", bindingResult) { user.password != form.newPassword }
+        notSame("password", bindingResult) { form.oldPassword != form.newPassword }
 
         checkNoErrors(bindingResult)
 
