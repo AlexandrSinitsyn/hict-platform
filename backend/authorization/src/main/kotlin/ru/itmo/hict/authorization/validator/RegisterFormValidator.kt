@@ -1,4 +1,4 @@
-package ru.itmo.hict.authorization.validators
+package ru.itmo.hict.authorization.validator
 
 import org.springframework.stereotype.Component
 import org.springframework.validation.Errors

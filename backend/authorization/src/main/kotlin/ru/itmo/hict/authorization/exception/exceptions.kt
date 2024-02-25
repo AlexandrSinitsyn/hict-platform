@@ -1,4 +1,4 @@
-package ru.itmo.hict.authorization.exceptions
+package ru.itmo.hict.authorization.exception
 
 import org.springframework.validation.BindingResult
 

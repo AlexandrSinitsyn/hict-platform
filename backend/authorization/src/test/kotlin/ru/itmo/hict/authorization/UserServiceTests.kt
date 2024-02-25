@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
-import ru.itmo.hict.authorization.repositories.UserRepository
+import ru.itmo.hict.authorization.repository.UserRepository
 import ru.itmo.hict.authorization.service.UserService
 import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User

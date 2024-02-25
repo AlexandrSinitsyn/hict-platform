@@ -16,12 +16,12 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import ru.itmo.hict.authorization.controller.UserController
-import ru.itmo.hict.authorization.exceptions.ValidationException
-import ru.itmo.hict.authorization.repositories.UserRepository
+import ru.itmo.hict.authorization.exception.ValidationException
+import ru.itmo.hict.authorization.repository.UserRepository
 import ru.itmo.hict.authorization.service.JwtService
 import ru.itmo.hict.authorization.service.UserService
-import ru.itmo.hict.authorization.validators.EnterFormValidator
-import ru.itmo.hict.authorization.validators.RegisterFormValidator
+import ru.itmo.hict.authorization.validator.EnterFormValidator
+import ru.itmo.hict.authorization.validator.RegisterFormValidator
 import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import java.util.*

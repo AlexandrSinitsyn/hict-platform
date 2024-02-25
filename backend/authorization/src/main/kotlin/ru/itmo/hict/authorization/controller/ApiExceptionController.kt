@@ -6,7 +6,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import ru.itmo.hict.authorization.exceptions.ValidationException
+import ru.itmo.hict.authorization.exception.ValidationException
 
 @RestControllerAdvice
 class ApiExceptionController {

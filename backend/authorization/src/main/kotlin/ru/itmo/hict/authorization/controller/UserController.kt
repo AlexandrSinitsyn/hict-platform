@@ -5,13 +5,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
-import ru.itmo.hict.authorization.exceptions.ValidationException
+import ru.itmo.hict.authorization.exception.ValidationException
 import ru.itmo.hict.authorization.form.EnterForm
 import ru.itmo.hict.authorization.form.RegisterForm
 import ru.itmo.hict.authorization.service.JwtService
 import ru.itmo.hict.authorization.service.UserService
-import ru.itmo.hict.authorization.validators.EnterFormValidator
-import ru.itmo.hict.authorization.validators.RegisterFormValidator
+import ru.itmo.hict.authorization.validator.EnterFormValidator
+import ru.itmo.hict.authorization.validator.RegisterFormValidator
 import ru.itmo.hict.dto.Jwt
 
 @RestController

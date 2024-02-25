@@ -1,16 +1,17 @@
-package ru.itmo.hict.authorization.repositories
+package ru.itmo.hict.authorization.repository
 
-import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Isolation
+import org.springframework.transaction.annotation.Transactional
 import ru.itmo.hict.entity.User
 import java.util.Optional
 
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Query(
         value = """
             select * from new_user(:#{#user.username},

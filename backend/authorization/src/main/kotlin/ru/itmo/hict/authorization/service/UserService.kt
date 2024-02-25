@@ -1,7 +1,7 @@
 package ru.itmo.hict.authorization.service
 
 import org.springframework.stereotype.Service
-import ru.itmo.hict.authorization.repositories.UserRepository
+import ru.itmo.hict.authorization.repository.UserRepository
 import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import java.util.Optional
