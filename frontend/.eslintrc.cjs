@@ -1,18 +1,20 @@
 /* eslint-env node */
-require('@rushstack/eslint-patch/modern-module-resolution')
+require('@rushstack/eslint-patch/modern-module-resolution');
 
 module.exports = {
   root: true,
-  plugins: ['import'],
-  'extends': [
+  plugins: [
+      'import',
+  ],
+  extends: [
     'plugin:vue/vue3-essential',
     'eslint:recommended',
     '@vue/eslint-config-typescript',
     '@vue/eslint-config-typescript/recommended',
-    '@vue/eslint-config-prettier'
+    '@vue/eslint-config-prettier',
   ],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 'latest',
   },
   rules: {
     'block-spacing': 'error',
@@ -36,5 +38,5 @@ module.exports = {
         extensions: ['.vue', '.json', '.js', '.ts'],
       },
     },
-  }
-}
+  },
+};
