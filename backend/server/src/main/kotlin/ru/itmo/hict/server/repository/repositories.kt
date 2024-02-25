@@ -66,7 +66,6 @@ interface UserRepository : JpaRepository<User, Long> {
 
 @Repository
 interface HiCMapRepository : JpaRepository<HiCMap, Long> {
-    // fixme
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<HiCMap>
 }

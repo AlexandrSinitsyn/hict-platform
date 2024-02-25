@@ -15,7 +15,7 @@ import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import ru.itmo.hict.authorization.repositories.UserRepository
+import ru.itmo.hict.authorization.repository.UserRepository
 import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import kotlin.jvm.optionals.getOrNull
@@ -52,6 +52,7 @@ class UserDBTests {
         Assertions.assertTrue(execResult.stderr.isNullOrBlank())
     }
 
+    @Order(1)
     @Test
     fun `check not empty database`() {
         Assertions.assertEquals(4, userRepository.count())

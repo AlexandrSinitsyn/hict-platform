@@ -16,7 +16,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import ru.itmo.hict.authorization.form.EnterForm
 import ru.itmo.hict.authorization.form.RegisterForm
-import ru.itmo.hict.authorization.repositories.UserRepository
+import ru.itmo.hict.authorization.repository.UserRepository
 import ru.itmo.hict.dto.Jwt
 import java.net.URI
 

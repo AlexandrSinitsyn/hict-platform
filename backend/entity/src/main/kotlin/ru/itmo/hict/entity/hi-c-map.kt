@@ -38,6 +38,7 @@ class HiCMap(
     @NotBlank
     @Size(max = 65536)
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     val description: String,
 
