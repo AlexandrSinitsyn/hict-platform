@@ -1,0 +1,12 @@
+# Logs
+logs
+*.log
+
+node_modules
+
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+.vscode
+.idea
