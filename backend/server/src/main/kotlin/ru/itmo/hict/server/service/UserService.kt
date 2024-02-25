@@ -1,6 +1,7 @@
 package ru.itmo.hict.server.service
 
 import org.springframework.stereotype.Service
+import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.repository.UserRepository
 import kotlin.jvm.optionals.getOrNull
@@ -9,5 +10,24 @@ import kotlin.jvm.optionals.getOrNull
 class UserService(
     private val userRepository: UserRepository,
 ) {
+    fun count() = userRepository.count()
+
     fun getById(id: Long): User? = userRepository.findById(id).getOrNull()
+
+    fun checkCredentials(user: User, password: String) =
+        userRepository.findByLoginAndPassword(user.login, password).isPresent
+
+    fun updateUsername(user: User, username: String) = userRepository.updateUsername(user.id!!, username)
+
+    fun updateLogin(user: User, login: String) = userRepository.updateLogin(user.id!!, login)
+
+    fun updateEmail(user: User, email: String) = userRepository.updateEmail(user.id!!, email)
+
+    fun updateRole(user: User, role: Role) = userRepository.updateRole(user.id!!, role)
+
+    fun updatePassword(user: User, oldPassword: String, newPassword: String): Boolean {
+        userRepository.updatePassword(user.id!!, oldPassword, newPassword)
+
+        return userRepository.findByLoginAndPassword(user.login, newPassword).isPresent
+    }
 }

@@ -3,8 +3,6 @@ package ru.itmo.hict.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.minio.MinioClient
-import jakarta.annotation.PostConstruct
-import jakarta.annotation.PreDestroy
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -18,10 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.*
 import org.springframework.core.io.InputStreamResource
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.util.LinkedMultiValueMap
 import org.testcontainers.containers.BindMode
@@ -34,6 +29,7 @@ import ru.itmo.hict.dto.HiCMapInfoDto
 import ru.itmo.hict.dto.Jwt
 import ru.itmo.hict.dto.USER_ID_CLAIM
 import ru.itmo.hict.server.form.HiCMapCreationForm
+import ru.itmo.hict.server.form.UpdatePasswordForm
 import ru.itmo.hict.server.repository.HiCMapRepository
 import ru.itmo.hict.server.repository.UserRepository
 import ru.itmo.hict.server.service.MinioConfiguration
@@ -116,9 +112,10 @@ class HiCTPlatformServerApplicationTests {
     protected var randomPort: Int = 0
 
     private val server: String
-        get() = "http://localhost:$randomPort/api/v1/hi-c"
+        get() = "http://localhost:$randomPort/api/v1"
 
-    private val userId by lazy { userRepository.findByLoginAndPassword("user", "user").get().id!! }
+    private val userPass = "user"
+    private val userId by lazy { userRepository.findByLoginAndPassword("user", userPass).get().id!! }
 
     private val jwt by lazy { JWT.create().withClaim(USER_ID_CLAIM, userId).sign(algorithm) }
 
@@ -138,13 +135,13 @@ class HiCTPlatformServerApplicationTests {
 
     @Test
     fun `search for nothing`() {
-        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/all")).run {
+        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/hi-c/all")).run {
             Assertions.assertTrue(statusCode.is2xxSuccessful)
             Assertions.assertNotNull(body)
             Assertions.assertTrue(body!!.isEmpty())
         }
 
-        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/0")).run {
+        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/hi-c/0")).run {
             Assertions.assertTrue(statusCode.is4xxClientError)
             Assertions.assertNull(body)
         }
@@ -166,7 +163,7 @@ class HiCTPlatformServerApplicationTests {
         body.add("form", HiCMapCreationForm(NAME, DESCRIPTION))
 
         return restTemplate.postForEntity(
-            URI("$server/publish"),
+            URI("$server/hi-c/publish"),
             HttpEntity(body, headers),
             T::class.java
         )
@@ -211,7 +208,7 @@ class HiCTPlatformServerApplicationTests {
     }
 
     @Test
-    fun `no JWT`() {
+    fun `no JWT (publish)`() {
         publish<String>(FILE_CONTENT, null).run {
             Assertions.assertTrue(statusCode.is4xxClientError)
             Assertions.assertNotNull(body)
@@ -221,8 +218,78 @@ class HiCTPlatformServerApplicationTests {
     }
 
     @Test
-    fun `invalid JWT`() {
+    fun `invalid JWT (publish)`() {
         publish<String>(FILE_CONTENT, "invalid").run {
+            Assertions.assertTrue(statusCode.is4xxClientError)
+            Assertions.assertNotNull(body)
+            Assertions.assertTrue(body!!.isNotBlank())
+            Assertions.assertTrue("invalid jwt" in body!!.lowercase())
+        }
+    }
+
+    private inline fun <reified T> updatePassword(oldPassword: String, newPassword: String, jwt: Jwt?): ResponseEntity<T> {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+        jwt?.let { headers.setBearerAuth(it) }
+
+        return restTemplate.exchange(
+            URI("$server/users/update/password"),
+            HttpMethod.PATCH,
+            HttpEntity(UpdatePasswordForm(oldPassword, newPassword), headers),
+            T::class.java
+        )
+    }
+
+    @Test
+    fun `successful change password`() {
+        val newPass = "newPass"
+
+        updatePassword<Boolean>(userPass, newPass, jwt).run {
+            Assertions.assertTrue(statusCode.is2xxSuccessful)
+            Assertions.assertNotNull(body)
+            Assertions.assertTrue(body!!)
+        }
+
+        updatePassword<Boolean>(newPass, userPass, jwt).run {
+            Assertions.assertTrue(statusCode.is2xxSuccessful)
+            Assertions.assertNotNull(body)
+            Assertions.assertTrue(body!!)
+        }
+    }
+
+    @Test
+    fun `same password change password`() {
+        updatePassword<String>(userPass, userPass, jwt).run {
+            Assertions.assertTrue(statusCode.is4xxClientError)
+            Assertions.assertNotNull(body)
+            Assertions.assertTrue(body!!.isNotBlank())
+            Assertions.assertTrue("should be different" in body!!.lowercase())
+        }
+    }
+
+    @Test
+    fun `invalid password change password`() {
+        updatePassword<String>("invalid", "newPass", jwt).run {
+            Assertions.assertTrue(statusCode.is4xxClientError)
+            Assertions.assertNotNull(body)
+            Assertions.assertTrue(body!!.isNotBlank())
+            Assertions.assertTrue("must confirm" in body!!.lowercase())
+        }
+    }
+
+    @Test
+    fun `no JWT (update password)`() {
+        updatePassword<String>(userPass, "newPass", null).run {
+            Assertions.assertTrue(statusCode.is4xxClientError)
+            Assertions.assertNotNull(body)
+            Assertions.assertTrue(body!!.isNotBlank())
+            Assertions.assertTrue("must be authorized" in body!!.lowercase())
+        }
+    }
+
+    @Test
+    fun `invalid JWT (update password)`() {
+        updatePassword<String>(userPass, "newPass", "invalid").run {
             Assertions.assertTrue(statusCode.is4xxClientError)
             Assertions.assertNotNull(body)
             Assertions.assertTrue(body!!.isNotBlank())
