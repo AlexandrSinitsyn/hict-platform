@@ -26,28 +26,28 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findByLoginAndPassword(@Param("login") login: String,
                                @Param("password") password: String): Optional<User>
 
-    @Transactional
-    @Modifying
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Modifying(clearAutomatically = true)
     @Query("update User u set u.username = :username where u.id = :id")
     fun updateUsername(@Param("id") id: Long, @Param("username") username: String)
 
-    @Transactional
-    @Modifying
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(clearAutomatically = true)
     @Query("update User u set u.login = :login where u.id = :id")
     fun updateLogin(@Param("id") id: Long, @Param("login") login: String)
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    @Modifying
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(clearAutomatically = true)
     @Query("update User u set u.email = :email where u.id = :id")
     fun updateEmail(@Param("id") id: Long, @Param("email") email: String)
 
-    @Transactional
-    @Modifying
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(clearAutomatically = true)
     @Query("update User u set u.role = :role where u.id = :id")
     fun updateRole(@Param("id") id: Long, @Param("role") role: Role)
 
-    @Transactional
-    @Modifying
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(flushAutomatically = true)
     @Query(
         value = """
             update users
