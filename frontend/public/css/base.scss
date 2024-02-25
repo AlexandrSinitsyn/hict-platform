@@ -1,0 +1,32 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
+$bgcolor: $white;
+$highlighting: $pink;
+$unimportant: $gray-500;
+$text-color: $black;
+$border-color: $primary;
+$border-radius: 0.5rem;
+
+$success: map-get($theme-colors, "success");
+$info: map-get($theme-colors, "info");
+$warning: map-get($theme-colors, "warning");
+$error: map-get($theme-colors, "danger");
+
+@function opacity($c, $op) {
+  @return rgba(red($c), green($c), blue($c), $op);
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: $bgcolor;
+}
+
+* {
+  font-family: Comic Sans MS, Comic Sans, cursive;
+  font-style: italic;
+  color: $text-color;
+}
