@@ -1,12 +1,10 @@
 <template>
     <header>
-        <img alt="Logo" class="logo" src="/public/img/icon.ico" width="125" height="125" />
-
-        <h1 class="wrapper">{{ __NAME__ }}</h1>
+        <ToolbarComponent @goto="goto" />
     </header>
 
     <main>
-        <div>Platform</div>
+        <HomeComponent v-if="page == 'Home'" />
     </main>
 
     <footer>
@@ -18,7 +16,16 @@
 </template>
 
 <script setup lang="ts">
-import { __VERSION__, __AUTHOR__, __NAME__ } from '@/core/config';
+import ToolbarComponent from '@/components/ToolbarComponent.vue';
+import HomeComponent from '@/components/HomeComponent.vue';
+import { __VERSION__, __AUTHOR__ } from '@/core/config';
+import { type Ref, ref } from 'vue';
+
+const page: Ref<string> = ref('Home');
+
+function goto(pagename: string) {
+    page.value = pagename;
+}
 </script>
 
 <style lang="scss">
@@ -30,6 +37,10 @@ header {
     padding: 1rem;
     text-align: center;
     height: calc(100% - 2rem);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
 }
 
 main {

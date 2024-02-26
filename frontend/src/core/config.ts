@@ -4,6 +4,10 @@ export const __NAME__ = 'HiCT Platform';
 export const __AUTHOR__ = '@AlexSin';
 export const __VERSION__: string = process.env?.VITE_PROJECT_VERSION ?? '0.1';
 
+export const __AUTH_HOST__: string = process.env?.VITE_AUTH_HOST ?? 'unknown';
+
+export const AUTH = `http://${__AUTH_HOST__}/api/v1`;
+
 export function notify(type: 'info' | 'success' | 'warning' | 'error', message: string) {
     toast(message, {
         type: type,
