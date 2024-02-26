@@ -1,5 +1,5 @@
-import type { Jwt, LoginForm } from '@/core/types';
-import { authLogin } from '@/core/server-requests';
+import type { Jwt, LoginForm, RegisterForm } from '@/core/types';
+import { authLogin, authRegister } from '@/core/server-requests';
 import { notify } from '@/core/config';
 
 const JWT_STORAGE_KEY = 'JWT_STORAGE_KEY';
@@ -21,4 +21,15 @@ export function login(form: LoginForm) {
         saveJwt(jwt);
         notify('info', 'Successful log in');
     });
+}
+
+export function register(form: RegisterForm) {
+    authRegister(form, (jwt: Jwt) => {
+        saveJwt(jwt);
+        notify('info', 'Successful register');
+    });
+}
+
+export function logout() {
+    forgetJwt();
 }

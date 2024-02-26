@@ -5,3 +5,10 @@ export interface LoginForm {
     email?: string;
     password: string;
 }
+
+export interface RegisterForm {
+    username: string;
+    login: string;
+    email: string;
+    password: string;
+}

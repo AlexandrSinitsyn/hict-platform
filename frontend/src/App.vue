@@ -4,7 +4,7 @@
     </header>
 
     <main>
-        <HomeComponent v-if="page == 'Home'" />
+        <HomeComponent v-if="page == 'Home'" @entered="enter" />
     </main>
 
     <footer>
@@ -20,11 +20,18 @@ import ToolbarComponent from '@/components/ToolbarComponent.vue';
 import HomeComponent from '@/components/HomeComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
 import { type Ref, ref } from 'vue';
+import type { Jwt } from '@/core/types';
+import { getJwt } from '@/core/authentication';
 
 const page: Ref<string> = ref('Home');
+const jwt: Ref<Jwt | undefined> = ref(undefined);
 
 function goto(pagename: string) {
     page.value = pagename;
+}
+
+function enter() {
+    jwt.value = getJwt();
 }
 </script>
 

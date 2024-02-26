@@ -2,11 +2,13 @@
     <div>
         <img alt="Logo" class="logo" src="/public/img/icon.ico" width="125" height="125" />
 
-        <h1 class="wrapper">{{ __NAME__ }}</h1>
+        <h1>{{ __NAME__ }}</h1>
 
-        <div class="authentication">
-<!--            fixme-->
-<!--            <LoginForm />-->
+        <div class="authentication" v-if="jwt">
+            <div>{{ jwt ?? 'Not authorized' }}</div>
+            <div class="btn btn-outline-primary" @click="logout">
+                <span class="bi bi-box-arrow-right"></span>
+            </div>
         </div>
 
         <nav>
@@ -17,6 +19,12 @@
 
 <script setup lang="ts">
 import { __NAME__ } from '@/core/config';
+import type { Jwt } from '@/core/types';
+import { logout } from '@/core/authentication';
+
+const props = defineProps<{
+    jwt: Jwt | undefined;
+}>();
 
 const emit = defineEmits<{
     (e: 'goto', page: string): void;

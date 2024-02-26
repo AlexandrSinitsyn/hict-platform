@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import { AUTH, notify } from '@/core/config';
-import type { LoginForm, Jwt } from '@/core/types';
+import type { Jwt, LoginForm, RegisterForm } from '@/core/types';
 
 export type SuccessCallback<E> = (e: E) => void;
 
@@ -23,6 +23,13 @@ const errorHandler = (error: AxiosError) => {
 export function authLogin(form: LoginForm, onSuccess: SuccessCallback<Jwt>): void {
     axios
         .post<LoginForm, AxiosResponse<Jwt>>(`${AUTH}/auth/login`, form)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+export function authRegister(form: RegisterForm, onSuccess: SuccessCallback<Jwt>): void {
+    axios
+        .post<RegisterForm, AxiosResponse<Jwt>>(`${AUTH}/auth/register`, form)
         .then(handler(onSuccess))
         .catch(errorHandler);
 }
