@@ -25,21 +25,28 @@ import { __VERSION__, __AUTHOR__, __NAME__ } from '@/core/config';
 $aside-size: 15vw;
 
 header {
-    position: absolute;
+    position: fixed;
     width: $aside-size;
     padding: 1rem;
     text-align: center;
+    height: calc(100% - 2rem);
 }
 
 main {
     margin: 1rem 1rem 0 calc(1rem + $aside-size);
+    padding: 1rem;
+    min-height: calc(100vh - 4rem);
+    border-left: 1px solid gray;
 }
 
 footer {
-    border-top: 1px solid gray;
-    $shift: 4rem;
-    margin: 1rem $shift 0 calc($shift + $aside-size);
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: $aside-size;
+    margin: 1rem;
     padding: 1rem;
+    border-top: 1px solid gray;
     text-align: center;
     font-size: 0.8rem;
 
