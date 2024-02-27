@@ -6,6 +6,7 @@
     <main>
         <HomeComponent v-if="page == 'Home'" @entered="enter" />
         <DatabaseComponent v-if="page == 'Database'" />
+        <UploadComponent v-if="page == 'Upload'" @uploaded="() => goto('Database')" />
     </main>
 
     <footer>
@@ -20,6 +21,7 @@
 import ToolbarComponent from '@/components/ToolbarComponent.vue';
 import HomeComponent from '@/components/HomeComponent.vue';
 import DatabaseComponent from '@/components/DatabaseComponent.vue';
+import UploadComponent from '@/components/UploadComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
 import { onMounted, type Ref, ref } from 'vue';
 import type { User } from '@/core/types';

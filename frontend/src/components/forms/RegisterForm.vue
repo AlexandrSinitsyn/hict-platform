@@ -9,7 +9,7 @@
             Register
         </button>
         <AbstractForm id="registerFormModal" title="Register" @submit="submit">
-            <div class="login">
+            <div class="register">
                 <span class="username-label">Username</span>
                 <input class="username" type="text" v-model="username" />
                 <span class="login-label">Login</span>
@@ -59,7 +59,7 @@ function submit() {
 </script>
 
 <style scoped lang="scss">
-.login {
+.register {
     display: grid;
     grid-template-areas:
         'username-label username'

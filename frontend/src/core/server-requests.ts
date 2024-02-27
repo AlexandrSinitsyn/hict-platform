@@ -1,6 +1,7 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import { AUTH, notify, SERVER } from '@/core/config';
-import type { Jwt, LoginForm, RegisterForm, User } from '@/core/types';
+import type { HiCMap, Jwt, LoginForm, RegisterForm, User } from '@/core/types';
+import { getJwt } from '@/core/authentication';
 
 export type SuccessCallback<E> = (e: E) => void;
 
@@ -38,6 +39,32 @@ export function requestUser(jwt: Jwt, onSuccess: SuccessCallback<User | undefine
     axios
         .get<never, AxiosResponse<User>>(`${SERVER}/users/self`, {
             headers: { Authorization: `Bearer ${jwt}` },
+        })
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+export function getAllHiCMaps(onSuccess: SuccessCallback<HiCMap[]>): void {
+    axios
+        .get<never, AxiosResponse<HiCMap[]>>(`${SERVER}/hi-c/all`)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+export function publishHiCMap(formData: FormData, onSuccess: SuccessCallback<HiCMap>): void {
+    const jwt = getJwt();
+
+    if (!jwt) {
+        notify('error', 'Not authorized');
+        return;
+    }
+
+    axios
+        .post<FormData, AxiosResponse<HiCMap>>(`${SERVER}/hi-c/publish`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${jwt}`,
+            },
         })
         .then(handler(onSuccess))
         .catch(errorHandler);
