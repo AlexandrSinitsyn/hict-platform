@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
-import { AUTH, notify } from '@/core/config';
-import type { Jwt, LoginForm, RegisterForm } from '@/core/types';
+import { AUTH, notify, SERVER } from '@/core/config';
+import type { Jwt, LoginForm, RegisterForm, User } from '@/core/types';
 
 export type SuccessCallback<E> = (e: E) => void;
 
@@ -30,6 +30,15 @@ export function authLogin(form: LoginForm, onSuccess: SuccessCallback<Jwt>): voi
 export function authRegister(form: RegisterForm, onSuccess: SuccessCallback<Jwt>): void {
     axios
         .post<RegisterForm, AxiosResponse<Jwt>>(`${AUTH}/auth/register`, form)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+export function requestUser(jwt: Jwt, onSuccess: SuccessCallback<User | undefined>): void {
+    axios
+        .get<never, AxiosResponse<User>>(`${SERVER}/users/self`, {
+            headers: { Authorization: `Bearer ${jwt}` },
+        })
         .then(handler(onSuccess))
         .catch(errorHandler);
 }

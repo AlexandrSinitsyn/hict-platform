@@ -12,3 +12,10 @@ export interface RegisterForm {
     email: string;
     password: string;
 }
+
+export interface User {
+    id: number;
+    username: string;
+    login: string;
+    email: string;
+}

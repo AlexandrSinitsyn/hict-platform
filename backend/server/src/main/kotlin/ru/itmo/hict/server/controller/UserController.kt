@@ -4,7 +4,10 @@ import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
+import org.springframework.validation.DirectFieldBindingResult
 import org.springframework.web.bind.annotation.*
+import ru.itmo.hict.dto.UserInfoDto
+import ru.itmo.hict.dto.UserInfoDto.Companion.toInfoDto
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
@@ -24,6 +27,10 @@ class UserController(
 
     @GetMapping("/count")
     fun count(): ResponseEntity<Long> = userService.count().run { ResponseEntity.ok(this) }
+
+    @GetMapping("/self")
+    fun self(): ResponseEntity<UserInfoDto> =
+        authorized(DirectFieldBindingResult(this, "jwt")).run { ResponseEntity.ok(this.toInfoDto()) }
 
     private fun authorized(bindingResult: BindingResult): User {
         requestUserInfo.user?.let { return it }

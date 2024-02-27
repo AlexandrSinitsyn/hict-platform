@@ -1,6 +1,6 @@
 <template>
     <header>
-        <ToolbarComponent @goto="goto" />
+        <ToolbarComponent :user="user" @goto="goto" />
     </header>
 
     <main>
@@ -19,20 +19,24 @@
 import ToolbarComponent from '@/components/ToolbarComponent.vue';
 import HomeComponent from '@/components/HomeComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
-import { type Ref, ref } from 'vue';
-import type { Jwt } from '@/core/types';
-import { getJwt } from '@/core/authentication';
+import { onMounted, type Ref, ref } from 'vue';
+import type { User } from '@/core/types';
+import { getAuthorizedUser } from '@/core/authentication';
 
 const page: Ref<string> = ref('Home');
-const jwt: Ref<Jwt | undefined> = ref(undefined);
+const user: Ref<User | undefined> = ref(undefined);
 
 function goto(pagename: string) {
     page.value = pagename;
 }
 
 function enter() {
-    jwt.value = getJwt();
+    getAuthorizedUser((u) => {
+        user.value = u;
+    });
 }
+
+onMounted(enter);
 </script>
 
 <style lang="scss">

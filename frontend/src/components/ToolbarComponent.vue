@@ -4,8 +4,8 @@
 
         <h1>{{ __NAME__ }}</h1>
 
-        <div class="authentication" v-if="jwt">
-            <div>{{ jwt ?? 'Not authorized' }}</div>
+        <div class="authentication" v-if="user">
+            <div>{{ user?.username ?? 'Not authorized' }}</div>
             <div class="btn btn-outline-primary" @click="logout">
                 <span class="bi bi-box-arrow-right"></span>
             </div>
@@ -19,11 +19,11 @@
 
 <script setup lang="ts">
 import { __NAME__ } from '@/core/config';
-import type { Jwt } from '@/core/types';
+import type { User } from '@/core/types';
 import { logout } from '@/core/authentication';
 
 const props = defineProps<{
-    jwt: Jwt | undefined;
+    user: User | undefined;
 }>();
 
 const emit = defineEmits<{

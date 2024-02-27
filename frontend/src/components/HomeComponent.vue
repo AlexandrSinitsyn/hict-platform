@@ -5,9 +5,9 @@
         <h1>{{ __NAME__ }}</h1>
 
         <div class="auth">
-            <LoginForm @submit="auth(login)" />
+            <LoginForm @submit="(form) => auth(login, form)" />
 
-            <RegisterForm @submit="auth(register)" />
+            <RegisterForm @submit="(form) => auth(register, form)" />
         </div>
     </div>
 </template>
@@ -22,10 +22,9 @@ const emit = defineEmits<{
     (e: 'entered'): void;
 }>();
 
-const auth = (method: () => void) => {
-    method();
-    emit('entered');
-};
+function auth<F>(method: (f: F, then: () => void) => void, form: F) {
+    method(form, () => emit('entered'));
+}
 </script>
 
 <style scoped lang="scss">
