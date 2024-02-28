@@ -5,8 +5,9 @@
 
     <main>
         <HomeComponent v-if="page == 'Home'" @entered="enter" />
-        <DatabaseComponent v-if="page == 'Database'" />
+        <DatabaseComponent v-if="page == 'Database'" @selected="selected" />
         <UploadComponent v-if="page == 'Upload'" @uploaded="() => goto('Database')" />
+        <ViewComponent v-if="page == 'View'" :map="currentView" />
     </main>
 
     <footer>
@@ -22,13 +23,15 @@ import ToolbarComponent from '@/components/ToolbarComponent.vue';
 import HomeComponent from '@/components/HomeComponent.vue';
 import DatabaseComponent from '@/components/DatabaseComponent.vue';
 import UploadComponent from '@/components/UploadComponent.vue';
+import ViewComponent from '@/components/ViewComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
 import { onMounted, type Ref, ref } from 'vue';
-import type { User } from '@/core/types';
+import type { HiCMap, User } from '@/core/types';
 import { getAuthorizedUser } from '@/core/authentication';
 
 const page: Ref<string> = ref('Home');
 const user: Ref<User | undefined> = ref(undefined);
+const currentView: Ref<HiCMap | undefined> = ref(undefined);
 
 function goto(pagename: string) {
     page.value = pagename;
@@ -38,6 +41,10 @@ function enter() {
     getAuthorizedUser((u) => {
         user.value = u;
     });
+}
+
+function selected(map: HiCMap) {
+    currentView.value = map;
 }
 
 onMounted(enter);

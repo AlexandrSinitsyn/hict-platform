@@ -3,7 +3,7 @@
         <h1>Hi-C Maps database</h1>
 
         <div class="database">
-            <div class="hic" v-for="hic in hicMaps" :key="hic.id">
+            <div class="hic" v-for="hic in hicMaps" :key="hic.id" @click="emit('selected', hic)">
                 {{ hic.meta.name }}
             </div>
         </div>
@@ -14,6 +14,10 @@
 import { onMounted, type Ref, ref } from 'vue';
 import { getAllHiCMaps } from '@/core/server-requests';
 import type { HiCMap } from '@/core/types';
+
+const emit = defineEmits<{
+    (e: 'selected', map: HiCMap): void;
+}>();
 
 const hicMaps: Ref<HiCMap[]> = ref([]);
 
