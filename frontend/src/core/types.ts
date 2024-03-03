@@ -20,6 +20,17 @@ export interface User {
     email: string;
 }
 
+export interface UpdateUserInfo {
+    username: string | null;
+    login: string | null;
+    email: string | null;
+}
+
+export interface UpdateUserPassword {
+    oldPassword: string | undefined;
+    newPassword: string | undefined;
+}
+
 export interface HiCCreationForm {
     name: string;
     description: string;

@@ -17,6 +17,9 @@ class UserService(
     fun checkCredentials(user: User, password: String) =
         userRepository.findByLoginAndPassword(user.login, password).isPresent
 
+    fun isUniqueLoginAndEmail(login: String?, email: String?) =
+        userRepository.findByLoginOrEmail(login, email).isEmpty
+
     fun updateUsername(user: User, username: String) = userRepository.updateUsername(user.id!!, username)
 
     fun updateLogin(user: User, login: String) = userRepository.updateLogin(user.id!!, login)

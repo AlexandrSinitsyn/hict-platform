@@ -5,32 +5,36 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.validation.DirectFieldBindingResult
+import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
-import ru.itmo.hict.dto.UserInfoDto
-import ru.itmo.hict.dto.UserInfoDto.Companion.toInfoDto
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
-import ru.itmo.hict.server.form.UpdateEmailForm
-import ru.itmo.hict.server.form.UpdateLoginForm
-import ru.itmo.hict.server.form.UpdatePasswordForm
-import ru.itmo.hict.server.form.UpdateUsernameForm
+import ru.itmo.hict.server.form.*
+import ru.itmo.hict.server.form.UserExtendedInfo.Companion.toExtendedInfo
 import ru.itmo.hict.server.service.UserService
+import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(
     private val userService: UserService,
+    private val updateUserInfoFormValidator: UpdateUserInfoFormValidator,
 ) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
+
+    @InitBinder("form")
+    fun initPublishBinder(webDataBinder: WebDataBinder) {
+        webDataBinder.addValidators(updateUserInfoFormValidator)
+    }
 
     @GetMapping("/count")
     fun count(): ResponseEntity<Long> = userService.count().run { ResponseEntity.ok(this) }
 
     @GetMapping("/self")
-    fun self(): ResponseEntity<UserInfoDto> =
-        authorized(DirectFieldBindingResult(this, "jwt")).run { ResponseEntity.ok(this.toInfoDto()) }
+    fun self(): ResponseEntity<UserExtendedInfo> =
+        authorized(DirectFieldBindingResult(this, "jwt")).run { ResponseEntity.ok(this.toExtendedInfo()) }
 
     private fun authorized(bindingResult: BindingResult): User {
         requestUserInfo.user?.let { return it }
@@ -42,6 +46,7 @@ class UserController(
     private fun notSame(field: String, bindingResult: BindingResult, test: () -> Boolean) {
         if (!test()) {
             bindingResult.reject("same-$field", "New $field should be different")
+            throw ValidationException(bindingResult)
         }
     }
 
@@ -51,44 +56,30 @@ class UserController(
         }
     }
 
-    @PatchMapping("/update/username")
-    fun updateUsername(@RequestBody @Valid form: UpdateUsernameForm,
-                       bindingResult: BindingResult): ResponseEntity<Boolean> {
-        val user = authorized(bindingResult)
-
-        notSame("username", bindingResult) { user.username != form.username }
-
+    @PatchMapping("/update/info")
+    fun updateInfo(@RequestBody @Valid form: UpdateUserInfoForm,
+                   bindingResult: BindingResult): ResponseEntity<Boolean> {
         checkNoErrors(bindingResult)
 
-        userService.updateUsername(user, form.username)
-
-        return ResponseEntity.ok(true)
-    }
-
-    @PatchMapping("/update/login")
-    fun updateLogin(@RequestBody @Valid form: UpdateLoginForm,
-                    bindingResult: BindingResult): ResponseEntity<Boolean> {
         val user = authorized(bindingResult)
 
-        notSame("login", bindingResult) { user.login != form.login }
+        form.username?.let {
+            notSame("username", bindingResult) { user.username != it }
 
-        checkNoErrors(bindingResult)
+            userService.updateUsername(user, it)
+        }
 
-        userService.updateLogin(user, form.login)
+        form.login?.let {
+            notSame("login", bindingResult) { user.login != it }
 
-        return ResponseEntity.ok(true)
-    }
+            userService.updateLogin(user, it)
+        }
 
-    @PatchMapping("/update/email")
-    fun updateEmail(@RequestBody @Valid form: UpdateEmailForm,
-                    bindingResult: BindingResult): ResponseEntity<Boolean> {
-        val user = authorized(bindingResult)
+        form.email?.let {
+            notSame("email", bindingResult) { user.email != it }
 
-        notSame("email", bindingResult) { user.email != form.email }
-
-        checkNoErrors(bindingResult)
-
-        userService.updateEmail(user, form.email)
+            userService.updateEmail(user, it)
+        }
 
         return ResponseEntity.ok(true)
     }

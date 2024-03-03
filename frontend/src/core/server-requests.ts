@@ -1,6 +1,14 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import { AUTH, notify, SERVER } from '@/core/config';
-import type { HiCMap, Jwt, LoginForm, RegisterForm, User } from '@/core/types';
+import type {
+    HiCMap,
+    Jwt,
+    LoginForm,
+    RegisterForm,
+    UpdateUserInfo,
+    UpdateUserPassword,
+    User,
+} from '@/core/types';
 import { getJwt } from '@/core/authentication';
 
 export type SuccessCallback<E> = (e: E) => void;
@@ -51,6 +59,28 @@ export function getAllHiCMaps(onSuccess: SuccessCallback<HiCMap[]>): void {
         .catch(errorHandler);
 }
 
+function authorizedRequest<T, R>(
+    method: typeof axios.post,
+    url: string,
+    data: T,
+    onSuccess: SuccessCallback<R>
+): void {
+    const jwt = getJwt();
+
+    if (!jwt) {
+        notify('error', 'Not authorized');
+        return;
+    }
+
+    method<T, AxiosResponse<R>>(url, data, {
+        headers: {
+            Authorization: `Bearer ${jwt}`,
+        },
+    })
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
 export function publishHiCMap(formData: FormData, onSuccess: SuccessCallback<HiCMap>): void {
     const jwt = getJwt();
 
@@ -68,4 +98,15 @@ export function publishHiCMap(formData: FormData, onSuccess: SuccessCallback<HiC
         })
         .then(handler(onSuccess))
         .catch(errorHandler);
+}
+
+export function updateUserInfo(form: UpdateUserInfo, onSuccess: SuccessCallback<boolean>): void {
+    authorizedRequest(axios.patch, `${SERVER}/users/update/info`, form, onSuccess);
+}
+
+export function updateUserPassword(
+    form: UpdateUserPassword,
+    onSuccess: SuccessCallback<boolean>
+): void {
+    authorizedRequest(axios.patch, `${SERVER}/users/update/password`, form, onSuccess);
 }

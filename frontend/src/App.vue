@@ -8,6 +8,7 @@
         <DatabaseComponent v-if="page == 'Database'" @selected="selected" />
         <UploadComponent v-if="page == 'Upload'" @uploaded="() => goto('Database')" />
         <ViewComponent v-if="page == 'View'" :map="currentView" />
+        <AccountComponent v-if="page == 'Account'" :user="user" @updated="userInfoUpdated" />
     </main>
 
     <footer>
@@ -24,6 +25,7 @@ import HomeComponent from '@/components/HomeComponent.vue';
 import DatabaseComponent from '@/components/DatabaseComponent.vue';
 import UploadComponent from '@/components/UploadComponent.vue';
 import ViewComponent from '@/components/ViewComponent.vue';
+import AccountComponent from '@/components/AccountComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
 import { onMounted, type Ref, ref } from 'vue';
 import type { HiCMap, User } from '@/core/types';
@@ -45,6 +47,11 @@ function enter() {
 
 function selected(map: HiCMap) {
     currentView.value = map;
+}
+
+function userInfoUpdated() {
+    enter();
+    goto('Home');
 }
 
 onMounted(enter);

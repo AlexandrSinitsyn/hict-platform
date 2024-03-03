@@ -16,11 +16,10 @@ import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.controller.UserController
 import ru.itmo.hict.server.exception.ValidationException
-import ru.itmo.hict.server.form.UpdateEmailForm
-import ru.itmo.hict.server.form.UpdateLoginForm
 import ru.itmo.hict.server.form.UpdatePasswordForm
-import ru.itmo.hict.server.form.UpdateUsernameForm
+import ru.itmo.hict.server.form.UpdateUserInfoForm
 import ru.itmo.hict.server.service.UserService
+import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 import java.sql.Timestamp
 import kotlin.random.Random
 
@@ -34,6 +33,7 @@ class UserControllerTests {
 
         private lateinit var userController: UserController
         private lateinit var userService: UserService
+        private lateinit var updateUserInfoFormValidator: UpdateUserInfoFormValidator
 
         private fun testRequestUserInfo() = RequestUserInfo("test-jwt", user)
 
@@ -57,7 +57,8 @@ class UserControllerTests {
         @BeforeAll
         fun init() {
             userService = mock<UserService>()
-            userController = UserController(userService)
+            updateUserInfoFormValidator = mock<UpdateUserInfoFormValidator>()
+            userController = UserController(userService, updateUserInfoFormValidator)
 
             setCorrectRequestUserInfo()
         }
@@ -77,7 +78,7 @@ class UserControllerTests {
 
     @TestMethodOrder(OrderAnnotation::class)
     abstract inner class UpdateField<Form>(protected val form: Form,
-                                           private val mocks: () -> Unit,
+                                           protected val mocks: () -> Unit,
                                            protected val method: (Form, BindingResult) -> ResponseEntity<Boolean>) {
         protected val bindingResult: BindingResult = DirectFieldBindingResult(this, "test")
 
@@ -120,25 +121,48 @@ class UserControllerTests {
     }
 
     @Nested
-    inner class UpdateUsername : UpdateField<UpdateUsernameForm>(
-        UpdateUsernameForm("newUsername"),
-        { doNothing().whenever(userService).updateUsername(any(), any()) },
-        userController::updateUsername,
-    )
+    inner class UpdateUsername : UpdateField<UpdateUserInfoForm>(
+        UpdateUserInfoForm("newUsername", "newLogin", "new@email.com"),
+        {
+            doNothing().whenever(userService).updateUsername(any(), any())
+            doNothing().whenever(userService).updateLogin(any(), any())
+            doNothing().whenever(userService).updateEmail(any(), any())
+        },
+        userController::updateInfo,
+    ) {
+        @Order(2)
+        @Test
+        fun `correct partial update`() {
+            mocks()
 
-    @Nested
-    inner class UpdateLogin : UpdateField<UpdateLoginForm>(
-        UpdateLoginForm("newLogin"),
-        { doNothing().whenever(userService).updateLogin(any(), any()) },
-        userController::updateLogin,
-    )
+            fun test(form: UpdateUserInfoForm) {
+                val response = method(form, bindingResult)
 
-    @Nested
-    inner class UpdateEmail : UpdateField<UpdateEmailForm>(
-        UpdateEmailForm("new@email.com"),
-        { doNothing().whenever(userService).updateEmail(any(), any()) },
-        userController::updateEmail,
-    )
+                Assertions.assertTrue(response.statusCode.is2xxSuccessful)
+                Assertions.assertNotNull(response.body)
+                Assertions.assertEquals(true, response.body!!)
+            }
+
+            test(UpdateUserInfoForm("newUsername", null, null))
+            test(UpdateUserInfoForm(null, "newLogin", null))
+            test(UpdateUserInfoForm(null, null, "new@email.com"))
+        }
+
+        @Order(3)
+        @Test
+        fun `nothing to update`() {
+            mocks()
+
+            try {
+                method(UpdateUserInfoForm(null, null, null), bindingResult)
+            } catch (e: ValidationException) {
+                Assertions.assertNotNull(e.bindingResult)
+                Assertions.assertTrue(e.bindingResult.hasErrors())
+                Assertions.assertNotNull(e.bindingResult.allErrors.first().defaultMessage)
+                Assertions.assertTrue("require at least one" in e.bindingResult.allErrors.first().defaultMessage!!)
+            }
+        }
+    }
 
     @Nested
     inner class UpdatePassword : UpdateField<UpdatePasswordForm>(

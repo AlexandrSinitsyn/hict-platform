@@ -26,6 +26,16 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findByLoginAndPassword(@Param("login") login: String,
                                @Param("password") password: String): Optional<User>
 
+    @Query(
+        value = """
+            select u
+            from User u
+            where (:login is not null and u.login = :login)
+               or (:email is not null and u.email = :email)
+        """,
+    )
+    fun findByLoginOrEmail(@Param("login") login: String?, @Param("email") email: String?): Optional<User>
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Modifying(clearAutomatically = true)
     @Query("update User u set u.username = :username where u.id = :id")
