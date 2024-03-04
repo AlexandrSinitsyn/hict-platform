@@ -7,6 +7,7 @@ import org.springframework.validation.BindingResult
 import org.springframework.validation.DirectFieldBindingResult
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
+import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
@@ -32,16 +33,22 @@ class UserController(
     @GetMapping("/count")
     fun count(): ResponseEntity<Long> = userService.count().run { ResponseEntity.ok(this) }
 
-    @GetMapping("/self")
-    fun self(): ResponseEntity<UserExtendedInfo> =
-        authorized(DirectFieldBindingResult(this, "jwt")).run { ResponseEntity.ok(this.toExtendedInfo()) }
-
     private fun authorized(bindingResult: BindingResult): User {
         requestUserInfo.user?.let { return it }
 
         bindingResult.reject("not-authorized", "You must be authorized to update your profile")
         throw ValidationException(bindingResult)
     }
+
+    @GetMapping("/self")
+    fun self(): ResponseEntity<UserExtendedInfo> =
+        authorized(DirectFieldBindingResult(this, "jwt")).run { ResponseEntity.ok(this.toExtendedInfo()) }
+
+    @GetMapping("/all")
+    fun all(): ResponseEntity<List<UserExtendedInfo>> =
+        authorized(DirectFieldBindingResult(this, "jwt")).run {
+            ResponseEntity.ok(userService.getAll().map { it.toExtendedInfo() })
+        }
 
     private fun notSame(field: String, bindingResult: BindingResult, test: () -> Boolean) {
         if (!test()) {
@@ -80,6 +87,29 @@ class UserController(
 
             userService.updateEmail(user, it)
         }
+
+        return ResponseEntity.ok(true)
+    }
+
+    @PatchMapping("/update/role")
+    fun updateRole(@RequestBody @Valid form: UpdateRoleForm,
+                   bindingResult: BindingResult): ResponseEntity<Boolean> {
+        val user = authorized(bindingResult)
+
+        val acceptor = userService.getById(form.id)
+
+        when {
+            user.role < Role.ADMIN ->
+                bindingResult.reject("not-admin", "You must have an admin role to do this")
+            acceptor == null -> bindingResult.reject("no-user-found",
+                "No user found with provided ID=${form.id}")
+            user.role <= acceptor.role ->
+                bindingResult.reject("too-low-grade", "You must have a higher grade to do this")
+        }
+
+        checkNoErrors(bindingResult)
+
+        userService.updateRole(acceptor!!, form.newRole)
 
         return ResponseEntity.ok(true)
     }

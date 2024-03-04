@@ -14,6 +14,8 @@ class UserService(
 
     fun getById(id: Long): User? = userRepository.findById(id).getOrNull()
 
+    fun getAll(): List<User> = userRepository.findAll()
+
     fun checkCredentials(user: User, password: String) =
         userRepository.findByLoginAndPassword(user.login, password).isPresent
 

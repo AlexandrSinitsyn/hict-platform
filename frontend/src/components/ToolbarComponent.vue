@@ -30,7 +30,7 @@ const emit = defineEmits<{
     (e: 'goto', page: string): void;
 }>();
 
-const pages = ['Home', 'Database', 'Upload', 'Account'];
+const pages = ['Home', 'Database', 'Upload', 'Account', 'Admin'];
 </script>
 
 <style scoped lang="scss">

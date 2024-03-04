@@ -9,6 +9,7 @@
         <UploadComponent v-if="page == 'Upload'" @uploaded="() => goto('Database')" />
         <ViewComponent v-if="page == 'View'" :map="currentView" />
         <AccountComponent v-if="page == 'Account'" :user="user" @updated="userInfoUpdated" />
+        <AdminComponent v-if="page == 'Admin'" :user="user" />
     </main>
 
     <footer>
@@ -26,6 +27,7 @@ import DatabaseComponent from '@/components/DatabaseComponent.vue';
 import UploadComponent from '@/components/UploadComponent.vue';
 import ViewComponent from '@/components/ViewComponent.vue';
 import AccountComponent from '@/components/AccountComponent.vue';
+import AdminComponent from '@/components/AdminComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
 import { onMounted, type Ref, ref } from 'vue';
 import type { HiCMap, User } from '@/core/types';

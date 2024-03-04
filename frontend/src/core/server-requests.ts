@@ -7,6 +7,7 @@ import type {
     RegisterForm,
     UpdateUserInfo,
     UpdateUserPassword,
+    UpdateUserRole,
     User,
 } from '@/core/types';
 import { getJwt } from '@/core/authentication';
@@ -53,10 +54,7 @@ export function requestUser(jwt: Jwt, onSuccess: SuccessCallback<User | undefine
 }
 
 export function getAllHiCMaps(onSuccess: SuccessCallback<HiCMap[]>): void {
-    axios
-        .get<never, AxiosResponse<HiCMap[]>>(`${SERVER}/hi-c/all`)
-        .then(handler(onSuccess))
-        .catch(errorHandler);
+    authorizedGetRequest(`${SERVER}/hi-c/all`, onSuccess);
 }
 
 function authorizedRequest<T, R>(
@@ -77,6 +75,24 @@ function authorizedRequest<T, R>(
             Authorization: `Bearer ${jwt}`,
         },
     })
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+function authorizedGetRequest<R>(url: string, onSuccess: SuccessCallback<R>): void {
+    const jwt = getJwt();
+
+    if (!jwt) {
+        notify('error', 'Not authorized');
+        return;
+    }
+
+    axios
+        .get<never, AxiosResponse<R>>(url, {
+            headers: {
+                Authorization: `Bearer ${jwt}`,
+            },
+        })
         .then(handler(onSuccess))
         .catch(errorHandler);
 }
@@ -109,4 +125,12 @@ export function updateUserPassword(
     onSuccess: SuccessCallback<boolean>
 ): void {
     authorizedRequest(axios.patch, `${SERVER}/users/update/password`, form, onSuccess);
+}
+
+export function updateUserRole(form: UpdateUserRole, onSuccess: SuccessCallback<boolean>): void {
+    authorizedRequest(axios.patch, `${SERVER}/users/update/role`, form, onSuccess);
+}
+
+export function getAllUsers(onSuccess: SuccessCallback<User[]>): void {
+    authorizedGetRequest(`${SERVER}/users/all`, onSuccess);
 }

@@ -13,11 +13,19 @@ export interface RegisterForm {
     password: string;
 }
 
+export enum Role {
+    ANONYMOUS,
+    USER,
+    ADMIN,
+    SUPERUSER,
+}
+
 export interface User {
     id: number;
     username: string;
     login: string;
     email: string;
+    role: Role;
 }
 
 export interface UpdateUserInfo {
@@ -29,6 +37,11 @@ export interface UpdateUserInfo {
 export interface UpdateUserPassword {
     oldPassword: string | undefined;
     newPassword: string | undefined;
+}
+
+export interface UpdateUserRole {
+    id: number;
+    newRole: Role;
 }
 
 export interface HiCCreationForm {

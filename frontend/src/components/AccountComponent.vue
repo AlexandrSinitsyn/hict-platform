@@ -22,6 +22,11 @@
             </div>
 
             <div class="form-group row">
+                <label class="col-sm-1 col-form-label col-form-label">Role</label>
+                <label class="col-sm-1 col-form-label col-form-label">{{ user?.role }}</label>
+            </div>
+
+            <div class="form-group row">
                 <label for="colFormLabelLg" class="col-sm-1 col-form-label col-form-label" />
                 <div class="col-sm-5">
                     <div class="btn btn-primary" @click="updateInfo">Update</div>
