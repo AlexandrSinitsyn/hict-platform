@@ -21,7 +21,7 @@
                     <td>{{ u.email }}</td>
                     <td>{{ u.role }}</td>
                     <td>
-                        <UpdateUserRoleForm :user="u" @submit="setRole" />
+                        <UpdateUserRoleFormComponent :user="u" @submit="setRole" />
                     </td>
                 </tr>
             </tbody>
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import UpdateUserRoleForm from '@/components/forms/UpdateUserRoleForm.vue';
+import UpdateUserRoleFormComponent from '@/components/forms/UpdateUserRoleFormComponent.vue';
 import { type User, Role } from '@/core/types';
 import { isAtLeast } from '@/core/extensions';
 import { onMounted, type Ref, ref } from 'vue';

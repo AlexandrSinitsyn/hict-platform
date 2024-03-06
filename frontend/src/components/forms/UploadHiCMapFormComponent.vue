@@ -10,19 +10,19 @@
         >
             Upload
         </button>
-        <AbstractForm id="uploadFormModal" title="Upload Hi-C Maps" @submit="submit">
+        <AbstractFormComponent id="uploadFormModal" title="Upload Hi-C Maps" @submit="submit">
             <div class="upload">
                 <span class="name-label">Name</span>
                 <input class="name" type="text" v-model="name" />
                 <span class="description-label">Description</span>
                 <input class="description" type="text" v-model="description" />
             </div>
-        </AbstractForm>
+        </AbstractFormComponent>
     </div>
 </template>
 
 <script setup lang="ts">
-import AbstractForm from '@/components/forms/AbstractForm.vue';
+import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
 import { type HiCCreationForm } from '@/core/types';
 import { notify } from '@/core/config';

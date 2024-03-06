@@ -8,7 +8,7 @@
         >
             Register
         </button>
-        <AbstractForm id="registerFormModal" title="Register" @submit="submit">
+        <AbstractFormComponent id="registerFormModal" title="Register" @submit="submit">
             <div class="register">
                 <span class="username-label">Username</span>
                 <input class="username" type="text" v-model="username" />
@@ -19,12 +19,12 @@
                 <span class="password-label">Password</span>
                 <input class="password" type="password" v-model="password" />
             </div>
-        </AbstractForm>
+        </AbstractFormComponent>
     </div>
 </template>
 
 <script setup lang="ts">
-import AbstractForm from '@/components/forms/AbstractForm.vue';
+import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
 import { type RegisterForm } from '@/core/types';
 import { notify } from '@/core/config';

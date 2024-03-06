@@ -5,16 +5,16 @@
         <h1>{{ __NAME__ }}</h1>
 
         <div class="auth">
-            <LoginForm @submit="(form) => auth(login, form)" />
+            <LoginFormComponent @submit="(form) => auth(login, form)" />
 
-            <RegisterForm @submit="(form) => auth(register, form)" />
+            <RegisterFormComponent @submit="(form) => auth(register, form)" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import LoginForm from '@/components/forms/LoginForm.vue';
-import RegisterForm from '@/components/forms/RegisterForm.vue';
+import LoginFormComponent from '@/components/forms/LoginFormComponent.vue';
+import RegisterFormComponent from '@/components/forms/RegisterFormComponent.vue';
 import { __NAME__ } from '@/core/config';
 import { login, register } from '@/core/authentication';
 

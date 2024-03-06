@@ -8,19 +8,19 @@
         >
             Login
         </button>
-        <AbstractForm id="loginFormModal" title="Log in" @submit="submit">
+        <AbstractFormComponent id="loginFormModal" title="Log in" @submit="submit">
             <div class="login">
                 <span class="loginOrEmail-label">Login or email</span>
                 <input class="loginOrEmail" type="text" v-model="loginOrEmail" />
                 <span class="password-label">Password</span>
                 <input class="password" type="password" v-model="password" />
             </div>
-        </AbstractForm>
+        </AbstractFormComponent>
     </div>
 </template>
 
 <script setup lang="ts">
-import AbstractForm from '@/components/forms/AbstractForm.vue';
+import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
 import { type LoginForm } from '@/core/types';
 import { notify } from '@/core/config';

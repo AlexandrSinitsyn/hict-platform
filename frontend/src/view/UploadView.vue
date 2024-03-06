@@ -4,12 +4,12 @@
 
         <FileLoaderComponent :extensions="['xml', 'json']" @loaded="loaded" />
 
-        <UploadHiCMapForm upload-id="uploadId" @submit="upload" />
+        <UploadHiCMapFormComponent upload-id="uploadId" @submit="upload" />
     </div>
 </template>
 
 <script setup lang="ts">
-import UploadHiCMapForm from '@/components/forms/UploadHiCMapForm.vue';
+import UploadHiCMapFormComponent from '@/components/forms/UploadHiCMapFormComponent.vue';
 import FileLoaderComponent from '@/components/FileLoaderComponent.vue';
 import { type Ref, ref } from 'vue';
 import { publishHiCMap } from '@/core/server-requests';

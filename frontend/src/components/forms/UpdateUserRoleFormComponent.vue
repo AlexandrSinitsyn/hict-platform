@@ -9,7 +9,7 @@
         >
             Update user role
         </button>
-        <AbstractForm id="updateUserRoleFormModal" title="Update user role" @submit="submit">
+        <AbstractFormComponent id="updateUserRoleFormModal" title="Update user role" @submit="submit">
             <div class="update">
                 <span class="username-label">Username</span>
                 <span class="username">{{ user.username }}</span>
@@ -22,12 +22,12 @@
                     <option v-for="r in roleNames" :key="r" :value="r">{{ r }}</option>
                 </select>
             </div>
-        </AbstractForm>
+        </AbstractFormComponent>
     </div>
 </template>
 
 <script setup lang="ts">
-import AbstractForm from '@/components/forms/AbstractForm.vue';
+import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
 import { type User, Role } from '@/core/types';
 import { roleNames } from '@/core/extensions';
