@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { onMounted, type Ref, ref } from 'vue';
 import { getAllHiCMaps } from '@/core/server-requests';
-import type { HiCMap } from '@/core/types';
+import type { HiCMap } from '@types';
 import { useSelectedHiCStore } from '@/stores/selected-hic-store';
 import router from '@/router';
 

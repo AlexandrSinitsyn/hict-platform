@@ -13,7 +13,7 @@ import UploadHiCMapFormComponent from '@/components/forms/UploadHiCMapFormCompon
 import FileLoaderComponent from '@/components/FileLoaderComponent.vue';
 import { type Ref, ref } from 'vue';
 import { publishHiCMap } from '@/core/server-requests';
-import type { HiCCreationForm, HiCMap } from '@/core/types';
+import type { HiCCreationForm, HiCMap } from '@types';
 import { notify } from '@/core/config';
 import $ from 'jquery';
 

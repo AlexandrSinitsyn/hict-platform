@@ -1,4 +1,4 @@
-import type { Jwt, LoginForm, RegisterForm, User } from '@/core/types';
+import type { Jwt, LoginForm, RegisterForm, User } from '@types';
 import { authLogin, authRegister, requestUser } from '@/core/server-requests';
 import { notify } from '@/core/config';
 

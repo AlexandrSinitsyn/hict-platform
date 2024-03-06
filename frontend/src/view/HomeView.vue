@@ -18,7 +18,7 @@ import RegisterFormComponent from '@/components/forms/RegisterFormComponent.vue'
 import { __NAME__ } from '@/core/config';
 import { getAuthorizedUser, login, register } from '@/core/authentication';
 import { useAuthStore } from '@/stores/auth-store';
-import type { LoginForm, RegisterForm } from '@/core/types';
+import type { LoginForm, RegisterForm } from '@types';
 
 const authStore = useAuthStore();
 

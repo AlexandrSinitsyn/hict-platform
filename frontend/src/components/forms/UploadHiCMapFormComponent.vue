@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
-import { type HiCCreationForm } from '@/core/types';
+import { type HiCCreationForm } from '@types';
 import { notify } from '@/core/config';
 
 const props = defineProps<{

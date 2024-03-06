@@ -15,6 +15,7 @@ export default ({ mode }: { mode: string }) => {
         resolve: {
             alias: {
                 '@': fileURLToPath(new URL('./src', import.meta.url)),
+                '@types': fileURLToPath(new URL('./src/core/entity/types.ts', import.meta.url)),
             },
         },
         server: {

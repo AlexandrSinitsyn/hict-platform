@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import UpdateUserRoleFormComponent from '@/components/forms/UpdateUserRoleFormComponent.vue';
-import { type User, Role } from '@/core/types';
+import { type User, Role } from '@types';
 import { isAtLeast } from '@/core/extensions';
 import { onMounted, type Ref, ref } from 'vue';
 import { getAllUsers, updateUserRole } from '@/core/server-requests';

@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
-import { type User, Role } from '@/core/types';
+import { type User, Role } from '@types';
 import { roleNames } from '@/core/extensions';
 
 const props = defineProps<{

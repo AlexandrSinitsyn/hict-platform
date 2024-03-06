@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
-import { type LoginForm } from '@/core/types';
+import { type LoginForm } from '@types';
 import { notify } from '@/core/config';
 
 const emit = defineEmits<{

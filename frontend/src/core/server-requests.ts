@@ -9,7 +9,7 @@ import type {
     UpdateUserPassword,
     UpdateUserRole,
     User,
-} from '@/core/types';
+} from '@types';
 import { getJwt } from '@/core/authentication';
 
 export type SuccessCallback<E> = (e: E) => void;

@@ -1,4 +1,4 @@
-import { Role } from '@/core/types';
+import { Role } from '@types';
 
 export const roleNames: string[] = Object.values(Role).filter(
     (value) => typeof value === 'string'
@@ -13,5 +13,5 @@ export function roleOrNull(role: Role | null | undefined): string | undefined {
 }
 
 export function isAtLeast(role: Role | null | undefined, min: Role): boolean {
-    return !role ? false : Role[role] >= min;
+    return !role ? false : +Role[role] >= min;
 }
