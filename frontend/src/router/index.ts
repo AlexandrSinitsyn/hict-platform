@@ -22,6 +22,11 @@ const router = createRouter({
             component: DatabaseView,
         },
         {
+            path: '/view',
+            name: 'view',
+            component: () => import('@/view/HiCView.vue'),
+        },
+        {
             path: '/upload',
             name: 'upload',
             component: UploadView,

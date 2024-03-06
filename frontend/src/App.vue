@@ -1,6 +1,6 @@
 <template>
     <header>
-        <ToolbarComponent :user="user" @goto="goto" />
+        <ToolbarComponent />
     </header>
 
     <main>
@@ -18,31 +18,16 @@
 <script setup lang="ts">
 import ToolbarComponent from '@/components/ToolbarComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
-import { onMounted, type Ref, ref } from 'vue';
-import type { HiCMap, User } from '@/core/types';
+import { onMounted } from 'vue';
 import { getAuthorizedUser } from '@/core/authentication';
+import { useAuthStore } from '@/stores/auth-store';
 
-const page: Ref<string> = ref('Home');
-const user: Ref<User | undefined> = ref(undefined);
-const currentView: Ref<HiCMap | undefined> = ref(undefined);
-
-function goto(pagename: string) {
-    page.value = pagename;
-}
+const authStore = useAuthStore();
 
 function enter() {
     getAuthorizedUser((u) => {
-        user.value = u;
+        authStore.login(u);
     });
-}
-
-function selected(map: HiCMap) {
-    currentView.value = map;
-}
-
-function userInfoUpdated() {
-    enter();
-    goto('Home');
 }
 
 onMounted(enter);

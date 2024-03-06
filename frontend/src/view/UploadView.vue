@@ -19,10 +19,6 @@ import $ from 'jquery';
 
 const file: Ref<File | undefined> = ref(undefined);
 
-const emit = defineEmits<{
-    (e: 'uploaded'): void;
-}>();
-
 function loaded(uploaded: File) {
     $('#uploadId').click();
     file.value = uploaded;
@@ -46,7 +42,6 @@ function upload(form: HiCCreationForm) {
 
     publishHiCMap(formData, (hicMap: HiCMap) => {
         notify('info', `Uploaded: ${hicMap.meta.name}`);
-        emit('uploaded');
     });
 }
 </script>

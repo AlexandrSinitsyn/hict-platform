@@ -37,10 +37,10 @@ import { isAtLeast } from '@/core/extensions';
 import { onMounted, type Ref, ref } from 'vue';
 import { getAllUsers, updateUserRole } from '@/core/server-requests';
 import { notify } from '@/core/config';
+import { useAuthStore } from '@/stores/auth-store';
+import { storeToRefs } from 'pinia';
 
-const props = defineProps<{
-    user: User | undefined;
-}>();
+const { user } = storeToRefs(useAuthStore());
 
 const allUsers: Ref<User[]> = ref([]);
 
@@ -51,7 +51,7 @@ onMounted(() => {
 });
 
 function setRole(acceptor: User, newRole: Role) {
-    const me = props.user;
+    const me = user.value;
 
     if (!me) {
         notify('error', 'You should be authorized!');
@@ -68,19 +68,10 @@ function setRole(acceptor: User, newRole: Role) {
         return;
     }
 
-    updateUserRole(
-        {
-            id: acceptor.id,
-            newRole: newRole,
-        },
-        (updated) => {
-            if (updated) {
-                notify('info', `Successfully updated`);
-            } else {
-                notify('warning', `Has errors. Not updated`);
-            }
-        }
-    );
+    updateUserRole({
+        id: acceptor.id,
+        newRole: newRole,
+    });
 }
 </script>
 

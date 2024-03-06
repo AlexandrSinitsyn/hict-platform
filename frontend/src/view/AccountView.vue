@@ -76,18 +76,13 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from '@/core/types';
 import { type Ref, ref } from 'vue';
 import { notify } from '@/core/config';
 import { updateUserInfo, updateUserPassword } from '@/core/server-requests';
+import { useAuthStore } from '@/stores/auth-store';
+import { storeToRefs } from 'pinia';
 
-const props = defineProps<{
-    user: User | undefined;
-}>();
-
-const emit = defineEmits<{
-    (e: 'updated'): void;
-}>();
+const { user } = storeToRefs(useAuthStore());
 
 const username: Ref<string | undefined> = ref(undefined);
 const login: Ref<string | undefined> = ref(undefined);
@@ -96,9 +91,9 @@ const oldPassword: Ref<string | undefined> = ref(undefined);
 const newPassword: Ref<string | undefined> = ref(undefined);
 
 const fields: [string, string | undefined, Ref<string | undefined>][] = [
-    ['Username', props.user?.username, username],
-    ['Login', props.user?.login, login],
-    ['Email', props.user?.email, email],
+    ['Username', user.value?.username, username],
+    ['Login', user.value?.login, login],
+    ['Email', user.value?.email, email],
 ];
 
 function updateInfo() {
@@ -113,21 +108,11 @@ function updateInfo() {
 
     const valueOrNull = (x: string | null | undefined) => (!x || /^\s*$/.test(x) ? null : x);
 
-    updateUserInfo(
-        {
-            username: valueOrNull(usernameValue),
-            login: valueOrNull(loginValue),
-            email: valueOrNull(emailValue),
-        },
-        (updated) => {
-            if (updated) {
-                notify('info', `Successfully updated`);
-                emit('updated');
-            } else {
-                notify('warning', `Has errors. Not updated`);
-            }
-        }
-    );
+    updateUserInfo({
+        username: valueOrNull(usernameValue),
+        login: valueOrNull(loginValue),
+        email: valueOrNull(emailValue),
+    });
 }
 
 function updatePassword() {
@@ -139,20 +124,10 @@ function updatePassword() {
         return;
     }
 
-    updateUserPassword(
-        {
-            oldPassword: oldPasswordValue,
-            newPassword: newPasswordValue,
-        },
-        (updated) => {
-            if (updated) {
-                notify('info', `Successfully updated`);
-                emit('updated');
-            } else {
-                notify('warning', `Has errors. Not updated`);
-            }
-        }
-    );
+    updateUserPassword({
+        oldPassword: oldPasswordValue,
+        newPassword: newPasswordValue,
+    });
 }
 </script>
 

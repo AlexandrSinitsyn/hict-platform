@@ -5,7 +5,7 @@
         <h1>{{ __NAME__ }}</h1>
 
         <div class="authentication" v-if="user">
-            <div>{{ user?.username ?? 'Not authorized' }}</div>
+            <div>{{ user.username }}</div>
             <div class="btn btn-outline-primary" @click="logout">
                 <span class="bi bi-box-arrow-right"></span>
             </div>
@@ -15,21 +15,19 @@
             <RouterLink v-for="p in pages" :key="p" :to="'/' + p.toLowerCase()">
                 <div>{{ p }}</div>
             </RouterLink>
-            
         </nav>
     </div>
 </template>
 
 <script setup lang="ts">
 import { __NAME__ } from '@/core/config';
-import type { User } from '@/core/types';
 import { logout } from '@/core/authentication';
+import { useAuthStore } from '@/stores/auth-store';
+import { storeToRefs } from 'pinia';
 
-const props = defineProps<{
-    user: User | undefined;
-}>();
+const { user } = storeToRefs(useAuthStore());
 
-const pages = ['Home', 'Database', 'Upload', 'Account', 'Admin'];
+const pages = ['Home', 'Database', 'View', 'Upload', 'Account', 'Admin'];
 </script>
 
 <style scoped lang="scss">

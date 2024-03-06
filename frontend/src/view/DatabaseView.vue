@@ -3,7 +3,7 @@
         <h1>Hi-C Maps database</h1>
 
         <div class="database">
-            <div class="hic" v-for="hic in hicMaps" :key="hic.id" @click="emit('selected', hic)">
+            <div class="hic" v-for="hic in hicMaps" :key="hic.id" @click="select(hic)">
                 {{ hic.meta.name }}
             </div>
         </div>
@@ -14,12 +14,17 @@
 import { onMounted, type Ref, ref } from 'vue';
 import { getAllHiCMaps } from '@/core/server-requests';
 import type { HiCMap } from '@/core/types';
+import { useSelectedHiCStore } from '@/stores/selected-hic-store';
+import router from '@/router';
 
-const emit = defineEmits<{
-    (e: 'selected', map: HiCMap): void;
-}>();
+const selectedHiCStore = useSelectedHiCStore();
 
 const hicMaps: Ref<HiCMap[]> = ref([]);
+
+function select(hic: HiCMap) {
+    selectedHiCStore.select(hic);
+    router.push({ path: '/view' });
+}
 
 onMounted(() => {
     getAllHiCMaps((lst: HiCMap[]) => {

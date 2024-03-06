@@ -116,19 +116,24 @@ export function publishHiCMap(formData: FormData, onSuccess: SuccessCallback<HiC
         .catch(errorHandler);
 }
 
-export function updateUserInfo(form: UpdateUserInfo, onSuccess: SuccessCallback<boolean>): void {
-    authorizedRequest(axios.patch, `${SERVER}/users/update/info`, form, onSuccess);
+const updateNotify: SuccessCallback<boolean> = (updated) => {
+    if (updated) {
+        notify('info', `Successfully updated`);
+    } else {
+        notify('warning', `Has errors. Not updated`);
+    }
+};
+
+export function updateUserInfo(form: UpdateUserInfo): void {
+    authorizedRequest(axios.patch, `${SERVER}/users/update/info`, form, updateNotify);
 }
 
-export function updateUserPassword(
-    form: UpdateUserPassword,
-    onSuccess: SuccessCallback<boolean>
-): void {
-    authorizedRequest(axios.patch, `${SERVER}/users/update/password`, form, onSuccess);
+export function updateUserPassword(form: UpdateUserPassword): void {
+    authorizedRequest(axios.patch, `${SERVER}/users/update/password`, form, updateNotify);
 }
 
-export function updateUserRole(form: UpdateUserRole, onSuccess: SuccessCallback<boolean>): void {
-    authorizedRequest(axios.patch, `${SERVER}/users/update/role`, form, onSuccess);
+export function updateUserRole(form: UpdateUserRole): void {
+    authorizedRequest(axios.patch, `${SERVER}/users/update/role`, form, updateNotify);
 }
 
 export function getAllUsers(onSuccess: SuccessCallback<User[]>): void {

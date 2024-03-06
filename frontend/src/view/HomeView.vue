@@ -5,9 +5,9 @@
         <h1>{{ __NAME__ }}</h1>
 
         <div class="auth">
-            <LoginFormComponent @submit="(form) => auth(login, form)" />
+            <LoginFormComponent @submit="loginSubmit" />
 
-            <RegisterFormComponent @submit="(form) => auth(register, form)" />
+            <RegisterFormComponent @submit="registerSubmit" />
         </div>
     </div>
 </template>
@@ -16,14 +16,18 @@
 import LoginFormComponent from '@/components/forms/LoginFormComponent.vue';
 import RegisterFormComponent from '@/components/forms/RegisterFormComponent.vue';
 import { __NAME__ } from '@/core/config';
-import { login, register } from '@/core/authentication';
+import { getAuthorizedUser, login, register } from '@/core/authentication';
+import { useAuthStore } from '@/stores/auth-store';
+import type { LoginForm, RegisterForm } from '@/core/types';
 
-const emit = defineEmits<{
-    (e: 'entered'): void;
-}>();
+const authStore = useAuthStore();
 
-function auth<F>(method: (f: F, then: () => void) => void, form: F) {
-    method(form, () => emit('entered'));
+function loginSubmit(form: LoginForm) {
+    login(form, () => getAuthorizedUser(authStore.login));
+}
+
+function registerSubmit(form: RegisterForm) {
+    register(form, () => getAuthorizedUser(authStore.login));
 }
 </script>
 
