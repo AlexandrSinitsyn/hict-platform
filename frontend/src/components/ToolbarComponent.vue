@@ -12,7 +12,10 @@
         </div>
 
         <nav>
-            <div v-for="p in pages" :key="p" @click="emit('goto', p)">{{ p }}</div>
+            <RouterLink v-for="p in pages" :key="p" :to="'/' + p.toLowerCase()">
+                <div>{{ p }}</div>
+            </RouterLink>
+            
         </nav>
     </div>
 </template>
@@ -24,10 +27,6 @@ import { logout } from '@/core/authentication';
 
 const props = defineProps<{
     user: User | undefined;
-}>();
-
-const emit = defineEmits<{
-    (e: 'goto', page: string): void;
 }>();
 
 const pages = ['Home', 'Database', 'Upload', 'Account', 'Admin'];
