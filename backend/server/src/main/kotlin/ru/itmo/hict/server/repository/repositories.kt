@@ -85,10 +85,12 @@ interface ViewsRepository : JpaRepository<Views, Long> {
     @Query(
         value = """
             merge into hi_c_map_views
-            using (select :id as id) new
+            using (select :id as id) as new
             on hi_c_map_views.hi_c_map_id = new.id
-            when matched then update set hi_c_map_views.count = hi_c_map_views.count + 1
-            when not matched then insert (hi_c_map_id, count) values (new.id, 1)
+            when matched then
+                update set count = count + 1
+            when not matched then
+                insert (hi_c_map_id, count) values (new.id, 1)
         """,
         nativeQuery = true,
     )

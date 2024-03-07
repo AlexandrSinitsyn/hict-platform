@@ -25,7 +25,7 @@ class UserController(
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
 
-    @InitBinder("form")
+    @InitBinder("updateUserInfoForm")
     fun initPublishBinder(webDataBinder: WebDataBinder) {
         webDataBinder.addValidators(updateUserInfoFormValidator)
     }
@@ -64,25 +64,25 @@ class UserController(
     }
 
     @PatchMapping("/update/info")
-    fun updateInfo(@RequestBody @Valid form: UpdateUserInfoForm,
+    fun updateInfo(@RequestBody @Valid updateUserInfoForm: UpdateUserInfoForm,
                    bindingResult: BindingResult): ResponseEntity<Boolean> {
         checkNoErrors(bindingResult)
 
         val user = authorized(bindingResult)
 
-        form.username?.let {
+        updateUserInfoForm.username?.let {
             notSame("username", bindingResult) { user.username != it }
 
             userService.updateUsername(user, it)
         }
 
-        form.login?.let {
+        updateUserInfoForm.login?.let {
             notSame("login", bindingResult) { user.login != it }
 
             userService.updateLogin(user, it)
         }
 
-        form.email?.let {
+        updateUserInfoForm.email?.let {
             notSame("email", bindingResult) { user.email != it }
 
             userService.updateEmail(user, it)
