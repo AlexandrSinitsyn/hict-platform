@@ -5,12 +5,14 @@ import org.springframework.stereotype.Service
 import ru.itmo.hict.entity.HiCMap
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.repository.HiCMapRepository
+import ru.itmo.hict.server.repository.ViewsRepository
 import kotlin.jvm.optionals.getOrNull
 
 @Service
 class HiCMapService(
     private val hiCMapRepository: HiCMapRepository,
     private val minioService: MinioService,
+    private val viewsRepository: ViewsRepository,
 ) {
     private val bucket = "hi-c"
 
@@ -22,6 +24,8 @@ class HiCMapService(
     fun getAll(): List<HiCMap> = hiCMapRepository.findAll()
 
     fun getById(id: Long): HiCMap? = hiCMapRepository.findById(id).getOrNull()
+
+    fun view(id: Long) = viewsRepository.viewById(id)
 
     fun checkUnique(name: String): Boolean = hiCMapRepository.findByName(name).isEmpty
 

@@ -34,10 +34,12 @@ class HiCMapController(
     fun getAll(): ResponseEntity<List<HiCMapInfoDto>> =
         hiCMapService.getAll().map { it.toInfoDto() }.run { ResponseEntity.ok(this) }
 
-    @GetMapping("/{id}")
+    @GetMapping("/acquire/{id}")
     fun getById(@PathVariable("id") id: Long): ResponseEntity<HiCMapInfoDto> =
-        hiCMapService.getById(id)?.run { ResponseEntity.ok(this.toInfoDto()) }
-            ?: ResponseEntity.notFound().build()
+        hiCMapService.getById(id)?.run {
+            hiCMapService.view(id)
+            ResponseEntity.ok(this.toInfoDto())
+        } ?: ResponseEntity.notFound().build()
 
     @PostMapping("/publish")
     fun publish(

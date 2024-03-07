@@ -22,8 +22,9 @@ const router = createRouter({
             component: DatabaseView,
         },
         {
-            path: '/view',
+            path: '/view/:hiCMapName',
             name: 'view',
+            sensitive: true,
             component: () => import('@/view/HiCView.vue'),
         },
         {

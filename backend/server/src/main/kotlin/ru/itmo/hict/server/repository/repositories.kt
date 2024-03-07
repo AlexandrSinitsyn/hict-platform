@@ -79,4 +79,18 @@ interface HiCMapRepository : JpaRepository<HiCMap, Long> {
 }
 
 @Repository
-interface ViewsRepository : JpaRepository<Views, Long>
+interface ViewsRepository : JpaRepository<Views, Long> {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Modifying
+    @Query(
+        value = """
+            merge into hi_c_map_views
+            using (select :id as id) new
+            on hi_c_map_views.hi_c_map_id = new.id
+            when matched then update set hi_c_map_views.count = hi_c_map_views.count + 1
+            when not matched then insert (hi_c_map_id, count) values (new.id, 1)
+        """,
+        nativeQuery = true,
+    )
+    fun viewById(@Param("id") hiCMapId: Long)
+}

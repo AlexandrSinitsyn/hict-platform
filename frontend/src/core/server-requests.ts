@@ -146,3 +146,10 @@ export function getUsersCount(onSuccess: SuccessCallback<number>): void {
         .then(handler(onSuccess))
         .catch(errorHandler);
 }
+
+export function acquireHiCMap(id: number, onSuccess: SuccessCallback<HiCMap>): void {
+    axios
+        .get<never, AxiosResponse<HiCMap>>(`${SERVER}/hi-c/acquire/${id}`)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
