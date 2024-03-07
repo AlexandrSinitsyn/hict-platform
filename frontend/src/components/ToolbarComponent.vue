@@ -12,8 +12,12 @@
         </div>
 
         <nav>
-            <RouterLink v-for="p in pages" :key="p" :to="'/' + p.toLowerCase()">
-                <div>{{ p }}</div>
+            <RouterLink
+                v-for="p in pages"
+                :key="p[0]"
+                :to="p.length === 1 ? `/${p[0].toLowerCase()}` : p[1]"
+            >
+                <div>{{ p[0] }}</div>
             </RouterLink>
         </nav>
     </div>
@@ -27,7 +31,14 @@ import { storeToRefs } from 'pinia';
 
 const { user } = storeToRefs(useAuthStore());
 
-const pages = ['Home', 'Database', 'View', 'Upload', 'Account', 'Admin'];
+const pages: ([string] | [string, string])[] = [
+    ['Home'],
+    ['Database'],
+    ['View', '/view/unknown'],
+    ['Upload'],
+    ['Account'],
+    ['Admin'],
+];
 </script>
 
 <style scoped lang="scss">

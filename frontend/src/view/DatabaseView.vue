@@ -12,12 +12,9 @@
 
 <script setup lang="ts">
 import { onMounted, type Ref, ref } from 'vue';
-import { acquireHiCMap, getAllHiCMaps } from '@/core/server-requests';
+import { getAllHiCMaps } from '@/core/server-requests';
 import type { HiCMap } from '@types';
-import { useSelectedHiCStore } from '@/stores/selected-hic-store';
 import router from '@/router';
-
-const selectedHiCStore = useSelectedHiCStore();
 
 const hicMaps: Ref<HiCMap[]> = ref([]);
 
@@ -27,9 +24,6 @@ function select(hic: HiCMap) {
         params: {
             hiCMapName: hic.meta.name,
         },
-    });
-    acquireHiCMap(hic.id, (map) => {
-        selectedHiCStore.select(map);
     });
 }
 

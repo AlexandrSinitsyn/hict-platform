@@ -23,9 +23,9 @@ class HiCMapService(
 
     fun getAll(): List<HiCMap> = hiCMapRepository.findAll()
 
-    fun getById(id: Long): HiCMap? = hiCMapRepository.findById(id).getOrNull()
+    fun getByName(name: String): HiCMap? = hiCMapRepository.findByName(name).getOrNull()
 
-    fun view(id: Long) = viewsRepository.viewById(id)
+    fun view(hiCMap: HiCMap) = viewsRepository.viewById(hiCMap.id!!)
 
     fun checkUnique(name: String): Boolean = hiCMapRepository.findByName(name).isEmpty
 

@@ -13,10 +13,19 @@
 </template>
 
 <script setup lang="ts">
-import { useSelectedHiCStore } from '@/stores/selected-hic-store';
-import { storeToRefs } from 'pinia';
+import { onMounted, type Ref, ref } from 'vue';
+import { acquireHiCMap } from '@/core/server-requests';
+import type { HiCMap } from '@types';
+import { useRoute } from 'vue-router';
 
-const { selected } = storeToRefs(useSelectedHiCStore());
+const selected: Ref<HiCMap | undefined> = ref(undefined);
+
+onMounted(() => {
+    const router = useRoute();
+    acquireHiCMap(router.params.hiCMapName as string, (map) => {
+        selected.value = map;
+    });
+});
 </script>
 
 <style scoped lang="scss"></style>
