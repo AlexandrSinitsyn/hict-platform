@@ -6,6 +6,7 @@
             <p>Name: {{ selected.meta.name }}</p>
             <p>Description: {{ selected.meta.description }}</p>
             <p>Created at: {{ selected.meta.creationTime }}</p>
+            <p>Views: {{ selected.views }}</p>
         </div>
         <div v-else>You have not selected any map yet!</div>
     </div>

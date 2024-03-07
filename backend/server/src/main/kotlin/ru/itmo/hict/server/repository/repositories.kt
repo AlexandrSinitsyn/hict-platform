@@ -7,9 +7,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
-import ru.itmo.hict.entity.HiCMap
-import ru.itmo.hict.entity.Role
-import ru.itmo.hict.entity.User
+import ru.itmo.hict.entity.*
 import java.util.Optional
 
 @Repository
@@ -79,3 +77,6 @@ interface HiCMapRepository : JpaRepository<HiCMap, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<HiCMap>
 }
+
+@Repository
+interface ViewsRepository : JpaRepository<Views, Long>

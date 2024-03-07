@@ -9,6 +9,7 @@ export interface HiCMap {
     id: number;
     author: User;
     meta: HiCMapMeta;
+    views: number;
 }
 
 export interface HiCMapMeta {

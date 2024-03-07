@@ -11,6 +11,7 @@
         <p>
             &copy; Powered by <code>{{ __AUTHOR__ }}</code>
         </p>
+        <p>Registered users count: {{ users }}</p>
         <i class="version">v{{ __VERSION__ }}</i>
     </footer>
 </template>
@@ -18,16 +19,18 @@
 <script setup lang="ts">
 import ToolbarComponent from '@/components/ToolbarComponent.vue';
 import { __VERSION__, __AUTHOR__ } from '@/core/config';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { getAuthorizedUser } from '@/core/authentication';
 import { useAuthStore } from '@/stores/auth-store';
+import { getUsersCount } from '@/core/server-requests';
 
 const authStore = useAuthStore();
 
+const users = ref(0);
+
 function enter() {
-    getAuthorizedUser((u) => {
-        authStore.login(u);
-    });
+    getAuthorizedUser(authStore.login);
+    getUsersCount((x) => (users.value = x));
 }
 
 onMounted(enter);

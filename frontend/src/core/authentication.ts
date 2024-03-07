@@ -36,12 +36,19 @@ export function logout() {
     forgetJwt();
 }
 
-export function getAuthorizedUser(doGet: (user: User | undefined) => void) {
+export function getAuthorizedUser(doGet: (user: User) => void) {
     const jwt = getJwt();
 
     if (!jwt) {
         return;
     }
 
-    requestUser(jwt, doGet);
+    requestUser(jwt, (u) => {
+        if (!u) {
+            notify('error', 'Invalid JWT');
+            return;
+        }
+
+        doGet(u);
+    });
 }

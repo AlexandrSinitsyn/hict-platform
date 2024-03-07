@@ -139,3 +139,10 @@ export function updateUserRole(form: UpdateUserRole): void {
 export function getAllUsers(onSuccess: SuccessCallback<User[]>): void {
     authorizedGetRequest(`${SERVER}/users/all`, onSuccess);
 }
+
+export function getUsersCount(onSuccess: SuccessCallback<number>): void {
+    axios
+        .get<never, AxiosResponse<number>>(`${SERVER}/users/count`)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
