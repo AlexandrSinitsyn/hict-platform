@@ -4,12 +4,27 @@ x-envs: &env
   env_file:
     - .env
 
+x-kafka-setup: &kafka-setup
+  # Listeners
+  KAFKA_ZOOKEEPER_CONNECT: hict-zookeeper:2181
+  ALLOW_PLAINTEXT_LISTENER: yes
+  KAFKA_CFG_LISTENERS: BROKER://:9092
+  KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: BROKER:PLAINTEXT
+  KAFKA_CFG_INTER_BROKER_LISTENER_NAME: BROKER
+  # Clustering
+  KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+  KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR: 2
+
 networks:
   global:
     name: 'hict-global'
     driver: bridge
   internal:
     name: 'hict-internal'
+    driver: bridge
+  kafka-net:
+    name: 'hict-kafka-net'
     driver: bridge
   db-net:
     name: 'hict-db-net'
@@ -19,6 +34,12 @@ networks:
     driver: bridge
 
 volumes:
+  kafka-data-1:
+    name: 'hict-kafka-data-1'
+    driver: local
+  kafka-data-2:
+    name: 'hict-kafka-data-2'
+    driver: local
   hict-postgres-data:
     name: 'hict-postgres-data'
   hict-minio-data:
@@ -124,6 +145,7 @@ services:
       internal:
         aliases:
           - '${SERVER_HOST}'
+      kafka-net:
       db-net:
       minio-net:
     healthcheck:
@@ -137,6 +159,71 @@ services:
         condition: service_healthy
       liquibase:
         condition: service_completed_successfully
+
+  scheduler:
+    container_name: 'hict-scheduler'
+    image: 'hict/scheduler:${PROJECT_VERSION}'
+    build:
+      context: backend
+      dockerfile: scheduler/Dockerfile
+    restart: on-failure
+    <<: *env
+    expose:
+      - '8080'
+    networks:
+      - kafka-net
+    healthcheck:
+      test: 'wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1'
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      kafka-1:
+        condition: service_started
+      kafka-2:
+        condition: service_started
+
+############### BROKERS ###############
+
+  zookeeper:
+    container_name: 'hict-zookeeper'
+    image: zookeeper:3.9.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    expose:
+      - '2181'
+    networks:
+      - kafka-net
+
+  kafka-1:
+    container_name: 'hict-kafka-1'
+    image: bitnami/kafka:3.6
+    <<: *env
+    environment:
+      <<: *kafka-setup
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_ADVERTISED_LISTENERS: BROKER://hict-kafka-1:9092
+    expose:
+      - '9092'
+    networks:
+      - kafka-net
+    volumes:
+      - kafka-data-1:/bitnami/kafka
+    depends_on:
+      zookeeper:
+        condition: service_started
+
+  kafka-2:
+    container_name: 'hict-kafka-2'
+    extends:
+      service: kafka-1
+    environment:
+      KAFKA_CFG_NODE_ID: 2
+      KAFKA_CFG_ADVERTISED_LISTENERS: BROKER://hict-kafka-2:9092
+    volumes:
+      - kafka-data-2:/bitnami/kafka
 
 ############### DATA STORAGE ###############
 
