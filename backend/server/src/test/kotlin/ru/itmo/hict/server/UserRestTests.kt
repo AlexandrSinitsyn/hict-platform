@@ -12,7 +12,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import ru.itmo.hict.entity.Role
@@ -22,13 +21,14 @@ import ru.itmo.hict.server.controller.UserController
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.repository.UserRepository
 import ru.itmo.hict.server.service.UserService
+import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 import java.sql.Timestamp
 import java.util.*
 import kotlin.random.Random
 
 @WebMvcTest(UserController::class)
 @ContextConfiguration(
-    classes = [UserController::class, UserService::class, UserRestTests.RestTestBeans::class]
+    classes = [UserController::class, UserService::class, UpdateUserInfoFormValidator::class, UserRestTests.RestTestBeans::class]
 )
 class UserRestTests {
     @Autowired
@@ -48,7 +48,7 @@ class UserRestTests {
                     patch("/api/v1/users/$url")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(it))
-                    .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                    .andExpect(status().isBadRequest)
             }
         }
     }
@@ -109,7 +109,7 @@ class UserRestTests {
             doNothing().whenever(userRepository).updateEmail(any(), any())
 
             mvc.perform(
-                patch("/api/v1/users/info")
+                patch("/api/v1/users/update/info")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody(NEW_USERNAME, NEW_LOGIN, NEW_EMAIL)))
                 .andExpect(status().isOk)
@@ -126,7 +126,7 @@ class UserRestTests {
 
             fun run(username: String?, login: String?, email: String?) {
                 mvc.perform(
-                    patch("/api/v1/users/info")
+                    patch("/api/v1/users/update/info")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody(username, login, email)))
                     .andExpect(status().isOk)

@@ -26,6 +26,7 @@ import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.controller.HiCMapController
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.repository.HiCMapRepository
+import ru.itmo.hict.server.repository.ViewsRepository
 import ru.itmo.hict.server.service.*
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
 import java.sql.Timestamp
@@ -42,6 +43,8 @@ class HiCRestTests {
 
     @MockBean
     private lateinit var hiCMapRepository: HiCMapRepository
+    @MockBean
+    private lateinit var viewsRepository: ViewsRepository
     @MockBean
     private lateinit var minioService: MinioService
 
@@ -107,9 +110,9 @@ class HiCRestTests {
 
     @Test
     fun `get by id (exists)`() {
-        whenever(hiCMapRepository.findById(0)) doReturn Optional.of(hicMap)
+        whenever(hiCMapRepository.findByName("testName")) doReturn Optional.of(hicMap)
 
-        mvc.perform(get("/api/v1/hi-c/0"))
+        mvc.perform(get("/api/v1/hi-c/acquire/testName"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id", `is`(2)))

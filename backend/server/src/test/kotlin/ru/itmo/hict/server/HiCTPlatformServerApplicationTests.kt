@@ -141,7 +141,7 @@ class HiCTPlatformServerApplicationTests {
             Assertions.assertTrue(body!!.isEmpty())
         }
 
-        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/hi-c/0")).run {
+        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/hi-c/acquire/unknown")).run {
             Assertions.assertTrue(statusCode.is4xxClientError)
             Assertions.assertNull(body)
         }

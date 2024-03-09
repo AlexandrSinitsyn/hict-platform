@@ -23,7 +23,7 @@ class UpdateUserInfoFormValidator(
                     "UpdateUserInfoForm require at least one of [username, login, email]")
             }
 
-            if (userService.isUniqueLoginAndEmail(form.login, form.email)) {
+            if (!userService.isUniqueLoginAndEmail(form.login, form.email)) {
                 errors.reject("occupied-login-or-email", "Already taken login or email")
             }
         }
