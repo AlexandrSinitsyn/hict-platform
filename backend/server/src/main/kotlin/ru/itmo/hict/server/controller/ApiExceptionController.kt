@@ -4,12 +4,14 @@ import com.auth0.jwt.exceptions.JWTVerificationException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import ru.itmo.hict.server.exception.InvalidJwtException
 import ru.itmo.hict.server.exception.ValidationException
 
 @RestControllerAdvice
+@CrossOrigin
 class ApiExceptionController {
     @ExceptionHandler(ValidationException::class)
     fun validationException(validationException: ValidationException): ResponseEntity<Any> =

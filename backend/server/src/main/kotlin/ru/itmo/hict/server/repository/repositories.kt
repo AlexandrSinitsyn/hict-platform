@@ -7,9 +7,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
-import ru.itmo.hict.entity.HiCMap
-import ru.itmo.hict.entity.Role
-import ru.itmo.hict.entity.User
+import ru.itmo.hict.entity.*
 import java.util.Optional
 
 @Repository
@@ -25,6 +23,16 @@ interface UserRepository : JpaRepository<User, Long> {
     )
     fun findByLoginAndPassword(@Param("login") login: String,
                                @Param("password") password: String): Optional<User>
+
+    @Query(
+        value = """
+            select u
+            from User u
+            where (:login is not null and u.login = :login)
+               or (:email is not null and u.email = :email)
+        """,
+    )
+    fun findByLoginOrEmail(@Param("login") login: String?, @Param("email") email: String?): Optional<User>
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Modifying(clearAutomatically = true)
@@ -68,4 +76,23 @@ interface UserRepository : JpaRepository<User, Long> {
 interface HiCMapRepository : JpaRepository<HiCMap, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<HiCMap>
+}
+
+@Repository
+interface ViewsRepository : JpaRepository<Views, Long> {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Modifying
+    @Query(
+        value = """
+            merge into hi_c_map_views
+            using (select :id as id) as new
+            on hi_c_map_views.hi_c_map_id = new.id
+            when matched then
+                update set count = count + 1
+            when not matched then
+                insert (hi_c_map_id, count) values (new.id, 1)
+        """,
+        nativeQuery = true,
+    )
+    fun viewById(@Param("id") hiCMapId: Long)
 }

@@ -31,12 +31,13 @@ import kotlin.io.path.listDirectoryEntries
 class HiCMapControllerTests {
     private companion object {
         private const val USER_ID = 1L
-        private const val ID = 2L
         private val user = User(
             "username", "login", "email@test.com", "pass", Role.USER,
             id = USER_ID, creationTime = Timestamp(System.currentTimeMillis())
         )
-        private val hicMap = HiCMap(user, "name", "description",
+        private const val ID = 2L
+        private const val NAME = "name"
+        private val hicMap = HiCMap(user, NAME, "description",
             id = ID, creationTime = Timestamp(System.currentTimeMillis()))
 
         private lateinit var hicController: HiCMapController
@@ -97,9 +98,9 @@ class HiCMapControllerTests {
 
     @Test
     fun `get existing by id`() {
-        whenever(hicService.getById(ID)) doReturn hicMap
+        whenever(hicService.getByName(NAME)) doReturn hicMap
 
-        val response = hicController.getById(ID)
+        val response = hicController.getByName(NAME)
 
         Assertions.assertTrue(response.statusCode.is2xxSuccessful)
         Assertions.assertNotNull(response.body)
@@ -108,9 +109,9 @@ class HiCMapControllerTests {
 
     @Test
     fun `get invalid by id`() {
-        whenever(hicService.getById(any())) doReturn null
+        whenever(hicService.getByName(any())) doReturn null
 
-        val response = hicController.getById(ID)
+        val response = hicController.getByName(NAME)
 
         Assertions.assertTrue(response.statusCode.is4xxClientError)
         Assertions.assertNull(response.body)

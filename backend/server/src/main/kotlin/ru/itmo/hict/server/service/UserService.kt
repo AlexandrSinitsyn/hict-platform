@@ -14,8 +14,13 @@ class UserService(
 
     fun getById(id: Long): User? = userRepository.findById(id).getOrNull()
 
+    fun getAll(): List<User> = userRepository.findAll()
+
     fun checkCredentials(user: User, password: String) =
         userRepository.findByLoginAndPassword(user.login, password).isPresent
+
+    fun isUniqueLoginAndEmail(login: String?, email: String?) =
+        userRepository.findByLoginOrEmail(login, email).isEmpty
 
     fun updateUsername(user: User, username: String) = userRepository.updateUsername(user.id!!, username)
 

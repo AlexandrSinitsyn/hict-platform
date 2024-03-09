@@ -5,6 +5,9 @@ x-envs: &env
     - .env
 
 networks:
+  global:
+    name: 'hict-global'
+    driver: bridge
   internal:
     name: 'hict-internal'
     driver: bridge
@@ -25,6 +28,34 @@ name: 'hict-service'
 
 services:
 
+############### FRONTEND ###############
+
+  frontend:
+    container_name: 'hict-frontend'
+    image: 'hict/frontend:${PROJECT_VERSION}'
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        PROJECT_VERSION: '${PROJECT_VERSION}'
+        AUTH_HOST: '${APP_HOST}:${APP_PORT}/auth'
+        SERVER_HOST: '${APP_HOST}:${APP_PORT}/server'
+        NGINX_VERSION: '${NGINX_VERSION}'
+    restart: always
+    <<: *env
+    expose:
+      - '80'
+    networks:
+      global:
+        aliases:
+          - '${FRONTEND_HOST}'
+    healthcheck:
+      test: 'wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1'
+      interval: 2s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
 ############### PROXY ###############
 
   proxy:
@@ -40,8 +71,11 @@ services:
     ports:
       - '${APP_PORT}:80'
     networks:
+      - global
       - internal
     depends_on:
+      frontend:
+        condition: service_healthy
       authorization:
         condition: service_healthy
       server:

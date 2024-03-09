@@ -8,10 +8,12 @@ data class HiCMapInfoDto(
     val id: Long,
     val author: UserInfoDto,
     val meta: HiCMetaDto,
+    val views: Long,
 ) {
     companion object {
         fun HiCMap.toInfoDto(): HiCMapInfoDto =
-            HiCMapInfoDto(id!!, author.toInfoDto(), HiCMetaDto(name, description, creationTime!!))
+            HiCMapInfoDto(id!!, author.toInfoDto(),
+                HiCMetaDto(name, description, creationTime!!), views?.count ?: 0)
     }
 }
 

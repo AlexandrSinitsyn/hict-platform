@@ -12,7 +12,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import ru.itmo.hict.entity.Role
@@ -22,13 +21,14 @@ import ru.itmo.hict.server.controller.UserController
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.repository.UserRepository
 import ru.itmo.hict.server.service.UserService
+import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 import java.sql.Timestamp
 import java.util.*
 import kotlin.random.Random
 
 @WebMvcTest(UserController::class)
 @ContextConfiguration(
-    classes = [UserController::class, UserService::class, UserRestTests.RestTestBeans::class]
+    classes = [UserController::class, UserService::class, UpdateUserInfoFormValidator::class, UserRestTests.RestTestBeans::class]
 )
 class UserRestTests {
     @Autowired
@@ -48,7 +48,7 @@ class UserRestTests {
                     patch("/api/v1/users/$url")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(it))
-                    .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                    .andExpect(status().isBadRequest)
             }
         }
     }
@@ -87,30 +87,64 @@ class UserRestTests {
             .andExpect(content().string("$count"))
     }
 
-    abstract inner class UpdateField(protected val url: String,
-                                     protected val jsonBody: (field: String?) -> String,
-                                     private val correctTest: Pair<String, () -> Unit>,
-                                     private val invalidTest: String) {
+    @Nested
+    inner class UpdateUserInfoForm {
+        private val NEW_USERNAME = "newUsername"
+        private val NEW_LOGIN = "newLogin"
+        private val NEW_EMAIL = "new@email.com"
+
+        private fun jsonBody(username: String?, login: String?, email: String?) = """
+            {
+                "username": ${username?.let { "\"$it\"" }},
+                "login": ${login?.let { "\"$it\"" }},
+                "email": ${email?.let { "\"$it\"" }}
+            }
+        """.trimIndent()
+
         @Test
         fun `correct update`() {
             whenever(userRepository.findById(USER_ID)) doReturn Optional.of(user)
-            correctTest.second()
+            doNothing().whenever(userRepository).updateUsername(any(), any())
+            doNothing().whenever(userRepository).updateLogin(any(), any())
+            doNothing().whenever(userRepository).updateEmail(any(), any())
 
             mvc.perform(
-                patch("/api/v1/users/$url")
+                patch("/api/v1/users/update/info")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonBody(correctTest.first)))
+                    .content(jsonBody(NEW_USERNAME, NEW_LOGIN, NEW_EMAIL)))
                 .andExpect(status().isOk)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("true"))
         }
 
         @Test
-        open fun `invalid update`() {
+        fun `correct partial update`() {
+            whenever(userRepository.findById(USER_ID)) doReturn Optional.of(user)
+            doNothing().whenever(userRepository).updateUsername(any(), any())
+            doNothing().whenever(userRepository).updateLogin(any(), any())
+            doNothing().whenever(userRepository).updateEmail(any(), any())
+
+            fun run(username: String?, login: String?, email: String?) {
+                mvc.perform(
+                    patch("/api/v1/users/update/info")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody(username, login, email)))
+                    .andExpect(status().isOk)
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(content().string("true"))
+            }
+
+            run(NEW_USERNAME, null, null)
+            run(null, NEW_LOGIN, null)
+            run(null, null, NEW_EMAIL)
+        }
+
+        @Test
+        fun `invalid update`() {
             mvc.perform(
-                patch("/api/v1/users/$url")
+                patch("/api/v1/users/update/info")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonBody(invalidTest)))
+                    .content(jsonBody(user.username, user.login, user.email)))
                 .andExpect {
                     Assertions.assertNotNull(it.resolvedException)
                     val err = it.resolvedException.run {
@@ -126,12 +160,12 @@ class UserRestTests {
 
         @Test
         fun `no data`() {
-            expectBadRequest(url, "", "{}")
+            expectBadRequest("update/info", "", "{}")
         }
 
         @Test
         fun `invalid form`() {
-            expectBadRequest(url,
+            expectBadRequest("update/info",
                 """
                     {
                         "invalid": "unsupported"
@@ -141,100 +175,43 @@ class UserRestTests {
         }
 
         @Test
-        open fun `null field in the form`() {
-            expectBadRequest(url,
-                jsonBody(null),
+        fun `null field in the form`() {
+            expectBadRequest("update/info",
+                jsonBody(null, null, null),
             )
         }
 
         @Test
-        open fun `empty field form`() {
-            expectValidationException(url,
-                jsonBody("") throws IS_BLANK or INVALID_SIZE,
+        fun `empty field form`() {
+            expectValidationException("update/info",
+                jsonBody("", NEW_LOGIN, NEW_EMAIL) throws IS_BLANK or INVALID_SIZE,
+                jsonBody(NEW_USERNAME, "", NEW_EMAIL) throws IS_BLANK or INVALID_SIZE,
+                jsonBody(NEW_USERNAME, NEW_LOGIN, "") throws IS_BLANK or INVALID_SIZE or NOT_EMAIL_TYPE,
             )
         }
 
         @Test
-        open fun `blank field form`() {
-            expectValidationException(url,
-                jsonBody("    ") throws IS_BLANK,
+        fun `blank field form`() {
+            expectValidationException("update/info",
+                jsonBody("    ", NEW_LOGIN, NEW_EMAIL) throws IS_BLANK,
+                jsonBody(NEW_USERNAME, "    ", NEW_EMAIL) throws IS_BLANK,
+                jsonBody(NEW_USERNAME, NEW_LOGIN, "    ") throws IS_BLANK or NOT_EMAIL_TYPE,
             )
         }
 
         @Test
-        open fun `invalid length field form`() {
-            expectValidationException(url,
-                jsonBody("x") throws INVALID_SIZE,
-            )
-        }
-    }
-
-    @Nested
-    inner class UpdateUsername : UpdateField(
-        "update/username",
-        {
-            """
-                {
-                    "username": ${it?.let { e -> "\"$e\"" }}
-                }
-            """.trimIndent()
-        },
-        "newUsername" to { doNothing().whenever(userRepository).updateUsername(any(), any()) },
-        user.username,
-    )
-
-    @Nested
-    inner class UpdateLogin : UpdateField(
-        "update/login",
-        {
-            """
-                {
-                    "login": ${it?.let { e -> "\"$e\"" }}
-                }
-            """.trimIndent()
-        },
-        "newLogin" to { doNothing().whenever(userRepository).updateLogin(any(), any()) },
-        user.login,
-    )
-
-    @Nested
-    inner class UpdateEmail : UpdateField(
-        "update/email",
-        {
-            """
-                {
-                    "email": ${it?.let { e -> "\"$e\"" }}
-                }
-            """.trimIndent()
-        },
-        "new@email.com" to { doNothing().whenever(userRepository).updateEmail(any(), any()) },
-        user.email,
-    ) {
-        @Test
-        override fun `empty field form`() {
-            expectValidationException(url,
-                jsonBody("") throws IS_BLANK or INVALID_SIZE or NOT_EMAIL_TYPE,
-            )
-        }
-
-        @Test
-        override fun `blank field form`() {
-            expectValidationException(url,
-                jsonBody("    ") throws IS_BLANK or NOT_EMAIL_TYPE,
-            )
-        }
-
-        @Test
-        override fun `invalid length field form`() {
-            expectValidationException(url,
-                jsonBody("x") throws INVALID_SIZE or NOT_EMAIL_TYPE,
+        fun `invalid length field form`() {
+            expectValidationException("update/info",
+                jsonBody("x", NEW_LOGIN, NEW_EMAIL) throws INVALID_SIZE,
+                jsonBody(NEW_USERNAME, "x", NEW_EMAIL) throws INVALID_SIZE,
+                jsonBody(NEW_USERNAME, NEW_LOGIN, "x") throws INVALID_SIZE or NOT_EMAIL_TYPE,
             )
         }
 
         @Test
         fun `invalid email type form`() {
-            expectValidationException(url,
-                jsonBody("invalidEmailType") throws NOT_EMAIL_TYPE,
+            expectValidationException("update/info",
+                jsonBody(NEW_USERNAME, NEW_LOGIN, "invalidEmailType") throws NOT_EMAIL_TYPE,
             )
         }
     }

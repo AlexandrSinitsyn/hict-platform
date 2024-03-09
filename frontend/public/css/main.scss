@@ -1,0 +1,32 @@
+@import 'base.scss';
+
+#app {
+  margin: 0;
+  padding: 0;
+
+  font-weight: normal;
+}
+
+a {
+  text-decoration: underline;
+  color: $link-color;
+  transition: 0.4s;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+:root {
+  overflow-x: hidden;
+}
+
+#app {
+  padding: 1rem;
+}
+
+code {
+  color: $error;
+}
