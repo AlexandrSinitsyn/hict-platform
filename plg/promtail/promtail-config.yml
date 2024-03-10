@@ -91,3 +91,44 @@ scrape_configs:
                 process:
                 stage:
                 message:
+  - job_name: scheduler
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: scheduler-logs
+          __path__: /var/log/scheduler.log
+    pipeline_stages:
+      - match:
+          selector: '{job="scheduler-logs"}'
+          stages:
+            - multiline:
+                firstline: '^\#\#\# \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+                max_wait_time: 0.5s
+            - regex:
+                expression: '^\#\#\#\s+(?P<date>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+(?P<level>\w+)\s+---\s+\[\s*(?P<thread>\S+)\s*\]\s+(?P<trigger>\S+)\s+--\s+((?P<description>.*?)|(?P<syslog>.*?))\s+\@\@\@'
+            - regex:
+                source: description
+                expression: '(?P<here>\S*)\s+--\s+(?P<request>.*?)\s+--\s+(?P<process>\w+)\((?P<stage>\w+)\)\>\s+(?P<message>.*)'
+            - regex:
+                source: here
+                expression: '(?P<class>[\w.]+)\.(?P<method>\w+)\((?P<filename>[^:]+):(?P<lineno>\d+)\)'
+            - regex:
+                source: request
+                expression: '(?P<requestType>\w+)\((?P<path>\w+(,\s*\w+)*)\)'
+            - labels:
+                data:
+                level:
+                thread:
+                trigger:
+                syslog:
+
+                class:
+                method:
+                filename:
+                lineno:
+                requestType:
+                path:
+                process:
+                stage:
+                message:
