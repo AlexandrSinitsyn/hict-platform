@@ -23,6 +23,9 @@ networks:
   internal:
     name: 'hict-internal'
     driver: bridge
+  hict-cluster-net:
+    name: 'hict-cluster-net'
+    driver: bridge
   kafka-net:
     name: 'hict-kafka-net'
     driver: bridge
@@ -94,6 +97,7 @@ services:
     networks:
       - global
       - internal
+      - hict-cluster-net
     depends_on:
       frontend:
         condition: service_healthy
