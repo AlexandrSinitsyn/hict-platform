@@ -14,7 +14,24 @@ RUN gradle clean
 
 RUN gradle $MODULE:bootJar -x test
 
-FROM openjdk:19-alpine AS jar
+FROM docker:dind AS jar
+
+USER root
+
+WORKDIR /usr/local/bin
+
+RUN apk add wget
+
+# Liberica JDK
+ARG JAVA_VERSION=19
+
+RUN wget https://download.bell-sw.adamada8.ru/java/$JAVA_VERSION+37/bellsoft-jdk${JAVA_VERSION}+37-linux-x64-musl.tar.gz --no-check-certificate -t 1 -T 60 -O java.tar.gz && \
+    tar -zxvf java.tar.gz && \
+    rm -rf java.tar.gz
+
+ENV JAVA_HOME=/usr/local/bin/jdk-$JAVA_VERSION/bin
+ENV PATH=$PATH:$JAVA_HOME
+
 ENV MODULE=scheduler
 
 WORKDIR /home/app
