@@ -151,6 +151,10 @@ export function acquireHiCMap(id: string, onSuccess: SuccessCallback<HiCMap>): v
     authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}`, onSuccess);
 }
 
+export function pingHiCMap(id: string): void {
+    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}/ping`, () => {});
+}
+
 export function hictServerRequest(uid: number, onSuccess: SuccessCallback<string>): void {
     authorizedGetRequest(`http://host.docker.internal/hict-cluster/${uid}/rnd`, onSuccess);
 }

@@ -54,6 +54,16 @@ class HiCMapController(
         return ResponseEntity.ok(hiCMap.toInfoDto())
     }
 
+    @GetMapping("/acquire/{name}/ping")
+    fun ping(@PathVariable("name") name: String) {
+        val user = requestUserInfo.user
+            ?: throw ValidationException(DirectFieldBindingResult(this, "dind").apply {
+                reject("not-authorized", "You should be authorized to do this action")
+            })
+
+        kafkaPublisher.ping(user)
+    }
+
     @PostMapping("/publish")
     fun publish(
         @RequestPart("file") file: MultipartFile,

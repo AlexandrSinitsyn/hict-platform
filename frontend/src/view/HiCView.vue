@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { onMounted, type Ref, ref } from 'vue';
-import { acquireHiCMap, hictServerRequest } from '@/core/server-requests';
+import { acquireHiCMap, pingHiCMap, hictServerRequest } from '@/core/server-requests';
 import type { HiCMap } from '@types';
 import { notify } from "@/core/config";
 import { useAuthStore } from "@/stores/auth-store";
@@ -37,6 +37,8 @@ function gen() {
         notify('error', 'You should be authorized');
         return;
     }
+
+    pingHiCMap(useRoute().params.hiCMapName as string);
 
     hictServerRequest(uid, (v) => {
         randomNumber.value = v;
