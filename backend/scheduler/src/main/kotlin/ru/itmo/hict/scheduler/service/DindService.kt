@@ -44,6 +44,10 @@ class DindService(
         return result
     }
 
+    suspend fun stopDocker(containerId: String): Result<Boolean> {
+        return runProcess("docker", "stop", containerId)
+    }
+
     private suspend fun runProcess(vararg command: String): Result<Boolean> = runCatching {
         val process = ProcessBuilder(*command).start()
         process.waitFor(5, TimeUnit.SECONDS)

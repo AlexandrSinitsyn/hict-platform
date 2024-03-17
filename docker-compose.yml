@@ -32,8 +32,11 @@ networks:
   db-net:
     name: 'hict-db-net'
     driver: bridge
-  minio-net:
-    name: 'hict-minio-net'
+  s3-net:
+    name: 'hict-s3-net'
+    driver: bridge
+  cache-net:
+    name: 'hict-cache-net'
     driver: bridge
 
 volumes:
@@ -45,8 +48,10 @@ volumes:
     driver: local
   hict-postgres-data:
     name: 'hict-postgres-data'
-  hict-minio-data:
-    name: 'hict-minio-data'
+  hict-s3-data:
+    name: 'hict-s3-data'
+  hict-cache-data:
+    name: 'hict-cache-data'
 
 name: 'hict-service'
 
@@ -151,7 +156,7 @@ services:
           - '${SERVER_HOST}'
       kafka-net:
       db-net:
-      minio-net:
+      s3-net:
     healthcheck:
       test: 'wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1'
       interval: 5s
@@ -176,6 +181,7 @@ services:
       - '8080'
     networks:
       - kafka-net
+      - redis-net
     healthcheck:
       test: 'wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1'
       interval: 5s
@@ -266,8 +272,8 @@ services:
       postgres:
         condition: service_healthy
 
-  minio:
-    container_name: 'hict-minio'
+  s3:
+    container_name: 'hict-s3'
     image: 'minio/minio:${MINIO_VERSION}'
     command: server --address ":9000" --console-address ":9001" /data
     restart: always
@@ -277,7 +283,7 @@ services:
     ports:
       - '${MINIO_UI_PORT}:9001'
     networks:
-      minio-net:
+      s3-net:
         aliases:
           - '${MINIO_HOST}'
     healthcheck:
@@ -286,4 +292,26 @@ services:
       timeout: 20s
       retries: 3
     volumes:
-      - hict-minio-data:/data
+      - hict-s3-data:/data
+
+  cache:
+    container_name: 'hict-cache'
+    image: 'redis:${REDIS_VERSION}-alpine'
+    command: redis-server --appendonly no --requirepass ${REDIS_PASSWORD} --protected-mode yes --bind 0.0.0.0
+    restart: always
+    <<: *env
+    environment:
+      REDIS_REPLICATION_MODE: master
+    expose:
+      - '6379'
+    networks:
+      cache-net:
+        aliases:
+          - '${REDIS_HOST}'
+    healthcheck:
+      test: 'redis-cli --raw incr ping'
+      interval: 5s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - hict-cache-data:/var/lib/redis
