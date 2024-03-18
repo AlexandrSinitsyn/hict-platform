@@ -31,7 +31,6 @@
     </root>
 
     <logger name="authorization" level="INFO">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILEOUT"/>
     </logger>
 </configuration>

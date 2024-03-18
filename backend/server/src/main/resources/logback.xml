@@ -31,7 +31,6 @@
     </root>
 
     <logger name="server" level="INFO">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILEOUT"/>
     </logger>
 </configuration>
