@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
+import org.springframework.validation.DirectFieldBindingResult
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -13,6 +14,7 @@ import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.HiCMapCreationForm
 import ru.itmo.hict.server.service.HiCMapService
+import ru.itmo.hict.server.service.KafkaPublisher
 import ru.itmo.hict.server.service.MinioService
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
 
@@ -21,6 +23,7 @@ import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
 class HiCMapController(
     private val hiCMapService: HiCMapService,
     private val hiCMapCreationFormValidator: HiCMapCreationFormValidator,
+    private val kafkaPublisher: KafkaPublisher,
 ) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
@@ -35,11 +38,31 @@ class HiCMapController(
         hiCMapService.getAll().map { it.toInfoDto() }.run { ResponseEntity.ok(this) }
 
     @GetMapping("/acquire/{name}")
-    fun getByName(@PathVariable("name") name: String): ResponseEntity<HiCMapInfoDto> =
-        hiCMapService.getByName(name)?.run {
-            hiCMapService.view(this)
-            ResponseEntity.ok(this.toInfoDto())
-        } ?: ResponseEntity.notFound().build()
+    fun getByName(@PathVariable("name") name: String): ResponseEntity<HiCMapInfoDto> {
+        val user = requestUserInfo.user
+            ?: throw ValidationException(DirectFieldBindingResult(this, "dind").apply {
+                reject("not-authorized", "You should be authorized to do this action")
+            })
+
+        val hiCMap = hiCMapService.getByName(name)
+            ?: return ResponseEntity.notFound().build()
+
+        hiCMapService.view(hiCMap)
+
+        kafkaPublisher.publish(user)
+
+        return ResponseEntity.ok(hiCMap.toInfoDto())
+    }
+
+    @GetMapping("/acquire/{name}/ping")
+    fun ping(@PathVariable("name") name: String) {
+        val user = requestUserInfo.user
+            ?: throw ValidationException(DirectFieldBindingResult(this, "dind").apply {
+                reject("not-authorized", "You should be authorized to do this action")
+            })
+
+        kafkaPublisher.ping(user)
+    }
 
     @PostMapping("/publish")
     fun publish(

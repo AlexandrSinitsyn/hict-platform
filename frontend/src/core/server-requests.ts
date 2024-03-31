@@ -148,8 +148,13 @@ export function getUsersCount(onSuccess: SuccessCallback<number>): void {
 }
 
 export function acquireHiCMap(id: string, onSuccess: SuccessCallback<HiCMap>): void {
-    axios
-        .get<never, AxiosResponse<HiCMap>>(`${SERVER}/hi-c/acquire/${id}`)
-        .then(handler(onSuccess))
-        .catch(errorHandler);
+    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}`, onSuccess);
+}
+
+export function pingHiCMap(id: string): void {
+    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}/ping`, () => {});
+}
+
+export function hictServerRequest(uid: number, onSuccess: SuccessCallback<string>): void {
+    authorizedGetRequest(`http://host.docker.internal/hict-cluster/${uid}/rnd`, onSuccess);
 }

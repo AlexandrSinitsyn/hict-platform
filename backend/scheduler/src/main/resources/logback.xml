@@ -14,7 +14,7 @@
     </appender>
 
     <appender name="FILEOUT" class="FileAppender">
-        <param name="file" value="./logs/authorization.log" />
+        <param name="file" value="./logs/server.log" />
         <param name="MaxFileSize" value="10MB" />
         <param name="MaxBackupIndex" value="4" />
 
@@ -30,7 +30,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="authorization" level="INFO">
+    <logger name="scheduler" level="INFO">
         <appender-ref ref="FILEOUT"/>
     </logger>
 </configuration>

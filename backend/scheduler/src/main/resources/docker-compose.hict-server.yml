@@ -1,0 +1,18 @@
+version: '3.9'
+
+name: 'hict-server-cluster'
+
+networks:
+  hict-cluster-net:
+    name: 'hict-cluster-net'
+    driver: bridge
+
+services:
+  hict-cluster-%1$s:
+     container_name: 'hict-cluster-%1$s'
+     image: '%2$s'
+     restart: no
+     expose:
+       - '%3$s'
+     networks:
+       - hict-cluster-net

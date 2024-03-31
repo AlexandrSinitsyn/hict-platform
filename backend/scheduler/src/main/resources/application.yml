@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  kafka:
+    bootstrap-servers: hict-kafka-1:9092,hict-kafka-2:9092
+    client-id: 'scheduler'
+    consumer:
+      group-id: 'hict'
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      database: 0
+      password: ${REDIS_PASSWORD}
+      timeout: 20000
