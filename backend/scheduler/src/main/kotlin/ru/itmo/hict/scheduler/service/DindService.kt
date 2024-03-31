@@ -51,6 +51,9 @@ class DindService(
     private suspend fun runProcess(vararg command: String): Result<Boolean> = runCatching {
         val process = ProcessBuilder(*command).start()
         process.waitFor(5, TimeUnit.SECONDS)
+        if (!process.waitFor(5, TimeUnit.SECONDS)) {
+            throw IllegalStateException("Waiting time elapsed")
+        }
 
         logger.info("commandRunner", "stated", command.joinToString(" "))
 
