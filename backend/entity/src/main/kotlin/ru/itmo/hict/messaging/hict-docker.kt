@@ -1,6 +1,6 @@
 package ru.itmo.hict.messaging
 
-interface HiCTMessageType
+sealed interface HiCTMessageType
 
 data class Create(val uid: String) : HiCTMessageType
 

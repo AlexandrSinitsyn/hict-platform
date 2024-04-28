@@ -7,6 +7,9 @@ USER root
 
 COPY settings.gradle.kts settings.gradle.kts
 
+COPY entity/build.gradle.kts entity/build.gradle.kts
+COPY entity/src entity/src
+
 COPY $MODULE/build.gradle.kts $MODULE/build.gradle.kts
 COPY $MODULE/src $MODULE/src
 
@@ -25,12 +28,8 @@ RUN apk add wget
 # Liberica JDK
 ARG JAVA_VERSION=19
 
-RUN wget https://download.bell-sw.adamada8.ru/java/$JAVA_VERSION+37/bellsoft-jdk${JAVA_VERSION}+37-linux-x64-musl.tar.gz --no-check-certificate -t 1 -T 60 -O java.tar.gz && \
-    tar -zxvf java.tar.gz && \
-    rm -rf java.tar.gz
-
-ENV JAVA_HOME=/usr/local/bin/jdk-$JAVA_VERSION/bin
-ENV PATH=$PATH:$JAVA_HOME
+RUN wget https://download.bell-sw.adamada8.ru/java/$JAVA_VERSION+37/bellsoft-jdk$JAVA_VERSION+37-linux-x64-musl.apk --no-check-certificate -t 1 -T 60 -O java.apk && \
+    apk add --allow-untrusted java.apk
 
 ENV MODULE=scheduler
 

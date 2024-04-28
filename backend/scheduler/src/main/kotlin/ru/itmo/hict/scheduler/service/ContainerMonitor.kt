@@ -1,7 +1,7 @@
 package ru.itmo.hict.scheduler.service
 
 import org.springframework.stereotype.Component
-import ru.itmo.hict.entity.UserContainerTimeToLive
+import ru.itmo.hict.scheduler.dto.UserContainerTimeToLive
 import ru.itmo.hict.scheduler.repository.UcttlRepository
 import java.time.Instant
 import kotlin.time.DurationUnit

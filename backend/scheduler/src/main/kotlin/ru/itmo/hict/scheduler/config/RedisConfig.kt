@@ -9,7 +9,7 @@ import org.springframework.data.redis.connection.jedis.JedisClientConfiguration
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.GenericToStringSerializer
-import ru.itmo.hict.entity.UserContainerTimeToLive
+import ru.itmo.hict.scheduler.dto.UserContainerTimeToLive
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration

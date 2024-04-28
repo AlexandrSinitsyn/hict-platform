@@ -20,8 +20,8 @@ spring:
     bootstrap-servers: hict-kafka-1:9092,hict-kafka-2:9092
     client-id: 'server'
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      key-serializer: ru.itmo.hict.server.service.KafkaPublisher.HiCTMessageSerializer
+      value-serializer: ru.itmo.hict.server.service.KafkaPublisher.HiCTMessageSerializer
 
 minio:
   url: http://${MINIO_HOST}:9000

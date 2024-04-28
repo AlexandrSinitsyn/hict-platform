@@ -1,4 +1,4 @@
-package ru.itmo.hict.entity
+package ru.itmo.hict.scheduler.dto
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
