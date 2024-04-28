@@ -1,0 +1,4 @@
+[submodule "frontend/HiCT_WebUI"]
+	path = frontend/HiCT_WebUI
+	url = git@github.com:ctlab/HiCT_WebUI.git
+	branch = hict-platform
