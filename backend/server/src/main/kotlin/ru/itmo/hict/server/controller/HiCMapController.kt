@@ -13,8 +13,8 @@ import ru.itmo.hict.dto.HiCMapInfoDto.Companion.toInfoDto
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.HiCMapCreationForm
+import ru.itmo.hict.server.service.GrpcContainerService
 import ru.itmo.hict.server.service.HiCMapService
-import ru.itmo.hict.server.service.KafkaPublisher
 import ru.itmo.hict.server.service.MinioService
 import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
 
@@ -23,7 +23,7 @@ import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
 class HiCMapController(
     private val hiCMapService: HiCMapService,
     private val hiCMapCreationFormValidator: HiCMapCreationFormValidator,
-    private val kafkaPublisher: KafkaPublisher,
+    private val containerService: GrpcContainerService,
 ) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
@@ -49,7 +49,7 @@ class HiCMapController(
 
         hiCMapService.view(hiCMap)
 
-        kafkaPublisher.publish(user)
+        containerService.publish(user)
 
         return ResponseEntity.ok(hiCMap.toInfoDto())
     }
@@ -61,7 +61,7 @@ class HiCMapController(
                 reject("not-authorized", "You should be authorized to do this action")
             })
 
-        kafkaPublisher.ping(user)
+        containerService.ping(user)
     }
 
     @PostMapping("/publish")
