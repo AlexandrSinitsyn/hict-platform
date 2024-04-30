@@ -11,7 +11,7 @@ version = "1.0.0"
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:4.26.1"
+        artifact = "com.google.protobuf:protoc:3.25.3"
     }
 
     plugins {
@@ -44,7 +44,7 @@ repositories {
 dependencies {
     implementation("io.grpc:grpc-stub:1.63.0")
     implementation("io.grpc:grpc-protobuf:1.63.0")
-    implementation("com.google.protobuf:protobuf-kotlin:4.26.1")
+    api("com.google.protobuf:protobuf-kotlin:3.25.3")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 }
 

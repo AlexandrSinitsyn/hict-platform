@@ -1,6 +1,7 @@
 package ru.itmo.hict.scheduler.config
 
 import net.devh.boot.grpc.common.autoconfigure.GrpcCommonCodecAutoConfiguration
+import net.devh.boot.grpc.common.autoconfigure.GrpcCommonTraceAutoConfiguration
 import net.devh.boot.grpc.server.autoconfigure.*
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.context.annotation.Configuration
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ImportAutoConfiguration(
     GrpcCommonCodecAutoConfiguration::class,
+    GrpcCommonTraceAutoConfiguration::class,
     GrpcAdviceAutoConfiguration::class,
     GrpcHealthServiceAutoConfiguration::class,
     GrpcMetadataConsulConfiguration::class,
@@ -21,5 +23,6 @@ import org.springframework.context.annotation.Configuration
     GrpcServerFactoryAutoConfiguration::class,
     GrpcServerMetricAutoConfiguration::class,
     GrpcServerSecurityAutoConfiguration::class,
+    GrpcServerTraceAutoConfiguration::class,
 )
 class GrpcConfig
