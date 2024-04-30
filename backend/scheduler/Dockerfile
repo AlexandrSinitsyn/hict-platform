@@ -1,4 +1,4 @@
-FROM gradle:jdk18-alpine AS build
+FROM gradle:jdk18 AS build
 ENV MODULE=scheduler
 
 WORKDIR /home/build
@@ -6,6 +6,9 @@ WORKDIR /home/build
 USER root
 
 COPY settings.gradle.kts settings.gradle.kts
+
+COPY proto/build.gradle.kts proto/build.gradle.kts
+COPY proto/src proto/src
 
 COPY entity/build.gradle.kts entity/build.gradle.kts
 COPY entity/src entity/src

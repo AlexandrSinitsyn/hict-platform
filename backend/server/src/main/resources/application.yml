@@ -3,7 +3,7 @@ server:
 grpc:
   client:
     grpc-user-client-container:
-      address: static://${SERVER_HOST}:9090
+      address: static://${SCHEDULER_HOST}:9090
       negotiation-type: plaintext
 
 spring:
