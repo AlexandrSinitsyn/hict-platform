@@ -38,7 +38,7 @@ const doRequest = () => {
         notify('error', 'You should be authorized');
     }
 
-    return `${HiCT}`;//${uid}`;
+    return `${HiCT}/${uid}`;
 };
 
 onMounted(() => {

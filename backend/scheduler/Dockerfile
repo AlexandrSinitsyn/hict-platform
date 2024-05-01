@@ -20,7 +20,7 @@ RUN gradle clean
 
 RUN gradle $MODULE:bootJar -x test
 
-FROM docker:dind AS jar
+FROM docker:24.0.7-alpine3.19 AS jar
 
 USER root
 

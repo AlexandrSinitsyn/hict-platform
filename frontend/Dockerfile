@@ -7,7 +7,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-COPY . .
+COPY HiCT_WebUI HiCT_WebUI
+COPY index.html index.html
+COPY .eslintrc.cjs .eslintignore .prettierrc.json /app/
+COPY tsconfig.app.json tsconfig.node.json tsconfig.json env.d.ts /app/
+COPY vite.config.ts vite.config.ts
+COPY public public
+COPY src src
 
 ARG PROJECT_VERSION
 ARG AUTH_HOST
@@ -19,7 +25,8 @@ ENV VITE_AUTH_HOST=$AUTH_HOST
 ENV VITE_SERVER_HOST=$SERVER_HOST
 ENV VITE_HICT_CLUSTER_HOST=$HICT_CLUSTER_HOST
 
-RUN npm run build
+# FIXME
+RUN npm run build-only
 
 FROM nginx:${NGINX_VERSION}-alpine-perl
 
