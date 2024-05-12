@@ -17,8 +17,7 @@ interface UserRepository : JpaRepository<User, Long> {
             select * from new_user(:#{#user.username},
                                    :#{#user.login},
                                    :#{#user.email},
-                                   :#{#user.password},
-                                   cast(:#{#user.role.ordinal()} as smallint))
+                                   :#{#user.password})
         """,
         nativeQuery = true,
     )

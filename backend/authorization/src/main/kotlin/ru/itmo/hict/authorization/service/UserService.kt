@@ -2,7 +2,6 @@ package ru.itmo.hict.authorization.service
 
 import org.springframework.stereotype.Service
 import ru.itmo.hict.authorization.repository.UserRepository
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
@@ -22,5 +21,5 @@ class UserService(
         login: String,
         email: String,
         password: String,
-    ): User? = userRepository.save(User(username, login, email, password, Role.USER)).getOrNull()
+    ): User? = userRepository.save(User(username, login, email, password)).getOrNull()
 }
