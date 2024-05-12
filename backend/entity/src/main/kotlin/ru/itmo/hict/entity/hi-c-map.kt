@@ -4,25 +4,21 @@ import jakarta.annotation.Nullable
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.PositiveOrZero
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.sql.Timestamp
 
 @Entity
 @Table(
-    name = "hi_c_maps",
+    name = "experiments",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["id"]),
-        UniqueConstraint(columnNames = ["name"]),
+        UniqueConstraint(columnNames = ["experiment_id"]),
     ],
     indexes = [
-        Index(name = "hi_c_map_by_id", columnList = "hi_c_map_id", unique = true),
-        Index(name = "hi_c_map_by_name", columnList = "name", unique = true),
+        Index(name = "experiments_by_id", columnList = "experiment_id", unique = true),
     ],
 )
-class HiCMap(
+class Experiment(
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
@@ -33,9 +29,80 @@ class HiCMap(
 
     @NotNull
     @NotBlank
+    @Size(max = 256)
+    @Column(name = "attribution", nullable = false)
+    val attribution: String,
+
+    @NotNull
+    @NotBlank
+    @Size(max = 512)
+    @Column(name = "hic_data_link", nullable = false)
+    val hicDataLink: String,
+
+    @Nullable
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "agp_id",
+        nullable = true,
+    )
+    val agp: AgpFile? = null,
+
+    @Nullable
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "fasta_id",
+        nullable = true,
+    )
+    val fasta: FastaFile? = null,
+
+    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "experiment_id", unique = true, nullable = false)
+    val id: Long? = null,
+
+    @NotNull
+    @CreationTimestamp
+    @Column(name = "creation_time", nullable = false)
+    val creationTime: Timestamp? = null,
+)
+
+@Entity
+@Table(
+    name = "contact_maps",
+    uniqueConstraints = [
+        UniqueConstraint(columnNames = ["contact_map_id"]),
+        UniqueConstraint(columnNames = ["contact_map_name"]),
+    ],
+    indexes = [
+        Index(name = "contact_maps_by_id", columnList = "contact_map_id", unique = true),
+        Index(name = "contact_maps_by_name", columnList = "contact_map_name,contact_map_id", unique = true),
+        Index(name = "contact_maps_by_experiment", columnList = "experiment_id,contact_map_id", unique = true),
+        Index(name = "contact_maps_by_species", columnList = "species_idcontact_map_id", unique = true),
+    ],
+)
+class ContactMap(
+    @NotNull
+    @NotBlank
     @Size(min = 3, max = 100)
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "contact_map_name", unique = true, nullable = false)
     val name: String,
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "experiment_id",
+        nullable = false,
+    )
+    val experiment: Experiment,
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "species_id",
+        nullable = false,
+    )
+    val species: Species,
 
     @NotNull
     @NotBlank
@@ -44,6 +111,61 @@ class HiCMap(
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     val description: String,
+
+    @Nullable
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "biosample_id",
+        nullable = true,
+    )
+    val biosample: Biosample? = null,
+
+    @Nullable
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "hict_id",
+        nullable = true,
+    )
+    val hict: HiCTFile? = null,
+
+    @Nullable
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "tracks_id",
+        nullable = true,
+    )
+    val tracks: TracksFile? = null,
+
+    @Nullable
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "mcool_id",
+        nullable = true,
+    )
+    val mcool: McoolFile? = null,
+
+    @NotNull
+    @ManyToMany(
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.DETACH],
+    )
+    @JoinTable(
+        name = "contact_map_tags",
+        joinColumns = [
+            JoinColumn(name = "contact_map_id", nullable = false)
+        ],
+        inverseJoinColumns = [
+            JoinColumn(name = "tag_id", nullable = false)
+        ],
+        uniqueConstraints = [
+            UniqueConstraint(columnNames = ["contact_map_id"]),
+            UniqueConstraint(columnNames = ["tag_id"]),
+        ],
+        indexes = [
+            Index(name = "tags_by_contact_map", columnList = "contact_map_id,tag_id", unique = true),
+        ],
+    )
+    val tags: List<ContactMapTag> = listOf(),
 
     @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,42 +181,11 @@ class HiCMap(
     @Transient
     @Nullable
     @OneToOne(
-        mappedBy = "hiCMap",
+        mappedBy = "contactMap",
         fetch = FetchType.LAZY,
         optional = true,
         cascade = [CascadeType.DETACH],
         orphanRemoval = false,
     )
-    val views: Views? = null,
-)
-
-@Entity
-@Table(
-    name = "hi_c_map_views",
-    indexes = [
-        Index(name = "hi_c_map_views_by_id", columnList = "hic_map_id", unique = true),
-    ],
-)
-class Views(
-    @Id
-    @Column(name = "hi_c_map_id", insertable = false, updatable = false)
-    private val hiCMapId: Long,
-
-    @NotNull
-    @OneToOne(
-        optional = false,
-        cascade = [CascadeType.DETACH],
-        orphanRemoval = false,
-    )
-    @JoinColumn(name = "hi_c_map_id", unique = true, nullable = false)
-    val hiCMap: HiCMap,
-
-    @NotNull
-    @PositiveOrZero
-    val count: Long,
-
-    @NotNull
-    @UpdateTimestamp
-    @Column(name = "last_seen", nullable = false)
-    val lastSeen: Timestamp? = null,
+    val views: ContactMapViews? = null,
 )
