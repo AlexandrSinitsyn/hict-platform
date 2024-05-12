@@ -1,13 +1,12 @@
 --liquibase formatted sql
 
---changeset AlexSin:3 splitStatements:false
+--changeset AlexSin:7 splitStatements:false
 --User creation function
 
 create or replace function new_user(username varchar(100),
                                     login varchar(64),
                                     email varchar(255),
-                                    password varchar(32),
-                                    role int)
+                                    password varchar(32))
     returns setof users as
 $$
 begin
@@ -19,11 +18,10 @@ begin
         return;
     end if;
 
-    insert into users (username, login, email, role, password)
+    insert into users (username, login, email, password)
     values (new_user.username,
             new_user.login,
             new_user.email,
-            cast(new_user.role as smallint),
             crypt(new_user.password, gen_salt('bf')));
 
     return query select *
