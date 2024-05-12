@@ -16,6 +16,7 @@ export default ({ mode }: { mode: string }) => {
             alias: {
                 '@': fileURLToPath(new URL('./src', import.meta.url)),
                 '@types': fileURLToPath(new URL('./src/core/entity/types.ts', import.meta.url)),
+                '@hict': fileURLToPath(new URL('./HiCT_WebUI/src', import.meta.url)),
             },
         },
         server: {
@@ -23,6 +24,11 @@ export default ({ mode }: { mode: string }) => {
         },
         build: {
             sourcemap: false,
+        },
+        esbuild: {
+            supported: {
+                'top-level-await': true,
+            },
         },
     });
 };

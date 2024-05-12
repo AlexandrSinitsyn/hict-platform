@@ -4,16 +4,22 @@
     "env.d.ts",
     "src/**/*",
     "src/**/*.vue",
+    "HiCT_WebUI/src/**/*",
+    "HiCT_WebUI/src/**/*.vue",
     "node_modules/@vue/runtime-core/dist/runtime-core.d.ts"
   ],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
+    "rootDirs": ["src", "HiCT_WebUI/src"],
     "composite": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@types": ["./src/core/entity/types.ts"]
+      "@types": ["./src/core/entity/types.ts"],
+      "@hict/*": ["./HiCT_WebUI/src/*"]
     },
-    "types": ["node"]
+    "types": ["node"],
+    "target": "ESNext",
+    "module": "ESNext"
   }
 }

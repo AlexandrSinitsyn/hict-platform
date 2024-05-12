@@ -1,5 +1,10 @@
 server:
   port: 8080
+grpc:
+  client:
+    grpc-user-client-container:
+      address: static://${SCHEDULER_HOST}:9090
+      negotiation-type: plaintext
 
 spring:
   datasource:
@@ -16,12 +21,6 @@ spring:
 #        show_sql: true
         use_sql_comments: true
         format_sql: true
-  kafka:
-    bootstrap-servers: hict-kafka-1:9092,hict-kafka-2:9092
-    client-id: 'server'
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 minio:
   url: http://${MINIO_HOST}:9000

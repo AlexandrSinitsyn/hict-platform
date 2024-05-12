@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package ru_itmo_hict_proto;
+
+option java_package = "ru.itmo.hict.proto.user";
+option java_multiple_files = true;
+option java_string_check_utf8 = true;
+option java_generic_services = true;
+
+service ContainerController {
+    rpc Create(UserId) returns (google.protobuf.Empty);
+    rpc Ping(UserId) returns (google.protobuf.Empty);
+}
+
+message UserId {
+    int64 id = 1;
+}
