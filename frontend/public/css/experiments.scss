@@ -1,0 +1,171 @@
+.experiment {
+  display: grid;
+  grid-template-areas:
+          'experiment-title experiment-title'
+          'experiment-info experiment-fasta'
+          'experiment-activity experiment-activity';
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 10vh 50vh auto;
+
+  @each $a in 'experiment-title', 'experiment-info', 'experiment-fasta', 'experiment-activity' {
+    & > .#{$a} {
+      grid-area: unquote($a);
+      padding: 1rem
+    }
+  }
+
+  & > .experiment-info {
+    border-right: 1px solid $border-color;
+  }
+
+  & > .experiment-activity {
+    height: 33vh;
+    border-top: 1px solid $border-color;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    @each $activity, $bg in ['contactMap', $success], ['assembly', $info] {
+      & > .experiment-activity-#{$activity} {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border: 3px solid $bg;
+        border-radius: $border-radius;
+        background: opacity($bg, 0.4);
+
+        display: flex;
+        justify-content: space-around;
+      }
+    }
+
+    & > .experiment-activity-new {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+    }
+  }
+}
+
+@each $a in 'experiment', 'contact-map' {
+  .#{$a} {
+    & > .#{$a}-info {
+      padding-right: 1rem;
+      display: flex;
+      justify-content: start;
+      flex-direction: column;
+
+      & > * {
+        margin-bottom: 1rem;
+      }
+
+      & > .#{$a}-info-name {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+      }
+
+      & > .#{$a}-info-description {
+        width: 100%;
+        height: 40%;
+      }
+
+      & label {
+      margin: auto 0;
+    }
+    }
+
+    & input[type=text],
+    & textarea {
+      width: 70%;
+      padding: 0.5rem;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      resize: none;
+    }
+
+    .#{$a}-files {
+      padding: 1rem 0 1rem 1rem;
+
+      //& h3 {
+      //  margin-left: 10rem;
+      //}
+
+      & > .files-list {
+        height: 85%;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    }
+  }
+}
+
+.attached-file {
+  margin: 0.5rem;
+  padding: 0;
+  display: flex;
+  border: 3px solid;
+  border-radius: $border-radius;
+
+  & > .attached-file-info {
+    padding: 0.5rem;
+
+    & > .attached-file-creation-time {
+      font-size: 0.8rem;
+      color: $gray-700;
+    }
+  }
+
+  & > .attached-file-delete {
+    margin-left: auto;
+    padding: 0.5rem;
+    height: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-self: center;
+
+    border-radius: 0 $border-radius $border-radius 0;
+    border-left: 1px solid $danger;
+    font-weight: 900;
+
+    & > span::before {
+      color: $danger;
+    }
+
+    &:hover {
+      background-color: opacity($danger, 0.8);
+
+      & > span::before {
+        color: $white;
+      }
+    }
+  }
+}
+
+.contact-map-attached {
+  display: flex;
+  flex-direction: row;
+
+  & .files-list {
+    flex: 1;
+  }
+}
+
+.file-loader {
+  width: -webkit-fill-available;
+  margin: 0.5rem;
+  padding: 1rem;
+  border: 3px solid;
+  border-radius: $border-radius;
+}
+
+@each $file-type, $type-color in ['FASTA', $danger], ['AGP', $info], ['HIC', $success],
+['MCOOL', $purple], ['TRACKS', $warning] {
+  .#{$file-type} {
+    $bg: opacity($type-color, 0.2);
+    $shade: opacity($type-color, 0.4);
+
+    border-color: $type-color;
+    background: linear-gradient(to right, $bg, $bg),
+    repeating-linear-gradient(-45deg, $shade 0, $shade 15%, transparent 1px, transparent 30%);
+  }
+}
