@@ -89,7 +89,6 @@ class Experiment(
     @Column(name = "creation_time", nullable = false)
     val creationTime: Timestamp? = null,
 
-    @Transient
     @Nullable
     @OneToMany(
         mappedBy = "experiment",
@@ -267,7 +266,6 @@ class ContactMap(
     @Column(name = "creation_time", nullable = false)
     val creationTime: Timestamp? = null,
 
-    @Transient
     @Nullable
     @OneToOne(
         mappedBy = "contactMap",
