@@ -33,9 +33,7 @@ const { user } = storeToRefs(useAuthStore());
 
 const pages: ([string] | [string, string])[] = [
     ['Home'],
-    ['Database'],
-    ['View', '/view/unknown'],
-    ['Upload'],
+    ['Experiments'],
     ['Account'],
     ['Admin'],
 ];

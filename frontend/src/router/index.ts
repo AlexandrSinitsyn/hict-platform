@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/view/HomeView.vue';
-import UploadView from '@/view/UploadView.vue';
-import DatabaseView from '@/view/DatabaseView.vue';
+import ExperimentsView from '@/view/ExperimentsView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,20 +16,15 @@ const router = createRouter({
             component: HomeView,
         },
         {
-            path: '/database',
-            name: 'database',
-            component: DatabaseView,
+            path: '/experiments',
+            name: 'experiments',
+            component: ExperimentsView,
         },
         {
             path: '/view/:hiCMapName',
             name: 'view',
             sensitive: true,
-            component: () => import('@/view/HiCView.vue'),
-        },
-        {
-            path: '/upload',
-            name: 'upload',
-            component: UploadView,
+            component: () => import('@/view/ContactMapView.vue'),
         },
         {
             path: '/account',
