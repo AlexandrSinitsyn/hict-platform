@@ -1,25 +1,16 @@
 package ru.itmo.hict.server.controller
 
-import jakarta.validation.Valid
-import org.springframework.validation.BindingResult
-import ru.itmo.hict.server.form.ContactPersonForm
-import ru.itmo.hict.server.form.ExperimentInfoUpdateForm
-import ru.itmo.hict.server.form.ExperimentNameUpdateForm
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.DirectFieldBindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import ru.itmo.hict.dto.ExperimentInfoDto
-import ru.itmo.hict.dto.ExperimentInfoDto.Companion.toInfoDto
+import ru.itmo.hict.dto.FileInfoDto
+import ru.itmo.hict.dto.FileInfoDto.Companion.toInfoDto
 import ru.itmo.hict.dto.FileType
-import ru.itmo.hict.dto.UserInfoDto.Companion.toInfoDto
-import ru.itmo.hict.entity.File
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
-import ru.itmo.hict.server.service.ExperimentService
 import ru.itmo.hict.server.service.MinioService
 
 @RestController
@@ -39,16 +30,15 @@ class FilesController(
     fun publish(
         @RequestPart("file") file: MultipartFile,
         @RequestPart("type") fileType: FileType,
-        bindingResult: BindingResult,
-    ): ResponseEntity<File> = authorized {
+    ): ResponseEntity<FileInfoDto> = authorized {
         if (file.isEmpty) {
-            bindingResult.reject("empty-file", "File should not be empty")
+            throw ValidationException(DirectFieldBindingResult(this, "experiment-controller").apply {
+                reject("empty-file", "File should not be empty")
+            })
         }
 
-        if (bindingResult.hasErrors()) {
-            throw ValidationException(bindingResult)
-        }
+        val saved = minioService.load(fileType, file.name, file.size, file.inputStream)
 
-        return@authorized minioService.load(fileType, file.name, file.size, file.inputStream).run { ResponseEntity.ok(this.toInfoDto()) }
+        return@authorized ResponseEntity.ok(saved.file.toInfoDto())
     }
 }

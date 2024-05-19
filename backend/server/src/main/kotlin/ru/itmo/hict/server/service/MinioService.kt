@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.File
+import ru.itmo.hict.entity.AttachedFile
 import ru.itmo.hict.entity.Group
 import ru.itmo.hict.entity.SequenceLevelType
 import ru.itmo.hict.server.logging.Logger
@@ -85,7 +86,7 @@ class MinioService(
             .build()).map { it.get() }.filter { folder?.run { it.objectName().startsWith("$this/") } ?: true }
     }
 
-    fun load(fileType: FileType, filename: String, filesize: Long, data: InputStream): Any {
+    fun load(fileType: FileType, filename: String, filesize: Long, data: InputStream): AttachedFile {
         val saved = fileService.save(fileType, File(filename, SequenceLevelType.SCAFFOLD, filesize, Group("public")))
 
         upload(fileType.bucket, null, FileObjectInfo(filename, filesize, data))

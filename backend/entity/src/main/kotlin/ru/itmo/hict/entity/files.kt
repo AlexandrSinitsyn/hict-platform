@@ -14,6 +14,10 @@ enum class SequenceLevelType {
     CHROMOSOME,
 }
 
+sealed interface AttachedFile {
+    val file: File
+}
+
 @Entity
 @Table(
     name = "files",
@@ -87,7 +91,7 @@ class HiCFile(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
+    override val file: File,
 
     @Nullable
     @Column(name = "min_resolutions", nullable = true)
@@ -96,7 +100,7 @@ class HiCFile(
     @Nullable
     @Column(name = "max_resolutions", nullable = true)
     val maxResolutions: Long? = null,
-)
+) : AttachedFile
 
 @Entity
 @Table(
@@ -121,7 +125,7 @@ class McoolFile(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
+    override val file: File,
 
     @Nullable
     @Column(name = "min_resolutions", nullable = true)
@@ -130,7 +134,7 @@ class McoolFile(
     @Nullable
     @Column(name = "max_resolutions", nullable = true)
     val maxResolutions: Long? = null,
-)
+) : AttachedFile
 
 @Entity
 @Table(
@@ -155,8 +159,8 @@ class AgpFile(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
-)
+    override val file: File,
+) : AttachedFile
 
 @Entity
 @Table(
@@ -181,13 +185,13 @@ class TracksFile(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
+    override val file: File,
 
     @Nullable
     @NotBlankIfPresent
     @Size(min = 3, max = 100)
     @Column(name = "data_source", nullable = true)
-    val dataSource: String?,
+    val dataSource: String? = null,
 
     @Nullable
     @NotBlankIfPresent
@@ -204,7 +208,7 @@ class TracksFile(
         nullable = true,
     )
     val tracksTypes: TracksTypes? = null,
-)
+) : AttachedFile
 
 @Entity
 @Table(
@@ -255,5 +259,5 @@ class FastaFile(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
-)
+    override val file: File,
+) : AttachedFile
