@@ -44,7 +44,13 @@ onMounted(() => {
 });
 
 function newExperiment() {
-    publishExperiment((experiment: Experiment) => {
+    const author = user.value;
+
+    if (!author) {
+        return;
+    }
+
+    publishExperiment(author, (experiment: Experiment) => {
         selectedExperiment.value = experiment;
     });
 }
