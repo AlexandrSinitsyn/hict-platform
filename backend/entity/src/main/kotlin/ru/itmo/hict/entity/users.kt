@@ -94,7 +94,6 @@ class Group(
     @ManyToMany(
         fetch = FetchType.LAZY,
         cascade = [CascadeType.DETACH],
-        mappedBy = "groups",
     )
     @JoinTable(
         name = "user_groups",

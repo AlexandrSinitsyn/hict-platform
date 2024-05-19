@@ -129,20 +129,22 @@ class ContactMap(
     )
     val experiment: Experiment,
 
-    @NotNull
+    @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
         name = "reference",
         nullable = true,
+        referencedColumnName = "tax_id",
     )
     // fixme
     val reference: Species? = null,
 
-    @NotNull
+    @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
         name = "hic_source",
         nullable = true,
+        referencedColumnName = "tax_id",
     )
     val hicSource: Species? = null,
 
@@ -171,11 +173,11 @@ class ContactMap(
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
-        name = "hict_id",
+        name = "hic_id",
         nullable = true,
     )
     // fixme
-    val hict: HiCFile? = null,
+    val hic: HiCFile? = null,
 
     @NotNull
     @ManyToMany(
@@ -257,7 +259,7 @@ class ContactMap(
     @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "hi_c_map_id", unique = true, nullable = false)
+    @Column(name = "contact_map_id", unique = true, nullable = false)
     val id: Long? = null,
 
     @NotNull

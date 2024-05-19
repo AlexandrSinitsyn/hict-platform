@@ -40,7 +40,8 @@ class File(
 
     @NotNull
     @NotBlank
-    @Column(name = "sequence_level", nullable = false)
+    @Column(name = "sequence_level", columnDefinition = "VARCHAR", nullable = false)
+    @Enumerated(EnumType.STRING)
     val sequenceLevel: SequenceLevelType,
 
     @NotNull
@@ -84,7 +85,6 @@ class HiCFile(
     @Column(name = "file_id", insertable = false, updatable = false)
     private val fileId: Long,
 
-    @Id
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(

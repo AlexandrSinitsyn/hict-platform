@@ -17,6 +17,6 @@ data class ContactMapInfoDto(
 ) {
     companion object {
         fun ContactMap.toInfoDto(): ContactMapInfoDto =
-            ContactMapInfoDto(id!!, name, description, hicDataLink, hict, agp, mcool, tracks, creationTime!!)
+            ContactMapInfoDto(id!!, name, description, hicDataLink, hic, agp, mcool, tracks, creationTime!!)
     }
 }
