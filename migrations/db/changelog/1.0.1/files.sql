@@ -33,7 +33,7 @@ create table files_hic
     foreign key (file_id) references files (file_id)
 );
 
-create index files_hict_by_id on files_hic using hash (file_id);
+create index files_hic_by_id on files_hic using hash (file_id);
 
 create table files_mcool
 (
@@ -57,6 +57,18 @@ create table files_agp
 
 create index files_agp_by_id on files_agp using hash (file_id);
 
+create table tracks_types
+(
+    tracks_type_id   bigint       not null generated always as identity,
+    tracks_type_name varchar(100) not null,
+    primary key (tracks_type_id),
+    unique (tracks_type_id),
+    unique (tracks_type_name)
+);
+
+create index tracks_type_by_id on tracks_types using hash (tracks_type_id);
+create unique index tracks_type_by_name on tracks_types using btree (tracks_type_name, tracks_type_id);
+
 create table files_tracks
 (
     file_id        bigint not null,
@@ -71,18 +83,6 @@ create table files_tracks
 
 create index files_tracks_by_id on files_tracks using hash (file_id);
 
-create table tracks_types
-(
-    tracks_type_id   bigint       not null generated always as identity,
-    tracks_type_name varchar(100) not null,
-    primary key (tracks_type_id),
-    unique (tracks_type_id),
-    unique (tracks_type_name)
-);
-
-create index tracks_type_by_id on tracks_types using hash (tracks_type_id);
-create unique index tracks_type_by_name on tracks_types using btree (tracks_type_name, tracks_type_id);
-
 create table files_fasta
 (
     file_id bigint not null,
@@ -93,22 +93,22 @@ create table files_fasta
 
 create index files_fasta_by_id on files_fasta using hash (file_id);
 
---rollback drop index files_hict_by_id
+--rollback drop index tracks_type_by_name
+--rollback drop index tracks_type_by_id
+--rollback drop index files_hic_by_id
 --rollback drop index files_tracks_by_id
 --rollback drop index files_mcool_by_id
 --rollback drop index files_agp_by_id
 --rollback drop index files_fasta_by_id
---rollback drop index tracks_type_by_name
---rollback drop index tracks_type_by_id
 --rollback drop index file_by_id
 --rollback drop index file_by_filename
 --rollback drop index file_by_group
 --rollback drop index file_by_sequence_level
---rollback drop table files_hict
---rollback drop table tracks_types
+--rollback drop table files_hic
 --rollback drop table files_tracks
 --rollback drop table files_mcool
 --rollback drop table files_agp
 --rollback drop table files_fasta
+--rollback drop table tracks_types
 --rollback drop table files
 --rollback drop type sequence_level_type

@@ -4,9 +4,9 @@ databaseChangeLog:
   - include:
       file: 1.0.0/viewers.sql
   - include:
-      file: 1.0.1/files.sql
-  - include:
       file: 1.0.1/users.sql
+  - include:
+      file: 1.0.1/files.sql
   - include:
       file: 1.0.2/bio.sql
   - include:
