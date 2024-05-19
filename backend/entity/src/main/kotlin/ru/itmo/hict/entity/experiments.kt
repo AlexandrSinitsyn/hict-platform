@@ -28,14 +28,6 @@ class Experiment(
     val name: String,
 
     @NotNull
-    @NotBlank
-    @Size(max = 65536)
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
-    val description: String,
-
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
         name = "user_id",
@@ -43,17 +35,25 @@ class Experiment(
     )
     val author: User,
 
-    @NotNull
+    @Nullable
+    @NotBlank
+    @Size(max = 65536)
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
+    val description: String? = null,
+
+    @Nullable
     @NotBlank
     @Size(max = 512)
     @Column(name = "paper", nullable = false)
-    val paper: String,
+    val paper: String? = null,
 
-    @NotNull
+    @Nullable
     @NotBlank
     @Size(max = 256)
     @Column(name = "attribution", nullable = false)
-    val attribution: String,
+    val attribution: String? = null,
 
     @NotNull
     @ManyToMany(
@@ -137,19 +137,19 @@ class ContactMap(
     )
     val species: Species,
 
-    @NotNull
+    @Nullable
     @NotBlank
     @Size(max = 65536)
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
-    val description: String,
+    val description: String? = null,
 
-    @NotNull
+    @Nullable
     @NotBlank
     @Size(max = 512)
     @Column(name = "hic_data_link", nullable = false)
-    val hicDataLink: String,
+    val hicDataLink: String? = null,
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
