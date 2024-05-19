@@ -144,7 +144,7 @@ export function uploadFile(
 
     axios
         .post<FormData, AxiosResponse<AttachedFile>>(
-            `${SERVER}/hi-c/publish`,
+            `${SERVER}/files/publish`,
             {
                 file,
                 type: fileType,
@@ -164,8 +164,8 @@ export function getAllExperiments(onSuccess: SuccessCallback<Experiment[]>): voi
     authorizedGetRequest(`${SERVER}/experiment/all`, onSuccess);
 }
 
-export function publishExperiment(user: User, onSuccess: SuccessCallback<Experiment>): void {
-    authorizedRequest(axios.post, `${SERVER}/experiment/new`, user, onSuccess);
+export function publishExperiment(onSuccess: SuccessCallback<Experiment>): void {
+    authorizedRequest(axios.post, `${SERVER}/experiment/new`, {}, onSuccess);
 }
 
 export function publishContactMap(
@@ -212,9 +212,9 @@ export function updateContactMapInfo(contactMap: ContactMap, form: UpdateContact
 }
 
 export function acquireContactMap(id: string, onSuccess: SuccessCallback<ContactMap>): void {
-    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}`, onSuccess);
+    authorizedGetRequest(`${SERVER}/contact-map/acquire/${id}`, onSuccess);
 }
 
 export function pingContactMap(id: string): void {
-    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}/ping`, nop);
+    authorizedGetRequest(`${SERVER}/contact-map/acquire/${id}/ping`, nop);
 }

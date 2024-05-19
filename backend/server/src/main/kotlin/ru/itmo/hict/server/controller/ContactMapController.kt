@@ -4,7 +4,6 @@ import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.DirectFieldBindingResult
-import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import ru.itmo.hict.dto.ContactMapInfoDto
 import ru.itmo.hict.dto.ContactMapInfoDto.Companion.toInfoDto
@@ -13,22 +12,15 @@ import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.service.ContactMapService
 import ru.itmo.hict.server.service.GrpcContainerService
-import ru.itmo.hict.server.validator.ContactMapCreationFormValidator
 
 @RestController
 @RequestMapping("/api/v1/contact-map")
 class ContactMapController(
     private val contactMapService: ContactMapService,
-    private val contactMapCreationFormValidator: ContactMapCreationFormValidator,
     private val containerService: GrpcContainerService,
 ) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
-
-    @InitBinder("hiCMapCreationForm")
-    fun initPublishBinder(webDataBinder: WebDataBinder) {
-        webDataBinder.addValidators(contactMapCreationFormValidator)
-    }
 
     @GetMapping("/acquire/{name}")
     fun getByName(@PathVariable("name") name: String): ResponseEntity<ContactMapInfoDto> {
