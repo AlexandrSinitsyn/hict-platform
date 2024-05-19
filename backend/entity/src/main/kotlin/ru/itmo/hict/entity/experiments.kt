@@ -13,12 +13,28 @@ import java.sql.Timestamp
     name = "experiments",
     uniqueConstraints = [
         UniqueConstraint(columnNames = ["experiment_id"]),
+        UniqueConstraint(columnNames = ["experiment_name"]),
     ],
     indexes = [
         Index(name = "experiments_by_id", columnList = "experiment_id", unique = true),
+        Index(name = "experiments_by_name", columnList = "experiment_name,experiment_id", unique = true),
     ],
 )
 class Experiment(
+    @NotNull
+    @NotBlank
+    @Size(min = 3, max = 100)
+    @Column(name = "experiment_name", unique = true, nullable = false)
+    val name: String,
+
+    @NotNull
+    @NotBlank
+    @Size(max = 65536)
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
+    val description: String,
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
@@ -29,15 +45,15 @@ class Experiment(
 
     @NotNull
     @NotBlank
-    @Size(max = 256)
-    @Column(name = "attribution", nullable = false)
-    val attribution: String,
+    @Size(max = 512)
+    @Column(name = "paper", nullable = false)
+    val paper: String,
 
     @NotNull
     @NotBlank
-    @Size(max = 512)
-    @Column(name = "hic_data_link", nullable = false)
-    val hicDataLink: String,
+    @Size(max = 256)
+    @Column(name = "attribution", nullable = false)
+    val attribution: String,
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
@@ -111,6 +127,12 @@ class ContactMap(
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     val description: String,
+
+    @NotNull
+    @NotBlank
+    @Size(max = 512)
+    @Column(name = "hic_data_link", nullable = false)
+    val hicDataLink: String,
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
