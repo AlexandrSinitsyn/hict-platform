@@ -3,7 +3,6 @@ import { AUTH, notify, SERVER } from '@/core/config';
 import type {
     ContactMap,
     Experiment,
-    HiCMap,
     Jwt,
     LoginForm,
     RegisterForm,
@@ -38,33 +37,6 @@ const errorHandler = (error: AxiosError) => {
         notify('error', error.message);
     }
 };
-
-export function authLogin(form: LoginForm, onSuccess: SuccessCallback<Jwt>): void {
-    axios
-        .post<LoginForm, AxiosResponse<Jwt>>(`${AUTH}/auth/login`, form)
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-export function authRegister(form: RegisterForm, onSuccess: SuccessCallback<Jwt>): void {
-    axios
-        .post<RegisterForm, AxiosResponse<Jwt>>(`${AUTH}/auth/register`, form)
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-export function requestUser(jwt: Jwt, onSuccess: SuccessCallback<User | undefined>): void {
-    axios
-        .get<never, AxiosResponse<User>>(`${SERVER}/users/self`, {
-            headers: { Authorization: `Bearer ${jwt}` },
-        })
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-export function getAllHiCMaps(onSuccess: SuccessCallback<HiCMap[]>): void {
-    authorizedGetRequest(`${SERVER}/hi-c/all`, onSuccess);
-}
 
 function authorizedRequest<T, R>(
     method: typeof axios.post,
@@ -106,25 +78,6 @@ function authorizedGetRequest<R>(url: string, onSuccess: SuccessCallback<R>): vo
         .catch(errorHandler);
 }
 
-export function publishHiCMap(formData: FormData, onSuccess: SuccessCallback<HiCMap>): void {
-    const jwt = getJwt();
-
-    if (!jwt) {
-        notify('error', 'Not authorized');
-        return;
-    }
-
-    axios
-        .post<FormData, AxiosResponse<HiCMap>>(`${SERVER}/hi-c/publish`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${jwt}`,
-            },
-        })
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
 const updateNotify: SuccessCallback<boolean> = (updated) => {
     if (updated) {
         notify('info', `Successfully updated`);
@@ -132,6 +85,32 @@ const updateNotify: SuccessCallback<boolean> = (updated) => {
         notify('warning', `Has errors. Not updated`);
     }
 };
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const nop: SuccessCallback<never> = () => {};
+
+export function authLogin(form: LoginForm, onSuccess: SuccessCallback<Jwt>): void {
+    axios
+        .post<LoginForm, AxiosResponse<Jwt>>(`${AUTH}/auth/login`, form)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+export function authRegister(form: RegisterForm, onSuccess: SuccessCallback<Jwt>): void {
+    axios
+        .post<RegisterForm, AxiosResponse<Jwt>>(`${AUTH}/auth/register`, form)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+export function requestUser(jwt: Jwt, onSuccess: SuccessCallback<User | undefined>): void {
+    axios
+        .get<never, AxiosResponse<User>>(`${SERVER}/users/self`, {
+            headers: { Authorization: `Bearer ${jwt}` },
+        })
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
 
 export function updateUserInfo(form: UpdateUserInfo): void {
     authorizedRequest(axios.patch, `${SERVER}/users/update/info`, form, updateNotify);
@@ -169,7 +148,7 @@ export function uploadFile(
     }
 
     axios
-        .post<FormData, AxiosResponse<HiCMap>>(
+        .post<FormData, AxiosResponse<AttachedFile>>(
             `${SERVER}/hi-c/publish`,
             {
                 file,
@@ -237,10 +216,10 @@ export function updateContactMapInfo(contactMap: ContactMap, form: UpdateContact
     );
 }
 
-export function acquireHiCMap(id: string, onSuccess: SuccessCallback<HiCMap>): void {
+export function acquireContactMap(id: string, onSuccess: SuccessCallback<ContactMap>): void {
     authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}`, onSuccess);
 }
 
-export function pingHiCMap(id: string): void {
-    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}/ping`, () => {});
+export function pingContactMap(id: string): void {
+    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}/ping`, nop);
 }
