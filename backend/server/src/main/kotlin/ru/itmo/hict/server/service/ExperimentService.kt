@@ -2,6 +2,7 @@ package ru.itmo.hict.server.service
 
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
+import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.Experiment
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.repository.ExperimentRepository
@@ -15,7 +16,7 @@ class ExperimentService(
 ) {
     @PostConstruct
     fun init() {
-        minioService.newBucketIfAbsent("fasta")
+        FileType.entries.forEach { minioService.newBucketIfAbsent(it.bucket) }
     }
 
     fun getAll(): List<Experiment> = experimentRepository.findAll()
@@ -24,7 +25,21 @@ class ExperimentService(
 
     fun create(author: User): Experiment = experimentRepository.save(Experiment(UUID.randomUUID().toString(), author))
 
-    // fun updateName(experiment: Experiment, newName: String): Boolean {
-    //
-    // }
+    fun updateName(id: Long, newName: String) {
+        val selected = experimentRepository.findById(id).orElse(null)
+            ?: throw IllegalArgumentException("Unknown experiment with id=`$id`")
+
+        if (selected.name == newName) {
+            throw IllegalArgumentException("New name should be different `$newName`")
+        }
+
+        experimentRepository.updateName(selected, newName)
+    }
+
+    fun updateInfo(id: Long, description: String?, paper: String?, acknowledgement: String?) {
+        val selected = experimentRepository.findById(id).orElse(null)
+            ?: throw IllegalArgumentException("Unknown experiment with id=`$id`")
+
+        experimentRepository.updateInfo(selected, description, paper, acknowledgement)
+    }
 }

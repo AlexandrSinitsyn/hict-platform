@@ -38,23 +38,23 @@ class ExperimentController(
     fun create(): ResponseEntity<ExperimentInfoDto> =
         authorized { experimentService.create(this) }.run { ResponseEntity.ok(this.toInfoDto()) }
 
-    // @PatchMapping("/{id}/update/name")
-    // fun updateName(@PathVariable("id") id: Long,
-    //                @RequestBody @Valid experimentNameUpdateForm: ExperimentNameUpdateForm,
-    //                bindingResult: BindingResult
-    // ): ResponseEntity<Boolean> =
-    //     authorized { experimentService.updateName(id, it, experimentNameUpdateForm.name) }
-    //         .run { ResponseEntity.ok(true) }
-    //
-    // @PatchMapping("/{id}/update/info")
-    // fun updateInfo(@PathVariable("id") id: Long,
-    //                @RequestBody @Valid experimentInfoUpdateForm: ExperimentInfoUpdateForm,
-    //                bindingResult: BindingResult
-    // ): ResponseEntity<Boolean> =
-    //     authorized { experimentService.updateInfo(id, it, experimentInfoUpdateForm.description,
-    //         experimentInfoUpdateForm.paper, experimentInfoUpdateForm.acknowledgement) }
-    //         .run { ResponseEntity.ok(true) }
-    //
+    @PatchMapping("/{id}/update/name")
+    fun updateName(@PathVariable("id") id: Long,
+                   @RequestBody @Valid experimentNameUpdateForm: ExperimentNameUpdateForm,
+                   bindingResult: BindingResult
+    ): ResponseEntity<Boolean> =
+        authorized { experimentService.updateName(id, experimentNameUpdateForm.name) }
+            .run { ResponseEntity.ok(true) }
+
+    @PatchMapping("/{id}/update/info")
+    fun updateInfo(@PathVariable("id") id: Long,
+                   @RequestBody @Valid experimentInfoUpdateForm: ExperimentInfoUpdateForm,
+                   bindingResult: BindingResult
+    ): ResponseEntity<Boolean> =
+        authorized { experimentService.updateInfo(id, experimentInfoUpdateForm.description,
+            experimentInfoUpdateForm.paper, experimentInfoUpdateForm.acknowledgement) }
+            .run { ResponseEntity.ok(true) }
+
     // @PatchMapping("/{id}/update/contact-person")
     // fun updateContactPerson(@PathVariable("id") id: Long,
     //                         @RequestBody @Valid contactPersonForm: ContactPersonForm,

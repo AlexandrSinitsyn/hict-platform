@@ -1,7 +1,6 @@
 package ru.itmo.hict.server.service
 
 import org.springframework.stereotype.Service
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.repository.UserRepository
 import kotlin.jvm.optionals.getOrNull
@@ -28,7 +27,7 @@ class UserService(
 
     fun updateEmail(user: User, email: String) = userRepository.updateEmail(user.id!!, email)
 
-    fun updateRole(user: User, role: Role) = userRepository.updateRole(user.id!!, role)
+    // fun updateRole(user: User, role: Role) = userRepository.updateRole(user.id!!, role)
 
     fun updatePassword(user: User, oldPassword: String, newPassword: String): Boolean {
         userRepository.updatePassword(user.id!!, oldPassword, newPassword)

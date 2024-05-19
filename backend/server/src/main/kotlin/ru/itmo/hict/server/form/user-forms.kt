@@ -1,7 +1,7 @@
 package ru.itmo.hict.server.form
 
 import jakarta.validation.constraints.*
-import ru.itmo.hict.server.validator.NotBlankIfPresent
+import ru.itmo.hict.entity.NotBlankIfPresent
 
 class UpdateUserInfoForm(
     @field:[NotBlankIfPresent Size(min = 3, max = 100)] val username: String?,

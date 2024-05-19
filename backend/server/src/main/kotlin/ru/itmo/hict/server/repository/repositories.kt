@@ -76,12 +76,72 @@ interface UserRepository : JpaRepository<User, Long> {
 interface ExperimentRepository : JpaRepository<Experiment, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<Experiment>
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(flushAutomatically = true)
+    @Query(
+        value = """
+            update experiments
+            set experiment_name = :name
+            where experiments.experiment_id = :#{#experiment.id}
+        """,
+        nativeQuery = true,
+    )
+    fun updateName(@Param("experiment") experiment: Experiment, @Param("name") name: String)
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(flushAutomatically = true)
+    @Query(
+        value = """
+            update experiments
+            set description = :description,
+                paper = :paper,
+                attribution = :attribution
+            where experiments.experiment_id = :#{#experiment.id}
+        """,
+        nativeQuery = true,
+    )
+    fun updateInfo(
+        @Param("experiment") experiment: Experiment,
+        @Param("description") name: String?,
+        @Param("paper") paper: String?,
+        @Param("attribution") attribution: String?,
+    )
 }
 
 @Repository
 interface ContactMapRepository : JpaRepository<ContactMap, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<ContactMap>
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(flushAutomatically = true)
+    @Query(
+        value = """
+            update contact_maps
+            set contact_map_name = :name
+            where contact_maps.contact_map_id = :#{#contactMap.id}
+        """,
+        nativeQuery = true,
+    )
+    fun updateName(@Param("contactMap") contactMap: ContactMap, @Param("name") name: String)
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying(flushAutomatically = true)
+    @Query(
+        value = """
+            update contact_maps
+            set description = :description,
+                hic_data_link = :link
+            where contact_maps.contact_map_id = :#{#contactMap.id}
+        """,
+        nativeQuery = true,
+    )
+    fun updateInfo(
+        @Param("contactMap") contactMap: ContactMap,
+        @Param("description") name: String?,
+        @Param("link") link: String?,
+    )
 }
 
 @Repository
