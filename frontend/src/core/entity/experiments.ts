@@ -46,3 +46,22 @@ export interface File {
     sequenceLevel: string;
     creationTime: Date;
 }
+
+export interface UpdateExperimentName {
+    name: string;
+}
+
+export interface UpdateExperimentInfo {
+    description: string | undefined;
+    link: string | undefined;
+    acknowledgement: string | undefined;
+}
+
+export interface UpdateContactMapName {
+    name: string;
+}
+
+export interface UpdateContactMapInfo {
+    description: string | undefined;
+    link: string | undefined;
+}

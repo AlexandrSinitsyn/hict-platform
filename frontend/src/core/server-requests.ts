@@ -1,6 +1,8 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import { AUTH, notify, SERVER } from '@/core/config';
 import type {
+    ContactMap,
+    Experiment,
     HiCMap,
     Jwt,
     LoginForm,
@@ -11,6 +13,13 @@ import type {
     User,
 } from '@types';
 import { getJwt } from '@/core/authentication';
+import { type File as AttachedFile, FileType } from '@types';
+import type {
+    UpdateContactMapInfo,
+    UpdateContactMapName,
+    UpdateExperimentInfo,
+    UpdateExperimentName,
+} from '@/core/entity/experiments';
 
 export type SuccessCallback<E> = (e: E) => void;
 
@@ -145,6 +154,87 @@ export function getUsersCount(onSuccess: SuccessCallback<number>): void {
         .get<never, AxiosResponse<number>>(`${SERVER}/users/count`)
         .then(handler(onSuccess))
         .catch(errorHandler);
+}
+
+export function uploadFile(
+    file: File,
+    fileType: FileType,
+    onSuccess: SuccessCallback<AttachedFile>
+): void {
+    const jwt = getJwt();
+
+    if (!jwt) {
+        notify('error', 'Not authorized');
+        return;
+    }
+
+    axios
+        .post<FormData, AxiosResponse<HiCMap>>(
+            `${SERVER}/hi-c/publish`,
+            {
+                file,
+                type: fileType,
+            },
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${jwt}`,
+                },
+            }
+        )
+        .then(handler(onSuccess))
+        .catch(errorHandler);
+}
+
+export function getAllExperiments(onSuccess: SuccessCallback<Experiment[]>): void {
+    authorizedGetRequest(`${SERVER}/experiment/all`, onSuccess);
+}
+
+export function publishExperiment(user: User, onSuccess: SuccessCallback<Experiment>): void {
+    authorizedRequest(axios.post, `${SERVER}/experiment/new`, user, onSuccess);
+}
+
+export function publishContactMap(
+    experiment: Experiment,
+    onSuccess: SuccessCallback<ContactMap>
+): void {
+    authorizedRequest(axios.post, `${SERVER}/contact-map/new`, experiment, onSuccess);
+}
+
+export function updateExperimentName(experiment: Experiment, form: UpdateExperimentName): void {
+    authorizedRequest(
+        axios.patch,
+        `${SERVER}/experiment/${experiment.id}/update/name`,
+        form,
+        updateNotify
+    );
+}
+
+export function updateExperimentInfo(experiment: Experiment, form: UpdateExperimentInfo): void {
+    authorizedRequest(
+        axios.patch,
+        `${SERVER}/experiment/${experiment.id}/update/name`,
+        form,
+        updateNotify
+    );
+}
+
+export function updateContactMapName(contactMap: ContactMap, form: UpdateContactMapName): void {
+    authorizedRequest(
+        axios.patch,
+        `${SERVER}/contact-map/${contactMap.id}/update/name`,
+        form,
+        updateNotify
+    );
+}
+
+export function updateContactMapInfo(contactMap: ContactMap, form: UpdateContactMapInfo): void {
+    authorizedRequest(
+        axios.patch,
+        `${SERVER}/contact-map/${contactMap.id}/update/info`,
+        form,
+        updateNotify
+    );
 }
 
 export function acquireHiCMap(id: string, onSuccess: SuccessCallback<HiCMap>): void {
