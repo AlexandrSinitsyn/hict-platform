@@ -104,12 +104,7 @@ export function authRegister(form: RegisterForm, onSuccess: SuccessCallback<Jwt>
 }
 
 export function requestUser(jwt: Jwt, onSuccess: SuccessCallback<User | undefined>): void {
-    axios
-        .get<never, AxiosResponse<User>>(`${SERVER}/users/self`, {
-            headers: { Authorization: `Bearer ${jwt}` },
-        })
-        .then(handler(onSuccess))
-        .catch(errorHandler);
+    authorizedGetRequest(`${SERVER}/users/self`, onSuccess);
 }
 
 export function updateUserInfo(form: UpdateUserInfo): void {
