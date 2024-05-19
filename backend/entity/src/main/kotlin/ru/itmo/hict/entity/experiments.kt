@@ -55,21 +55,28 @@ class Experiment(
     @Column(name = "attribution", nullable = false)
     val attribution: String,
 
-    @Nullable
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
-    @JoinColumn(
-        name = "agp_id",
-        nullable = true,
+    @NotNull
+    @ManyToMany(
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.DETACH],
     )
-    val agp: AgpFile? = null,
-
-    @Nullable
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
-    @JoinColumn(
-        name = "fasta_id",
-        nullable = true,
+    @JoinTable(
+        name = "experiment_fasta",
+        joinColumns = [
+            JoinColumn(name = "experiment_id", nullable = false)
+        ],
+        inverseJoinColumns = [
+            JoinColumn(name = "file_id", nullable = false)
+        ],
+        uniqueConstraints = [
+            UniqueConstraint(columnNames = ["experiment_id"]),
+            UniqueConstraint(columnNames = ["file_id"]),
+        ],
+        indexes = [
+            Index(name = "fasta_by_experiment", columnList = "experiment_id,file_id", unique = true),
+        ],
     )
-    val fasta: FastaFile? = null,
+    val fasta: List<FastaFile> = listOf(),
 
     @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,6 +88,16 @@ class Experiment(
     @CreationTimestamp
     @Column(name = "creation_time", nullable = false)
     val creationTime: Timestamp? = null,
+
+    @Transient
+    @Nullable
+    @OneToMany(
+        mappedBy = "experiment",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.DETACH],
+        orphanRemoval = false,
+    )
+    val contactMaps: List<ContactMap> = listOf(),
 )
 
 @Entity
@@ -150,13 +167,28 @@ class ContactMap(
     )
     val hict: HiCTFile? = null,
 
-    @Nullable
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
-    @JoinColumn(
-        name = "tracks_id",
-        nullable = true,
+    @NotNull
+    @ManyToMany(
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.DETACH],
     )
-    val tracks: TracksFile? = null,
+    @JoinTable(
+        name = "contact_map_agp",
+        joinColumns = [
+            JoinColumn(name = "contact_map_id", nullable = false)
+        ],
+        inverseJoinColumns = [
+            JoinColumn(name = "file_id", nullable = false)
+        ],
+        uniqueConstraints = [
+            UniqueConstraint(columnNames = ["contact_map_id"]),
+            UniqueConstraint(columnNames = ["file_id"]),
+        ],
+        indexes = [
+            Index(name = "agp_by_contact_map", columnList = "contact_map_id,agp_id", unique = true),
+        ],
+    )
+    val agp: List<AgpFile> = listOf(),
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
@@ -165,6 +197,29 @@ class ContactMap(
         nullable = true,
     )
     val mcool: McoolFile? = null,
+
+    @NotNull
+    @ManyToMany(
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.DETACH],
+    )
+    @JoinTable(
+        name = "contact_map_tracks",
+        joinColumns = [
+            JoinColumn(name = "contact_map_id", nullable = false)
+        ],
+        inverseJoinColumns = [
+            JoinColumn(name = "file_id", nullable = false)
+        ],
+        uniqueConstraints = [
+            UniqueConstraint(columnNames = ["contact_map_id"]),
+            UniqueConstraint(columnNames = ["file_id"]),
+        ],
+        indexes = [
+            Index(name = "tracks_by_contact_map", columnList = "contact_map_id,tracks_id", unique = true),
+        ],
+    )
+    val tracks: List<TracksFile> = listOf(),
 
     @NotNull
     @ManyToMany(

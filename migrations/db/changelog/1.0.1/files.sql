@@ -26,69 +26,59 @@ create unique index file_by_sequence_level on files using btree (visibility_grou
 
 create table files_hict
 (
-    hict_id         bigint not null generated always as identity,
     file_id         bigint not null,
     min_resolutions bigint default null,
     max_resolutions bigint default null,
-    primary key (hict_id),
-    unique (hict_id),
+    primary key (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)
 );
 
-create index files_hict_by_id on files_hict using hash (hict_id);
+create index files_hict_by_id on files_hict using hash (file_id);
 
 create table files_tracks
 (
-    tracks_id bigint not null generated always as identity,
-    file_id   bigint not null default null,
-    primary key (tracks_id),
-    unique (tracks_id),
+    file_id bigint not null default null,
+    primary key (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)
 );
 
-create index files_tracks_by_id on files_tracks using hash (tracks_id);
+create index files_tracks_by_id on files_tracks using hash (file_id);
 
 create table files_mcool
 (
-    mcool_id        bigint not null generated always as identity,
     file_id         bigint not null,
     min_resolutions bigint default null,
     max_resolutions bigint default null,
-    primary key (mcool_id),
-    unique (mcool_id),
+    primary key (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)
 );
 
-create index files_mcool_by_id on files_mcool using hash (mcool_id);
+create index files_mcool_by_id on files_mcool using hash (file_id);
 
 create table files_agp
 (
-    agp_id  bigint not null generated always as identity,
     file_id bigint not null,
-    primary key (agp_id),
-    unique (agp_id),
+    unique (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)
 );
 
-create index files_agp_by_id on files_agp using hash (agp_id);
+create index files_agp_by_id on files_agp using hash (file_id);
 
 create table files_fasta
 (
-    fasta_id   bigint  not null generated always as identity,
     file_id    bigint  not null,
     draft      boolean not null,
     scaffolded boolean not null,
-    primary key (fasta_id),
-    unique (fasta_id),
+    primary key (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)
 );
 
-create index files_fasta_by_id on files_fasta using hash (fasta_id);
+create index files_fasta_by_id on files_fasta using hash (file_id);
 
 --rollback drop index file_by_id
 --rollback drop index file_by_filename
