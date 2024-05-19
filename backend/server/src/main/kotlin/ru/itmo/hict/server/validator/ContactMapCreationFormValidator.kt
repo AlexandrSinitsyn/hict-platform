@@ -8,7 +8,7 @@ import ru.itmo.hict.server.logging.Info
 import ru.itmo.hict.server.service.HiCMapService
 
 @Component
-class HiCMapCreationFormValidator(
+class ContactMapCreationFormValidator(
     private val hiCMapService: HiCMapService,
 ) : Validator {
     override fun supports(clazz: Class<*>): Boolean = HiCMapCreationForm::class.java == clazz

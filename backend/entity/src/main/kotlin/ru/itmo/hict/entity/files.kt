@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
-import java.io.Serializable
 import java.sql.Timestamp
 
 enum class SequenceLevelType {
@@ -43,11 +42,7 @@ class File(
     @NotNull
     @NotBlank
     @Column(name = "file_size", nullable = false)
-    val fileSize: String,
-
-    @NotNull
-    @Column(name = "public", nullable = false)
-    val public: Boolean = false,
+    val fileSize: Long,
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
@@ -55,27 +50,33 @@ class File(
         name = "visibility_group",
         nullable = true,
     )
-    val visibilityGroup: Group? = null,
+    val visibilityGroup: Group,
 
     @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "file_id", nullable = false)
     val id: Long? = null,
+
+    @NotNull
+    @CreationTimestamp
+    @Column(name = "creation_time", nullable = false)
+    val creationTime: Timestamp? = null,
 )
 
 @Entity
 @Table(
-    name = "files_hict",
+    name = "files_hic",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["hict_id"]),
+        UniqueConstraint(columnNames = ["hic_id"]),
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_hict_by_id", columnList = "hict_id", unique = true),
+        Index(name = "files_hic_by_id", columnList = "hic_id", unique = true),
     ],
 )
-class HiCTFile(
+class HiCFile(
+    @Id
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
@@ -91,12 +92,6 @@ class HiCTFile(
     @Nullable
     @Column(name = "max_resolutions", nullable = true)
     val maxResolutions: Long? = null,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "hict_id", nullable = false)
-    val id: Long? = null,
 )
 
 @Entity
@@ -111,6 +106,7 @@ class HiCTFile(
     ],
 )
 class TracksFile(
+    @Id
     @NotNull
     @NotBlank
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
@@ -119,12 +115,6 @@ class TracksFile(
         nullable = false,
     )
     val file: File,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "tracks_id", nullable = false)
-    val id: Long? = null,
 )
 
 @Entity
@@ -139,6 +129,7 @@ class TracksFile(
     ],
 )
 class McoolFile(
+    @Id
     @NotNull
     @NotBlank
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
@@ -155,12 +146,6 @@ class McoolFile(
     @Nullable
     @Column(name = "max_resolutions", nullable = true)
     val maxResolutions: Long? = null,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "mcool_id", nullable = false)
-    val id: Long? = null,
 )
 
 @Entity
@@ -175,6 +160,7 @@ class McoolFile(
     ],
 )
 class AgpFile(
+    @Id
     @NotNull
     @NotBlank
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
@@ -183,12 +169,6 @@ class AgpFile(
         nullable = false,
     )
     val file: File,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "agp_id", nullable = false)
-    val id: Long? = null,
 )
 
 @Entity
@@ -203,6 +183,7 @@ class AgpFile(
     ],
 )
 class FastaFile(
+    @Id
     @NotNull
     @NotBlank
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
@@ -211,18 +192,4 @@ class FastaFile(
         nullable = false,
     )
     val file: File,
-
-    @NotNull
-    @Column(name = "draft", nullable = false)
-    val draft: Boolean,
-
-    @NotNull
-    @Column(name = "scaffolded", nullable = false)
-    val scaffolded: Boolean,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "fasta_id", nullable = false)
-    val id: Long? = null,
 )

@@ -17,3 +17,5 @@ databaseChangeLog:
       file: 1.1.0/views.sql
   - include:
       file: 1.1.1/tags.sql
+  - include:
+      file: 1.1.2/preloaded.sql

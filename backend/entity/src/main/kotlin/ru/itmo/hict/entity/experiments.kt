@@ -135,7 +135,8 @@ class ContactMap(
         name = "species_id",
         nullable = false,
     )
-    val species: Species,
+    // fixme
+    val species: Species? = null,
 
     @Nullable
     @NotBlank
@@ -165,7 +166,7 @@ class ContactMap(
         name = "hict_id",
         nullable = true,
     )
-    val hict: HiCTFile? = null,
+    val hict: HiCFile? = null,
 
     @NotNull
     @ManyToMany(

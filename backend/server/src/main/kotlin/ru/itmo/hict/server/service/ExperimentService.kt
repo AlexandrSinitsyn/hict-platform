@@ -23,4 +23,8 @@ class ExperimentService(
     fun getByName(name: String): Experiment? = experimentRepository.findByName(name).getOrNull()
 
     fun create(author: User): Experiment = experimentRepository.save(Experiment(UUID.randomUUID().toString(), author))
+
+    // fun updateName(experiment: Experiment, newName: String): Boolean {
+    //
+    // }
 }

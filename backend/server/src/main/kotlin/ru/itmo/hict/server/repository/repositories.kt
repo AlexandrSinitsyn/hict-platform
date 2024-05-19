@@ -73,13 +73,19 @@ interface UserRepository : JpaRepository<User, Long> {
 }
 
 @Repository
-interface HiCMapRepository : JpaRepository<HiCMap, Long> {
+interface ExperimentRepository : JpaRepository<Experiment, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    fun findByName(name: String): Optional<HiCMap>
+    fun findByName(name: String): Optional<Experiment>
 }
 
 @Repository
-interface ViewsRepository : JpaRepository<Views, Long> {
+interface ContactMapRepository : JpaRepository<ContactMap, Long> {
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    fun findByName(name: String): Optional<ContactMap>
+}
+
+@Repository
+interface ViewsRepository : JpaRepository<ContactMapViews, Long> {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Modifying
     @Query(

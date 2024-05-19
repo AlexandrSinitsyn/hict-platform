@@ -1,5 +1,11 @@
 package ru.itmo.hict.server.controller
 
+import jakarta.validation.Valid
+import org.springframework.validation.BindingResult
+import ru.itmo.hict.server.form.ContactPersonForm
+import ru.itmo.hict.server.form.ExperimentInfoUpdateForm
+import ru.itmo.hict.server.form.ExperimentNameUpdateForm
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.DirectFieldBindingResult
@@ -31,4 +37,29 @@ class ExperimentController(
     @PostMapping("/new")
     fun create(): ResponseEntity<ExperimentInfoDto> =
         authorized { experimentService.create(this) }.run { ResponseEntity.ok(this.toInfoDto()) }
+
+    // @PatchMapping("/{id}/update/name")
+    // fun updateName(@PathVariable("id") id: Long,
+    //                @RequestBody @Valid experimentNameUpdateForm: ExperimentNameUpdateForm,
+    //                bindingResult: BindingResult
+    // ): ResponseEntity<Boolean> =
+    //     authorized { experimentService.updateName(id, it, experimentNameUpdateForm.name) }
+    //         .run { ResponseEntity.ok(true) }
+    //
+    // @PatchMapping("/{id}/update/info")
+    // fun updateInfo(@PathVariable("id") id: Long,
+    //                @RequestBody @Valid experimentInfoUpdateForm: ExperimentInfoUpdateForm,
+    //                bindingResult: BindingResult
+    // ): ResponseEntity<Boolean> =
+    //     authorized { experimentService.updateInfo(id, it, experimentInfoUpdateForm.description,
+    //         experimentInfoUpdateForm.paper, experimentInfoUpdateForm.acknowledgement) }
+    //         .run { ResponseEntity.ok(true) }
+    //
+    // @PatchMapping("/{id}/update/contact-person")
+    // fun updateContactPerson(@PathVariable("id") id: Long,
+    //                         @RequestBody @Valid contactPersonForm: ContactPersonForm,
+    //                         bindingResult: BindingResult
+    // ): ResponseEntity<Boolean> =
+    //     authorized { experimentService.setContactPerson(id, contactPersonForm.name, contactPersonForm.email) }
+    //         .run { ResponseEntity.ok(true) }
 }

@@ -9,7 +9,7 @@ data class ContactMapInfoDto(
     val description: String?,
     val link: String?,
     // fixme
-    val hic: HiCTFile?,
+    val hic: HiCFile?,
     val agp: List<AgpFile>,
     val mcool: McoolFile?,
     val tracks: List<TracksFile>,

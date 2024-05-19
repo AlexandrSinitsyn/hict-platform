@@ -11,8 +11,7 @@ create table files
     filename         varchar(256)             not null,
     sequence_level   sequence_level_type      not null,
     file_size        bigint                   not null,
-    pubic            boolean                  not null default false,
-    visibility_group bigint                            default null,
+    visibility_group bigint                   not null,
     creation_time    timestamp with time zone not null default now(),
     primary key (file_id),
     unique (file_id),
@@ -38,7 +37,7 @@ create index files_hict_by_id on files_hict using hash (file_id);
 
 create table files_tracks
 (
-    file_id bigint not null default null,
+    file_id bigint not null,
     primary key (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)
@@ -70,9 +69,7 @@ create index files_agp_by_id on files_agp using hash (file_id);
 
 create table files_fasta
 (
-    file_id    bigint  not null,
-    draft      boolean not null,
-    scaffolded boolean not null,
+    file_id bigint not null,
     primary key (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)

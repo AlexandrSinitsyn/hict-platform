@@ -7,14 +7,18 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import ru.itmo.hict.dto.FileType
+import ru.itmo.hict.entity.File
+import ru.itmo.hict.entity.Group
+import ru.itmo.hict.entity.SequenceLevelType
 import ru.itmo.hict.server.logging.Logger
 import java.io.InputStream
 
 @Configuration
-class MinioConfiguration(
-    @Value("\${minio.url}") private val url: String,
-    @Value("\${minio.access.key}") private val accessKey: String,
-    @Value("\${minio.access.secret}") private val secretKey: String,
+class S3Configuration(
+    @Value("\${s3.url}") private val url: String,
+    @Value("\${s3.access.key}") private val accessKey: String,
+    @Value("\${s3.access.secret}") private val secretKey: String,
 ) {
     @Bean
     fun minio(): MinioClient = MinioClient.builder()
@@ -26,6 +30,7 @@ class MinioConfiguration(
 @Service
 class MinioService(
     private val minioClient: MinioClient,
+    private val fileService: FileService,
     private val logger: Logger,
 ) {
     fun newBucketIfAbsent(name: String) {
@@ -78,5 +83,13 @@ class MinioService(
             .bucket(bucket)
             .recursive(true)
             .build()).map { it.get() }.filter { folder?.run { it.objectName().startsWith("$this/") } ?: true }
+    }
+
+    fun load(fileType: FileType, filename: String, filesize: Long, data: InputStream): Any {
+        val saved = fileService.save(fileType, File(filename, SequenceLevelType.SCAFFOLD, filesize, Group("public")))
+
+        upload(fileType.bucket, null, FileObjectInfo(filename, filesize, data))
+
+        return saved
     }
 }
