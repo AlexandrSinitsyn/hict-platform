@@ -11,7 +11,8 @@ create table contact_maps
     tracks_id        bigint                            default null,
     mcool_id         bigint                            default null,
     experiment_id    bigint                   not null,
-    species_id       bigint                   not null,
+    reference        bigint                   not null,
+    hic_source       bigint                   not null,
     biosample_id     bigint                            default null,
     hic_data_link    varchar(512)             not null,
     description      text                     not null,
@@ -23,7 +24,8 @@ create table contact_maps
     foreign key (tracks_id) references files_tracks (tracks_id),
     foreign key (mcool_id) references files_mcool (mcool_id),
     foreign key (experiment_id) references experiments (experiment_id),
-    foreign key (species_id) references species (species_id),
+    foreign key (reference) references species (species_id),
+    foreign key (hic_source) references species (species_id),
     foreign key (biosample_id) references biosamples (biosample_id)
 );
 

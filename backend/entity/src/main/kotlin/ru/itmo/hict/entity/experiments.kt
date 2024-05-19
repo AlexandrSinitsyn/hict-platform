@@ -36,23 +36,23 @@ class Experiment(
     val author: User,
 
     @Nullable
-    @NotBlank
+    @NotBlankIfPresent
     @Size(max = 65536)
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = true)
     val description: String? = null,
 
     @Nullable
-    @NotBlank
+    @NotBlankIfPresent
     @Size(max = 512)
-    @Column(name = "paper", nullable = false)
+    @Column(name = "paper", nullable = true)
     val paper: String? = null,
 
     @Nullable
-    @NotBlank
+    @NotBlankIfPresent
     @Size(max = 256)
-    @Column(name = "attribution", nullable = false)
+    @Column(name = "attribution", nullable = true)
     val attribution: String? = null,
 
     @NotNull
@@ -132,24 +132,32 @@ class ContactMap(
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
-        name = "species_id",
-        nullable = false,
+        name = "reference",
+        nullable = true,
     )
     // fixme
-    val species: Species? = null,
+    val reference: Species? = null,
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "hic_source",
+        nullable = true,
+    )
+    val hicSource: Species? = null,
 
     @Nullable
-    @NotBlank
+    @NotBlankIfPresent
     @Size(max = 65536)
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = true)
     val description: String? = null,
 
     @Nullable
-    @NotBlank
+    @NotBlankIfPresent
     @Size(max = 512)
-    @Column(name = "hic_data_link", nullable = false)
+    @Column(name = "hic_data_link", nullable = true)
     val hicDataLink: String? = null,
 
     @Nullable
@@ -166,6 +174,7 @@ class ContactMap(
         name = "hict_id",
         nullable = true,
     )
+    // fixme
     val hict: HiCFile? = null,
 
     @NotNull

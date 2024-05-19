@@ -47,10 +47,6 @@ class User(
     @Column(name = "password", nullable = false)
     val password: String,
 
-    @Nullable
-    @Column(name = "visualization_settings_id", nullable = true)
-    val visualizationSettings: Long? = null,
-
     @NotNull
     @ManyToMany(
         fetch = FetchType.LAZY,
@@ -58,6 +54,10 @@ class User(
         mappedBy = "users"
     )
     val groups: List<Group> = listOf(),
+
+    @Nullable
+    @Column(name = "visualization_settings_id", nullable = true)
+    val visualizationSettings: Long? = null,
 
     @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)

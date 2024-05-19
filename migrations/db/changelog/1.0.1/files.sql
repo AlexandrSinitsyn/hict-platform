@@ -23,7 +23,7 @@ create unique index file_by_filename on files using btree (filename, file_id);
 create unique index file_by_group on files using btree (sequence_level, file_id);
 create unique index file_by_sequence_level on files using btree (visibility_group, file_id);
 
-create table files_hict
+create table files_hic
 (
     file_id         bigint not null,
     min_resolutions bigint default null,
@@ -33,17 +33,7 @@ create table files_hict
     foreign key (file_id) references files (file_id)
 );
 
-create index files_hict_by_id on files_hict using hash (file_id);
-
-create table files_tracks
-(
-    file_id bigint not null,
-    primary key (file_id),
-    unique (file_id),
-    foreign key (file_id) references files (file_id)
-);
-
-create index files_tracks_by_id on files_tracks using hash (file_id);
+create index files_hict_by_id on files_hic using hash (file_id);
 
 create table files_mcool
 (
@@ -67,6 +57,32 @@ create table files_agp
 
 create index files_agp_by_id on files_agp using hash (file_id);
 
+create table files_tracks
+(
+    file_id        bigint not null,
+    description    text   not null,
+    data_source    varchar(100),
+    tracks_type_id bigint,
+    primary key (file_id),
+    unique (file_id),
+    foreign key (file_id) references files (file_id),
+    foreign key (tracks_type_id) references tracks_types (tracks_type_id)
+);
+
+create index files_tracks_by_id on files_tracks using hash (file_id);
+
+create table tracks_types
+(
+    tracks_type_id   bigint       not null generated always as identity,
+    tracks_type_name varchar(100) not null,
+    primary key (tracks_type_id),
+    unique (tracks_type_id),
+    unique (tracks_type_name)
+);
+
+create index tracks_type_by_id on tracks_types using hash (tracks_type_id);
+create unique index tracks_type_by_name on tracks_types using btree (tracks_type_name, tracks_type_id);
+
 create table files_fasta
 (
     file_id bigint not null,
@@ -77,16 +93,19 @@ create table files_fasta
 
 create index files_fasta_by_id on files_fasta using hash (file_id);
 
---rollback drop index file_by_id
---rollback drop index file_by_filename
---rollback drop index file_by_group
---rollback drop index file_by_sequence_level
 --rollback drop index files_hict_by_id
 --rollback drop index files_tracks_by_id
 --rollback drop index files_mcool_by_id
 --rollback drop index files_agp_by_id
 --rollback drop index files_fasta_by_id
+--rollback drop index tracks_type_by_name
+--rollback drop index tracks_type_by_id
+--rollback drop index file_by_id
+--rollback drop index file_by_filename
+--rollback drop index file_by_group
+--rollback drop index file_by_sequence_level
 --rollback drop table files_hict
+--rollback drop table tracks_types
 --rollback drop table files_tracks
 --rollback drop table files_mcool
 --rollback drop table files_agp

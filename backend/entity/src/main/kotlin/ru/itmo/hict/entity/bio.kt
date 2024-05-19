@@ -11,17 +11,16 @@ import java.sql.Timestamp
 @Table(
     name = "species",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["species_id"]),
         UniqueConstraint(columnNames = ["tax_id"]),
         UniqueConstraint(columnNames = ["species_name"]),
     ],
     indexes = [
-        Index(name = "species_by_id", columnList = "species_id", unique = true),
         Index(name = "species_by_tax_id", columnList = "tax_id", unique = true),
         Index(name = "species_by_name", columnList = "species_name,species_id", unique = true),
     ],
 )
 class Species(
+    @Id
     @NotNull
     @NotBlank
     @Size(max = 100)
@@ -33,12 +32,6 @@ class Species(
     @Size(max = 100)
     @Column(name = "species_name", unique = true, nullable = false)
     val speciesName: String,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "species_id", unique = true, nullable = false)
-    val id: Long? = null,
 )
 
 @Entity
@@ -57,8 +50,7 @@ class Biosample(
     @Column(name = "species_id", unique = true, nullable = false)
     val speciesId: Long,
 
-    @NotNull
-    @NotBlank
+    @NotBlankIfPresent
     @Size(max = 65536)
     @Lob
     @Basic(fetch = FetchType.LAZY)

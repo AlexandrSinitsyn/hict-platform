@@ -36,6 +36,7 @@ class ContactMapViews(
 
     @NotNull
     @PositiveOrZero
+    @Column(name = "count", nullable = false)
     val count: Long,
 
     @NotNull
