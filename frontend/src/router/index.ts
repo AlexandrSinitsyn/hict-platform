@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/view/HomeView.vue';
-import UploadView from '@/view/UploadView.vue';
 import ExperimentsView from '@/view/ExperimentsView.vue';
 
 const router = createRouter({
@@ -26,11 +25,6 @@ const router = createRouter({
             name: 'view',
             sensitive: true,
             component: () => import('@/view/HiCView.vue'),
-        },
-        {
-            path: '/upload',
-            name: 'upload',
-            component: UploadView,
         },
         {
             path: '/account',
