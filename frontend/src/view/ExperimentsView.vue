@@ -12,7 +12,7 @@
             <div v-for="e in experiments" :key="e.name">
                 {{ e.name }}
 
-                <div v-for="cm in e.contactMaps" :key="cm.name">
+                <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)">
                     {{ cm.name }}
                 </div>
                 <div v-for="a in e.assemblies" :key="a.name">
@@ -26,11 +26,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue';
-import type { Experiment } from '@types';
+import type {ContactMap, Experiment} from '@types';
 import { getAllExperiments, publishExperiment } from '@/core/server-requests';
 import NewExperimentView from '@/view/NewExperimentView.vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/stores/auth-store';
+import router from '@/router';
 
 const experiments: Ref<Experiment[]> = ref([]);
 
@@ -52,6 +53,15 @@ function newExperiment() {
 
     publishExperiment(author, (experiment: Experiment) => {
         selectedExperiment.value = experiment;
+    });
+}
+
+function selectMap(map: ContactMap): void {
+    router.push({
+        name: 'view',
+        params: {
+            hiCMapName: map.name,
+        },
     });
 }
 </script>

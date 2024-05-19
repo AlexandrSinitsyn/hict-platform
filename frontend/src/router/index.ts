@@ -24,7 +24,7 @@ const router = createRouter({
             path: '/view/:hiCMapName',
             name: 'view',
             sensitive: true,
-            component: () => import('@/view/HiCView.vue'),
+            component: () => import('@/view/ContactMapView.vue'),
         },
         {
             path: '/account',
