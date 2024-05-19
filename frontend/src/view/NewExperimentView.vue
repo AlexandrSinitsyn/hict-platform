@@ -1,5 +1,4 @@
 <template>
-    <div v-if="!user">Not authorized!</div>
     <div v-if="!selectedContactMap" class="experiment">
         <h1 class="experiment-title">New experiment</h1>
 
@@ -26,7 +25,9 @@
                 <input id="experiment-acknowledgement" type="text" v-model="acknowledgement" />
             </div>
 
-            <div class="btn btn-info" style="width: 20%; margin-left: auto" @click="updateInfo">Submit</div>
+            <div class="btn btn-info" style="width: 20%; margin-left: auto" @click="updateInfo">
+                Submit
+            </div>
         </div>
         <div class="experiment-files">
             <FileListComponent :files="fasta" type="FASTA" :wrap="!fullfasta" />
@@ -61,13 +62,16 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import type { Experiment, ContactMap, File, Assembly, User } from '@types';
+import type { Experiment, ContactMap, File, Assembly } from '@types';
 import FileListComponent from '@/components/FileListComponent.vue';
 import NewContactMapView from '@/view/NewContactMapView.vue';
-import {publishContactMap, publishExperiment, updateExperimentInfo, updateExperimentName} from "@/core/server-requests";
+import {
+    publishContactMap,
+    updateExperimentInfo,
+    updateExperimentName,
+} from '@/core/server-requests';
 
 const props = defineProps<{
-    user: User | undefined;
     selected: Experiment | undefined;
 }>();
 
@@ -108,13 +112,25 @@ function activities(): Activity[] {
 }
 
 function updateName(): void {
-    updateExperimentName({
+    const experiment = props.selected;
+
+    if (!experiment) {
+        return;
+    }
+
+    updateExperimentName(experiment, {
         name: name.value,
     });
 }
 
 function updateInfo(): void {
-    updateExperimentInfo({
+    const experiment = props.selected;
+
+    if (!experiment) {
+        return;
+    }
+
+    updateExperimentInfo(experiment, {
         description: description.value,
         link: link.value,
         acknowledgement: acknowledgement.value,
