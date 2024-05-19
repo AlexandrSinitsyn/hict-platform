@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-COPY HiCT_WebUI HiCT_WebUI
+COPY HiCT_WebUI/src HiCT_WebUI/src
 COPY index.html index.html
 COPY .eslintrc.cjs .eslintignore .prettierrc.json /app/
 COPY tsconfig.app.json tsconfig.node.json tsconfig.json env.d.ts /app/

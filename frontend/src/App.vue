@@ -52,8 +52,8 @@ header {
 }
 
 main {
-    margin: 1rem 1rem 0 calc(1rem + $aside-size);
-    padding: 1rem;
+    margin: 0 0 0 calc(1rem + $aside-size);
+    padding: 1rem 0 1rem 1rem;
     min-height: calc(100vh - 4rem);
     border-left: 1px solid gray;
 }
