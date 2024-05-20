@@ -1,5 +1,8 @@
 package ru.itmo.hict.server.controller
 
+import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
+import okio.IOException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.DirectFieldBindingResult
@@ -12,6 +15,8 @@ import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.service.MinioService
+import java.nio.file.Path
+import kotlin.io.path.*
 
 @RestController
 @RequestMapping("/api/v1/files")
@@ -20,6 +25,18 @@ class FilesController(
 ) : ApiExceptionController() {
     @Autowired
     private lateinit var requestUserInfo: RequestUserInfo
+    private lateinit var tempDir: Path
+
+    @PostConstruct
+    fun init() {
+        tempDir = createTempDirectory("hict_temp_${System.currentTimeMillis()}")
+    }
+
+    @OptIn(ExperimentalPathApi::class)
+    @PreDestroy
+    fun cleanup() {
+        tempDir.deleteRecursively()
+    }
 
     private fun <T> authorized(method: User.() -> T): T = requestUserInfo.user?.run(method)
         ?: throw ValidationException(DirectFieldBindingResult(this, "experiment-controller").apply {
@@ -37,8 +54,16 @@ class FilesController(
             })
         }
 
-        val saved = minioService.load(fileType, file.name, file.size, file.inputStream)
+        val filename = file.originalFilename ?: file.name
+        try {
+            val tempFile = createTempFile(tempDir, filename, ".tmp")
+            file.transferTo(tempFile)
 
-        return@authorized ResponseEntity.ok(saved.file.toInfoDto())
+            val saved = minioService.load(fileType, filename, file.size, tempFile.inputStream())
+
+            return@authorized ResponseEntity.ok(saved.file.toInfoDto())
+        } catch (e: IOException) {
+            throw IllegalStateException("Saving file failed: ${e.message}")
+        }
     }
 }

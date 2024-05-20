@@ -73,6 +73,11 @@ interface UserRepository : JpaRepository<User, Long> {
 }
 
 @Repository
+interface GroupRepository : JpaRepository<Group, Long> {
+    fun getByName(name: String): Optional<Group>
+}
+
+@Repository
 interface ExperimentRepository : JpaRepository<Experiment, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<Experiment>

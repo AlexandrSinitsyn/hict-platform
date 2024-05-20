@@ -81,12 +81,7 @@ class File(
 )
 class HiCFile(
     @NotNull
-    @Id
-    @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long,
-
-    @NotNull
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
@@ -100,6 +95,11 @@ class HiCFile(
     @Nullable
     @Column(name = "max_resolutions", nullable = true)
     val maxResolutions: Long? = null,
+
+    @NotNull
+    @Id
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: Long = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -114,13 +114,8 @@ class HiCFile(
 )
 class McoolFile(
     @NotNull
-    @Id
-    @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long,
-
-    @NotNull
     @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
@@ -134,6 +129,11 @@ class McoolFile(
     @Nullable
     @Column(name = "max_resolutions", nullable = true)
     val maxResolutions: Long? = null,
+
+    @NotNull
+    @Id
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: Long = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -148,18 +148,18 @@ class McoolFile(
 )
 class AgpFile(
     @NotNull
-    @Id
-    @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long,
-
-    @NotNull
     @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
     )
     override val file: File,
+
+    @NotNull
+    @Id
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: Long = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -174,13 +174,8 @@ class AgpFile(
 )
 class TracksFile(
     @NotNull
-    @Id
-    @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long,
-
-    @NotNull
     @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
@@ -208,6 +203,11 @@ class TracksFile(
         nullable = true,
     )
     val tracksTypes: TracksTypes? = null,
+
+    @NotNull
+    @Id
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: Long = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -248,16 +248,16 @@ class TracksTypes(
 )
 class FastaFile(
     @NotNull
-    @Id
-    @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long,
-
-    @NotNull
     @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
     )
     override val file: File,
+
+    @NotNull
+    @Id
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: Long = file.id!!,
 ) : AttachedFile

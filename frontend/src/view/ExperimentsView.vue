@@ -9,14 +9,14 @@
         </div>
 
         <div class="experiments">
-            <div v-for="e in experiments" :key="e.name">
+            <div v-for="e in experiments" :key="e.name" @click="selectedExperiment = e" class="FASTA">
                 {{ e.name }}
 
-                <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)">
-                    {{ cm.name }}
+                <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)" class="HIC">
+                    M: {{ cm.name }}
                 </div>
-                <div v-for="a in e.assemblies" :key="a.name">
-                    {{ a.name }}
+                <div v-for="a in e.assemblies" :key="a.name" class="AGP">
+                    A: {{ a.name }}
                 </div>
             </div>
         </div>

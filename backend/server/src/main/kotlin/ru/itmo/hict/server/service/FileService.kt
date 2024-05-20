@@ -15,14 +15,17 @@ class FileService(
     private val fastaFileRepository: FastaFileRepository,
 ) {
     fun save(fileType: FileType, file: File): AttachedFile {
-        val saved = fileRepository.save(file)
+        // fixme
+        fileRepository.save(file)
+
+        val saved = fileRepository.findByFilename(file.filename).orElseThrow()
 
         return when (fileType) {
-            FileType.HIC -> hicFileRepository.save(HiCFile(saved.id!!, saved))
-            FileType.MCOOL -> mcoolFileRepository.save(McoolFile(saved.id!!, saved))
-            FileType.AGP -> agpFileRepository.save(AgpFile(saved.id!!, saved))
-            FileType.TRACKS -> tracksFileRepository.save(TracksFile(saved.id!!, saved))
-            FileType.FASTA -> fastaFileRepository.save(FastaFile(saved.id!!, saved))
+            FileType.HIC -> hicFileRepository.save(HiCFile(saved))
+            FileType.MCOOL -> mcoolFileRepository.save(McoolFile(saved))
+            FileType.AGP -> agpFileRepository.save(AgpFile(saved))
+            FileType.TRACKS -> tracksFileRepository.save(TracksFile(saved))
+            FileType.FASTA -> fastaFileRepository.save(FastaFile(saved))
         }
     }
 }

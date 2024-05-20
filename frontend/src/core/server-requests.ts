@@ -132,7 +132,7 @@ export function getUsersCount(onSuccess: SuccessCallback<number>): void {
 
 export function uploadFile(
     file: File,
-    fileType: FileType,
+    fileType: string,
     onSuccess: SuccessCallback<AttachedFile>
 ): void {
     const jwt = getJwt();
@@ -142,20 +142,22 @@ export function uploadFile(
         return;
     }
 
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append(
+        'type',
+        new Blob([JSON.stringify(fileType)], {
+            type: 'application/json',
+        })
+    );
+
     axios
-        .post<FormData, AxiosResponse<AttachedFile>>(
-            `${SERVER}/files/publish`,
-            {
-                file,
-                type: fileType,
+        .post<FormData, AxiosResponse<AttachedFile>>(`${SERVER}/files/publish`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${jwt}`,
             },
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${jwt}`,
-                },
-            }
-        )
+        })
         .then(handler(onSuccess))
         .catch(errorHandler);
 }

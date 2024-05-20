@@ -34,7 +34,7 @@ const emit = defineEmits<{
 const filetype = props.type?.trim().replace('-', '');
 
 function doUpload(f: File): void {
-    uploadFile(f, FileType[filetype], (attached: AttachedFile) => {
+    uploadFile(f, filetype, (attached: AttachedFile) => {
         emit('upload', attached);
     });
 }

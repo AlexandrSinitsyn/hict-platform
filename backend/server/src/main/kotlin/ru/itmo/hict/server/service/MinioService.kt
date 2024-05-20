@@ -32,6 +32,7 @@ class S3Configuration(
 class MinioService(
     private val minioClient: MinioClient,
     private val fileService: FileService,
+    private val groupService: GroupService,
     private val logger: Logger,
 ) {
     fun newBucketIfAbsent(name: String) {
@@ -87,7 +88,9 @@ class MinioService(
     }
 
     fun load(fileType: FileType, filename: String, filesize: Long, data: InputStream): AttachedFile {
-        val saved = fileService.save(fileType, File(filename, SequenceLevelType.SCAFFOLD, filesize, Group("public")))
+        val visibilityGroup = groupService.getByName("public")!!
+
+        val saved = fileService.save(fileType, File(filename, SequenceLevelType.SCAFFOLD, filesize, visibilityGroup))
 
         upload(fileType.bucket, null, FileObjectInfo(filename, filesize, data))
 

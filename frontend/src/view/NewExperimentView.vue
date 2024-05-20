@@ -30,7 +30,12 @@
             </div>
         </div>
         <div class="experiment-files">
-            <FileListComponent :files="fasta" type="FASTA" :wrap="!fullfasta" />
+            <FileListComponent
+                :files="fasta"
+                type="FASTA"
+                :wrap="!fullfasta"
+                @upload="(f: File) => fasta.push(f)"
+            />
         </div>
         <div class="experiment-activity">
             <div
