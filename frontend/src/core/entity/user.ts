@@ -13,6 +13,11 @@ export interface User {
     role: Role;
 }
 
+export interface Group {
+    id: number;
+    name: string;
+}
+
 export interface UpdateUserInfo {
     username: string | null;
     login: string | null;

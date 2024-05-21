@@ -33,6 +33,7 @@ const { user } = storeToRefs(useAuthStore());
 
 const pages: ([string] | [string, string])[] = [
     ['Home'],
+    ['Groups'],
     ['Experiments'],
     ['Account'],
     ['Admin'],

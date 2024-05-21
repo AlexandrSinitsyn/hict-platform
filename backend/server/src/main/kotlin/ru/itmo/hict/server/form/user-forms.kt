@@ -18,3 +18,11 @@ class UpdatePasswordForm(
     @field:[NotNull NotBlank Size(min = 4, max = 32)] val oldPassword: String,
     @field:[NotNull NotBlank Size(min = 4, max = 32)] val newPassword: String,
 )
+
+class GroupCreationForm(
+    @field:[NotNull NotBlank Size(min = 3, max = 100)] val name: String,
+)
+
+class GroupUpdateNameForm(
+    @field:[NotNull NotBlank Size(min = 3, max = 100)] val name: String,
+)

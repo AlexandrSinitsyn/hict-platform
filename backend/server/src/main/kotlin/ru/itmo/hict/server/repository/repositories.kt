@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import ru.itmo.hict.entity.*
-import java.util.Optional
+import java.util.*
 
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
@@ -75,6 +75,27 @@ interface UserRepository : JpaRepository<User, Long> {
 @Repository
 interface GroupRepository : JpaRepository<Group, Long> {
     fun getByName(name: String): Optional<Group>
+
+    @Query("select count(g.id) > 0 from Group g where g.name = :name")
+    fun existsByName(@Param("name") name: String): Boolean
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying
+    @Query(value = "update Group g set g.name = :newName where g.name = :name")
+    fun updateName(@Param("name") name: String, @Param("newName") newName: String)
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Modifying
+    @Query(
+        value = """
+            insert into user_groups (user_id, group_id)
+            values (:#{#user.id}, (select groups.group_id
+                                   from groups
+                                   where groups.group_name = :name))
+        """,
+        nativeQuery = true,
+    )
+    fun join(@Param("name") name: String, @Param("user") user: User)
 }
 
 @Repository

@@ -2,7 +2,7 @@ import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import { AUTH, notify, SERVER } from '@/core/config';
 import type {
     ContactMap,
-    Experiment,
+    Experiment, Group, GroupCreationForm,
     Jwt,
     LoginForm,
     RegisterForm,
@@ -166,8 +166,19 @@ export function getAllExperiments(onSuccess: SuccessCallback<Experiment[]>): voi
     authorizedGetRequest(`${SERVER}/experiment/all`, onSuccess);
 }
 
+export function getAllGroups(onSuccess: SuccessCallback<Group[]>): void {
+    authorizedGetRequest(`${SERVER}/groups/all`, onSuccess);
+}
+
 export function publishExperiment(onSuccess: SuccessCallback<Experiment>): void {
     authorizedRequest(axios.post, `${SERVER}/experiment/new`, {}, onSuccess);
+}
+
+export function publishGroup(
+    groupForm: GroupCreationForm,
+    onSuccess: SuccessCallback<Group>
+): void {
+    authorizedRequest(axios.post, `${SERVER}/groups/new`, groupForm, onSuccess);
 }
 
 export function publishContactMap(
@@ -175,6 +186,10 @@ export function publishContactMap(
     onSuccess: SuccessCallback<ContactMap>
 ): void {
     authorizedRequest(axios.post, `${SERVER}/contact-map/new`, experiment, onSuccess);
+}
+
+export function joinGroup(group: Group): void {
+    authorizedRequest(axios.post, `${SERVER}/groups/${group.name}/join`, {}, nop);
 }
 
 export function updateExperimentName(experiment: Experiment, form: UpdateExperimentName): void {
