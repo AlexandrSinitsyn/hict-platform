@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service
 import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.Experiment
 import ru.itmo.hict.entity.User
+import ru.itmo.hict.server.exception.NoExperimentException
+import ru.itmo.hict.server.exception.SameFieldException
 import ru.itmo.hict.server.repository.ExperimentRepository
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -27,10 +29,10 @@ class ExperimentService(
 
     fun updateName(id: Long, newName: String) {
         val selected = experimentRepository.findById(id).orElse(null)
-            ?: throw IllegalArgumentException("Unknown experiment with id=`$id`")
+            ?: throw NoExperimentException(id)
 
         if (selected.name == newName) {
-            throw IllegalArgumentException("New name should be different `$newName`")
+            throw SameFieldException("name", newName)
         }
 
         experimentRepository.updateName(selected, newName)
@@ -38,7 +40,7 @@ class ExperimentService(
 
     fun updateInfo(id: Long, description: String?, paper: String?, acknowledgement: String?) {
         val selected = experimentRepository.findById(id).orElse(null)
-            ?: throw IllegalArgumentException("Unknown experiment with id=`$id`")
+            ?: throw NoExperimentException(id)
 
         experimentRepository.updateInfo(selected, description, paper, acknowledgement)
     }

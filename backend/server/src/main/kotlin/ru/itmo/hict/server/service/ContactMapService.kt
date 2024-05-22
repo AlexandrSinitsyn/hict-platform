@@ -2,6 +2,8 @@ package ru.itmo.hict.server.service
 
 import org.springframework.stereotype.Service
 import ru.itmo.hict.entity.ContactMap
+import ru.itmo.hict.server.exception.NoExperimentException
+import ru.itmo.hict.server.exception.SameFieldException
 import ru.itmo.hict.server.repository.ContactMapRepository
 import ru.itmo.hict.server.repository.ViewsRepository
 import java.util.UUID
@@ -23,10 +25,10 @@ class ContactMapService(
     fun view(contactMap: ContactMap) = viewsRepository.viewById(contactMap.id!!)
     fun updateName(id: Long, newName: String) {
         val selected = contactMapRepository.findById(id).orElse(null)
-            ?: throw IllegalArgumentException("Unknown experiment with id=`$id`")
+            ?: throw NoExperimentException(id)
 
         if (selected.name == newName) {
-            throw IllegalArgumentException("New name should be different `$newName`")
+            throw SameFieldException("name", newName)
         }
 
         contactMapRepository.updateName(selected, newName)
@@ -34,7 +36,7 @@ class ContactMapService(
 
     fun updateInfo(id: Long, description: String?, link: String?) {
         val selected = contactMapRepository.findById(id).orElse(null)
-            ?: throw IllegalArgumentException("Unknown experiment with id=`$id`")
+            ?: throw NoExperimentException(id)
 
         contactMapRepository.updateInfo(selected, description, link)
     }
