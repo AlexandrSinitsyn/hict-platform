@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.Experiment
 import ru.itmo.hict.entity.User
-import ru.itmo.hict.server.exception.NoExperimentException
+import ru.itmo.hict.server.exception.NoExperimentFoundException
 import ru.itmo.hict.server.exception.SameFieldException
 import ru.itmo.hict.server.repository.ExperimentRepository
 import java.util.UUID
@@ -29,7 +29,7 @@ class ExperimentService(
 
     fun updateName(id: Long, newName: String) {
         val selected = experimentRepository.findById(id).orElse(null)
-            ?: throw NoExperimentException(id)
+            ?: throw NoExperimentFoundException(id)
 
         if (selected.name == newName) {
             throw SameFieldException("name", newName)
@@ -40,7 +40,7 @@ class ExperimentService(
 
     fun updateInfo(id: Long, description: String?, paper: String?, acknowledgement: String?) {
         val selected = experimentRepository.findById(id).orElse(null)
-            ?: throw NoExperimentException(id)
+            ?: throw NoExperimentFoundException(id)
 
         experimentRepository.updateInfo(selected, description, paper, acknowledgement)
     }

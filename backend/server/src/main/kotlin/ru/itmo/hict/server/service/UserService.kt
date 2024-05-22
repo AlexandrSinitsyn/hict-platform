@@ -27,8 +27,6 @@ class UserService(
 
     fun updateEmail(user: User, email: String) = userRepository.updateEmail(user.id!!, email)
 
-    // fun updateRole(user: User, role: Role) = userRepository.updateRole(user.id!!, role)
-
     fun updatePassword(user: User, oldPassword: String, newPassword: String): Boolean {
         userRepository.updatePassword(user.id!!, oldPassword, newPassword)
 

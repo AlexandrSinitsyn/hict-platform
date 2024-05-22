@@ -2,7 +2,7 @@ package ru.itmo.hict.server.service
 
 import org.springframework.stereotype.Service
 import ru.itmo.hict.entity.ContactMap
-import ru.itmo.hict.server.exception.NoExperimentException
+import ru.itmo.hict.server.exception.NoContactMapFoundException
 import ru.itmo.hict.server.exception.SameFieldException
 import ru.itmo.hict.server.repository.ContactMapRepository
 import ru.itmo.hict.server.repository.ViewsRepository
@@ -23,9 +23,10 @@ class ContactMapService(
         }
 
     fun view(contactMap: ContactMap) = viewsRepository.viewById(contactMap.id!!)
+
     fun updateName(id: Long, newName: String) {
         val selected = contactMapRepository.findById(id).orElse(null)
-            ?: throw NoExperimentException(id)
+            ?: throw NoContactMapFoundException(id)
 
         if (selected.name == newName) {
             throw SameFieldException("name", newName)
@@ -36,7 +37,7 @@ class ContactMapService(
 
     fun updateInfo(id: Long, description: String?, link: String?) {
         val selected = contactMapRepository.findById(id).orElse(null)
-            ?: throw NoExperimentException(id)
+            ?: throw NoContactMapFoundException(id)
 
         contactMapRepository.updateInfo(selected, description, link)
     }

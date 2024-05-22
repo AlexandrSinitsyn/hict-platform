@@ -19,7 +19,7 @@ class GroupService(
 
     fun updateName(name: String, newName: String) {
         if (!groupRepository.existsByName(name)) {
-            throw NoSuchEntityException("name", name)
+            throw NoSuchEntityException("group", "name", name)
         }
 
         groupRepository.updateName(name, newName)

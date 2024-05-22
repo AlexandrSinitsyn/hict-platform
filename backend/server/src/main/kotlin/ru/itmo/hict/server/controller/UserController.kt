@@ -7,7 +7,9 @@ import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import ru.itmo.hict.dto.UserInfoDto
 import ru.itmo.hict.dto.UserInfoDto.Companion.toInfoDto
-import ru.itmo.hict.server.exception.ValidationException
+import ru.itmo.hict.server.exception.NotConfirmedException
+import ru.itmo.hict.server.exception.SamePasswordException
+import ru.itmo.hict.server.exception.ValidationException.Companion.alert
 import ru.itmo.hict.server.form.*
 import ru.itmo.hict.server.service.UserService
 import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
@@ -39,14 +41,12 @@ class UserController(
     fun updateInfo(@RequestBody @Valid updateUserInfoForm: UpdateUserInfoForm,
                    bindingResult: BindingResult): ResponseEntity<Boolean> = authorized {
         when {
-            this.username != updateUserInfoForm.username -> notSame("username", bindingResult)
-            this.login != updateUserInfoForm.login -> notSame("login", bindingResult)
-            this.email != updateUserInfoForm.email -> notSame("email", bindingResult)
+            this.username == updateUserInfoForm.username -> notSame("username", bindingResult)
+            this.login == updateUserInfoForm.login -> notSame("login", bindingResult)
+            this.email == updateUserInfoForm.email -> notSame("email", bindingResult)
         }
 
-        if (bindingResult.hasErrors()) {
-            throw ValidationException(bindingResult)
-        }
+        bindingResult.alert()
 
         updateUserInfoForm.let {
             userService.updateUsername(this, it.username!!)
@@ -59,17 +59,14 @@ class UserController(
     fun updatePassword(@RequestBody @Valid form: UpdatePasswordForm,
                        bindingResult: BindingResult): ResponseEntity<Boolean> = authorized {
         if (!userService.checkCredentials(this, form.oldPassword)) {
-            bindingResult.reject("invalid-password",
-                "You must confirm this action with a password")
+            throw NotConfirmedException()
         }
 
-        if (form.oldPassword != form.newPassword) {
-            notSame("password", bindingResult)
+        if (form.oldPassword == form.newPassword) {
+            throw SamePasswordException()
         }
 
-        if (bindingResult.hasErrors()) {
-            throw ValidationException(bindingResult)
-        }
+        bindingResult.alert()
 
         userService.updatePassword(this, form.oldPassword, form.newPassword)
     }.response()

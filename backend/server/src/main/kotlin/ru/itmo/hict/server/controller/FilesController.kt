@@ -10,7 +10,7 @@ import ru.itmo.hict.dto.FileInfoDto
 import ru.itmo.hict.dto.FileInfoDto.Companion.toInfoDto
 import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.server.exception.EmptyLoadedFileException
-import ru.itmo.hict.server.exception.LoadedFileException
+import ru.itmo.hict.server.exception.LoadingFailedException
 import ru.itmo.hict.server.service.MinioService
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -50,7 +50,7 @@ class FilesController(
             minioService.load(fileType, filename, file.size, tempFile.inputStream())
                 .file
         } catch (e: IOException) {
-            throw LoadedFileException("Saving file failed: ${e.message}")
+            throw LoadingFailedException(e.message ?: "I/O exception")
         }
     }.toInfoDto().response()
 }
