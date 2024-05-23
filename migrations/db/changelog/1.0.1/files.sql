@@ -7,7 +7,7 @@ create type sequence_level_type as enum ('contigs', 'scaffolds', 'chromosomes');
 
 create table files
 (
-    file_id          bigint                   not null generated always as identity,
+    file_id          uuid                     not null generated always as identity,
     filename         varchar(256)             not null,
     sequence_level   sequence_level_type      not null,
     file_size        bigint                   not null,
@@ -25,7 +25,7 @@ create unique index file_by_sequence_level on files using btree (visibility_grou
 
 create table files_hic
 (
-    file_id         bigint not null,
+    file_id         uuid not null,
     min_resolutions bigint default null,
     max_resolutions bigint default null,
     primary key (file_id),
@@ -37,7 +37,7 @@ create index files_hic_by_id on files_hic using hash (file_id);
 
 create table files_mcool
 (
-    file_id         bigint not null,
+    file_id         uuid not null,
     min_resolutions bigint default null,
     max_resolutions bigint default null,
     primary key (file_id),
@@ -49,7 +49,7 @@ create index files_mcool_by_id on files_mcool using hash (file_id);
 
 create table files_agp
 (
-    file_id bigint not null,
+    file_id uuid not null,
     unique (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)
@@ -59,7 +59,7 @@ create index files_agp_by_id on files_agp using hash (file_id);
 
 create table tracks_types
 (
-    tracks_type_id   bigint       not null generated always as identity,
+    tracks_type_id   uuid         not null default gen_random_uuid(),
     tracks_type_name varchar(100) not null,
     primary key (tracks_type_id),
     unique (tracks_type_id),
@@ -71,8 +71,8 @@ create unique index tracks_type_by_name on tracks_types using btree (tracks_type
 
 create table files_tracks
 (
-    file_id        bigint not null,
-    description    text   not null,
+    file_id        uuid not null,
+    description    text not null,
     data_source    varchar(100),
     tracks_type_id bigint,
     primary key (file_id),
@@ -85,7 +85,7 @@ create index files_tracks_by_id on files_tracks using hash (file_id);
 
 create table files_fasta
 (
-    file_id bigint not null,
+    file_id uuid not null,
     primary key (file_id),
     unique (file_id),
     foreign key (file_id) references files (file_id)

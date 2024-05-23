@@ -1,7 +1,9 @@
 package ru.itmo.hict.server.service
 
 import org.springframework.stereotype.Service
+import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.ContactMap
+import ru.itmo.hict.server.exception.InvalidFileTypeException
 import ru.itmo.hict.server.exception.NoContactMapFoundException
 import ru.itmo.hict.server.exception.SameFieldException
 import ru.itmo.hict.server.repository.ContactMapRepository
@@ -14,6 +16,7 @@ class ContactMapService(
     private val contactMapRepository: ContactMapRepository,
     private val experimentService: ExperimentService,
     private val viewsRepository: ViewsRepository,
+    private val fileService: FileService,
 ) {
     fun getByName(name: String): ContactMap? = contactMapRepository.findByName(name).getOrNull()
 
@@ -40,5 +43,20 @@ class ContactMapService(
             ?: throw NoContactMapFoundException(id)
 
         contactMapRepository.updateInfo(selected, description, link)
+    }
+
+    fun attachToContactMap(contactMapId: Long, fileId: UUID, fileType: FileType) {
+        val contactMap = contactMapRepository.findById(contactMapId).orElse(null)
+            ?: throw NoContactMapFoundException(contactMapId)
+
+        val attach: (map: ContactMap, fileId: UUID) -> Unit = when (fileType) {
+            FileType.HIC -> fileService::attachHicFileToContactMap
+            FileType.MCOOL -> fileService::attachMcoolFileToContactMap
+            FileType.AGP -> fileService::attachAgpFileToContactMap
+            FileType.TRACKS -> fileService::attachTracksFileToContactMap
+            FileType.FASTA -> throw InvalidFileTypeException(FileType.FASTA)
+        }
+
+        attach(contactMap, fileId)
     }
 }

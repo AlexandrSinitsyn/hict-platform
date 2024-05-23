@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
 import java.sql.Timestamp
+import java.util.UUID
 
 enum class SequenceLevelType {
     CONTIG,
@@ -61,7 +62,7 @@ class File(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "file_id", nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp
@@ -99,7 +100,7 @@ class HiCFile(
     @NotNull
     @Id
     @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long = file.id!!,
+    private val fileId: UUID = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -133,7 +134,7 @@ class McoolFile(
     @NotNull
     @Id
     @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long = file.id!!,
+    private val fileId: UUID = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -159,7 +160,7 @@ class AgpFile(
     @NotNull
     @Id
     @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long = file.id!!,
+    private val fileId: UUID = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -207,7 +208,7 @@ class TracksFile(
     @NotNull
     @Id
     @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long = file.id!!,
+    private val fileId: UUID = file.id!!,
 ) : AttachedFile
 
 @Entity
@@ -227,7 +228,7 @@ class TracksTypes(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "tracks_type_id", nullable = false)
-    val id: Long? = null,
+    val Id: UUID? = null,
 
     @NotNull
     @NotBlank
@@ -259,5 +260,5 @@ class FastaFile(
     @NotNull
     @Id
     @Column(name = "file_id", insertable = false, updatable = false)
-    private val fileId: Long = file.id!!,
+    private val fileId: UUID = file.id!!,
 ) : AttachedFile

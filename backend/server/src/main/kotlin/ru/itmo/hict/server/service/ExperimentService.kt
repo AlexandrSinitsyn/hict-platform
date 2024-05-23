@@ -15,6 +15,7 @@ import kotlin.jvm.optionals.getOrNull
 class ExperimentService(
     private val experimentRepository: ExperimentRepository,
     private val minioService: MinioService,
+    private val fileService: FileService,
 ) {
     @PostConstruct
     fun init() {
@@ -43,5 +44,12 @@ class ExperimentService(
             ?: throw NoExperimentFoundException(id)
 
         experimentRepository.updateInfo(selected, description, paper, acknowledgement)
+    }
+
+    fun attachToExperiment(experimentId: Long, fileId: UUID) {
+        val experiment = experimentRepository.findById(experimentId).orElse(null)
+            ?: throw NoExperimentFoundException(experimentId)
+
+        fileService.attachFastaFileToExperiment(experiment, fileId)
     }
 }

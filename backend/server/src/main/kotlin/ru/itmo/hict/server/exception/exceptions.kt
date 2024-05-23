@@ -2,6 +2,7 @@ package ru.itmo.hict.server.exception
 
 import org.springframework.validation.BindingResult
 import org.springframework.validation.DirectFieldBindingResult
+import ru.itmo.hict.dto.FileType
 
 open class InternalServerError(message: String) : Exception(message) {
     constructor() : this("")
@@ -90,5 +91,8 @@ class SamePasswordException : SameFieldException("password", "***")
 open class LoadedFileException(message: String) : ClientException(message)
 
 class EmptyLoadedFileException : LoadedFileException("File should not be empty")
+
+class InvalidFileTypeException(fileType: FileType)
+    : LoadedFileException("Uploaded file with unexpected type `$fileType`")
 
 class LoadingFailedException(message: String) : LoadedFileException("Error while loading file: $message")

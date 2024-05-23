@@ -23,8 +23,8 @@ create unique index experiments_by_name on experiments using btree (experiment_n
 
 create table experiment_fasta
 (
-    experiment_id bigint not null,
-    file_id       bigint not null,
+    experiment_id bigint  not null,
+    file_id       file_id not null,
     primary key (experiment_id, file_id),
     unique (experiment_id, file_id),
     foreign key (experiment_id) references experiments (experiment_id),
@@ -38,8 +38,8 @@ create table contact_maps
     contact_map_id   bigint                   not null generated always as identity,
     contact_map_name varchar(100)             not null,
     -- fixme
-    hic_id           bigint,
-    mcool_id         bigint                            default null,
+    hic_id           uuid,
+    mcool_id         uuid                              default null,
     experiment_id    bigint                   not null,
     reference        varchar(100),
     hic_source       varchar(100),
@@ -66,7 +66,7 @@ create unique index contact_maps_by_species on contact_maps using btree (referen
 create table contact_map_agp
 (
     contact_map_id bigint not null,
-    file_id        bigint not null,
+    file_id        uuid   not null,
     primary key (contact_map_id, file_id),
     unique (contact_map_id, file_id),
     foreign key (contact_map_id) references contact_maps (contact_map_id),
@@ -78,7 +78,7 @@ create unique index agp_by_contact_map on contact_map_agp using btree (contact_m
 create table contact_map_tracks
 (
     contact_map_id bigint not null,
-    file_id        bigint not null,
+    file_id        uuid   not null,
     primary key (contact_map_id, file_id),
     unique (contact_map_id, file_id),
     foreign key (contact_map_id) references contact_maps (contact_map_id),
