@@ -6,7 +6,7 @@ import ru.itmo.hict.entity.User
 import java.util.*
 
 data class UserInfoDto(
-    val id: Long,
+    val id: UUID,
     val username: String,
     val login: String,
     val email: String,
@@ -17,7 +17,7 @@ data class UserInfoDto(
 }
 
 data class GroupInfoDto(
-    val id: Long,
+    val id: UUID,
     val name: String,
     val users: List<UserInfoDto>,
     val creationTime: Date,

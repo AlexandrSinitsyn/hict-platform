@@ -12,6 +12,7 @@ import ru.itmo.hict.server.form.*
 import ru.itmo.hict.server.repository.HiCTRepository
 import ru.itmo.hict.server.service.ContactMapService
 import ru.itmo.hict.server.service.GrpcContainerService
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/contact-map")
@@ -26,14 +27,14 @@ class ContactMapController(
 
     @PatchMapping("/{id}/update/name")
     fun updateName(
-        @PathVariable("id") id: Long,
+        @PathVariable("id") id: UUID,
         @RequestBody @Valid contactMapNameUpdateForm: ContactMapNameUpdateForm,
         bindingResult: BindingResult,
     ): ResponseEntity<Boolean> = authorized { contactMapService.updateName(id, contactMapNameUpdateForm.name) }.success()
 
     @PatchMapping("/{id}/update/info")
     fun updateInfo(
-        @PathVariable("id") id: Long,
+        @PathVariable("id") id: UUID,
         @RequestBody @Valid contactMapInfoUpdateForm: ContactMapInfoUpdateForm,
         bindingResult: BindingResult,
     ): ResponseEntity<Boolean> = authorized {

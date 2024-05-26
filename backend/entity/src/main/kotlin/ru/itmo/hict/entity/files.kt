@@ -29,8 +29,7 @@ sealed interface AttachedFile {
     indexes = [
         Index(name = "file_by_id", columnList = "file_id", unique = true),
         Index(name = "file_by_filename", columnList = "filename,file_id", unique = true),
-        Index(name = "file_by_group", columnList = "sequence_level,file_id", unique = true),
-        Index(name = "file_by_sequence_level", columnList = "visibility_group,file_id", unique = true),
+        Index(name = "file_by_sequence_level", columnList = "sequence_level,file_id", unique = true),
     ],
 )
 class File(

@@ -13,7 +13,7 @@ enum class FileType(val bucket: String) {
 }
 
 data class FileInfoDto(
-    val id: Long,
+    val id: UUID,
     val filename: String,
     val sequenceLevel: SequenceLevelType,
     val filesize: Long,

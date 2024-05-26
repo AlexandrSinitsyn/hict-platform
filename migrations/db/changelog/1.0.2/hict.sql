@@ -50,7 +50,7 @@ create table contact_maps
     primary key (contact_map_id),
     unique (contact_map_id),
     unique (contact_map_name),
-    foreign key (hict_id) references files_hic (file_id),
+    foreign key (hict_id) references files_hict (file_id),
     foreign key (mcool_id) references files_mcool (file_id),
     foreign key (experiment_id) references experiments (experiment_id),
     foreign key (reference) references species (tax_id),

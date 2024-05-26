@@ -18,8 +18,7 @@ create table files
 
 create index file_by_id on files using hash (file_id);
 create unique index file_by_filename on files using btree (filename, file_id);
-create unique index file_by_group on files using btree (sequence_level, file_id);
-create unique index file_by_sequence_level on files using btree (visibility_group, file_id);
+create unique index file_by_sequence_level on files using btree (sequence_level, file_id);
 
 create table files_hict
 (
@@ -31,7 +30,7 @@ create table files_hict
     foreign key (file_id) references files (file_id)
 );
 
-create index files_hict_by_id on files_hic using hash (file_id);
+create index files_hict_by_id on files_hict using hash (file_id);
 
 create table files_mcool
 (
@@ -100,7 +99,6 @@ create index files_fasta_by_id on files_fasta using hash (file_id);
 --rollback drop index files_fasta_by_id
 --rollback drop index file_by_id
 --rollback drop index file_by_filename
---rollback drop index file_by_group
 --rollback drop index file_by_sequence_level
 --rollback drop table files_hict
 --rollback drop table files_tracks
