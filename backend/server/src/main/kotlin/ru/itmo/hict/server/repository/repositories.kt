@@ -117,7 +117,7 @@ interface ExperimentRepository : JpaRepository<Experiment, UUID> {
             update experiments
             set description = :description,
                 paper = :paper,
-                attribution = :attribution
+                acknowledgement = :attribution
             where experiments.experiment_id = :#{#experiment.id}
         """,
         nativeQuery = true,
@@ -171,13 +171,13 @@ interface ViewsRepository : JpaRepository<ContactMapViews, UUID> {
     @Modifying
     @Query(
         value = """
-            merge into hi_c_map_views
+            merge into contact_map_views
             using (select :id as id) as new
-            on hi_c_map_views.hi_c_map_id = new.id
+            on contact_map_views.contact_map_id = new.id
             when matched then
                 update set count = count + 1
             when not matched then
-                insert (hi_c_map_id, count) values (new.id, 1)
+                insert (contact_map_id, count) values (new.id, 1)
         """,
         nativeQuery = true,
     )
