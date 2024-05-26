@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
+import ru.itmo.hict.validator.NotBlankIfPresent
 import java.sql.Timestamp
 import java.util.UUID
 
@@ -50,16 +51,8 @@ class File(
     @Column(name = "file_size", nullable = false)
     val fileSize: Long,
 
-    @Nullable
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
-    @JoinColumn(
-        name = "visibility_group",
-        nullable = false,
-    )
-    val visibilityGroup: Group,
-
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "file_id", nullable = false)
     val id: UUID? = null,
@@ -72,15 +65,15 @@ class File(
 
 @Entity
 @Table(
-    name = "files_hic",
+    name = "files_hict",
     uniqueConstraints = [
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_hic_by_id", columnList = "hic_id", unique = true),
+        Index(name = "files_hict_by_id", columnList = "file_id", unique = true),
     ],
 )
-class HiCFile(
+class HictFile(
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
@@ -110,7 +103,7 @@ class HiCFile(
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_mcool_by_id", columnList = "mcool_id", unique = true),
+        Index(name = "files_mcool_by_id", columnList = "file_id", unique = true),
     ],
 )
 class McoolFile(
@@ -144,7 +137,7 @@ class McoolFile(
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_agp_by_id", columnList = "agp_id", unique = true),
+        Index(name = "files_agp_by_id", columnList = "file_id", unique = true),
     ],
 )
 class AgpFile(
@@ -170,7 +163,7 @@ class AgpFile(
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_tracks_by_id", columnList = "tracks_id", unique = true),
+        Index(name = "files_tracks_by_id", columnList = "file_id", unique = true),
     ],
 )
 class TracksFile(
@@ -225,16 +218,16 @@ class TracksFile(
 )
 class TracksTypes(
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "tracks_type_id", nullable = false)
-    val Id: UUID? = null,
-
-    @NotNull
     @NotBlank
     @Size(min = 3, max = 100)
     @Column(name = "tracks_type_name", nullable = false)
     val name: String,
+
+    @NotNull
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Id
+    @Column(name = "tracks_type_id", nullable = false)
+    val id: UUID? = null,
 )
 
 @Entity
@@ -244,7 +237,7 @@ class TracksTypes(
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_fasta_by_id", columnList = "fasta_id", unique = true),
+        Index(name = "files_fasta_by_id", columnList = "file_id", unique = true),
     ],
 )
 class FastaFile(

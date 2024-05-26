@@ -5,7 +5,7 @@
 
 create table contact_map_views
 (
-    contact_map_id bigint                   not null,
+    contact_map_id uuid                     not null,
     count          bigint                   not null check ( count >= 0 ),
     last_seen      timestamp with time zone not null default now(),
     primary key (contact_map_id),
@@ -23,9 +23,11 @@ begin
 end
 $$ language plpgsql;
 
-create trigger update_last_seen before insert or update
+create trigger update_last_seen
+    before insert or update
     on contact_map_views
-    for each row execute procedure update_last_seen_contact_map();
+    for each row
+execute procedure update_last_seen_contact_map();
 
 --rollback drop index contact_map_by_id
 --rollback drop function update_last_seen_contact_map

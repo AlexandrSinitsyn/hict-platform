@@ -1,18 +1,13 @@
 package ru.itmo.hict.server.form
 
 import jakarta.validation.constraints.*
-import ru.itmo.hict.entity.NotBlankIfPresent
+import ru.itmo.hict.validator.NotBlankIfPresent
 
 class UpdateUserInfoForm(
     @field:[NotBlankIfPresent Size(min = 3, max = 100)] val username: String?,
     @field:[NotBlankIfPresent Size(min = 3, max = 100)] val login: String?,
     @field:[NotBlankIfPresent Email                   ] val email: String?,
 )
-
-// class UpdateRoleForm(
-//     @field:[NotNull PositiveOrZero] val id: Long,
-//     @field:[NotNull               ] val newRole: Role,
-// )
 
 class UpdatePasswordForm(
     @field:[NotNull NotBlank Size(min = 4, max = 32)] val oldPassword: String,

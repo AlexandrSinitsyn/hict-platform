@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
 import java.sql.Timestamp
+import java.util.UUID
 
 @Entity
 @Table(
@@ -63,10 +64,10 @@ class Biosample(
     val description: String,
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "biosample_id", unique = true, nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp

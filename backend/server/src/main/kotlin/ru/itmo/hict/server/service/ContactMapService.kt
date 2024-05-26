@@ -27,8 +27,8 @@ class ContactMapService(
 
     fun view(contactMap: ContactMap) = viewsRepository.viewById(contactMap.id!!)
 
-    fun updateName(id: Long, newName: String) {
-        val selected = contactMapRepository.findById(id).orElse(null)
+    fun updateName(id: UUID, newName: String) {
+        val selected = contactMapRepository.findById(id).getOrNull()
             ?: throw NoContactMapFoundException(id)
 
         if (selected.name == newName) {
@@ -38,15 +38,15 @@ class ContactMapService(
         contactMapRepository.updateName(selected, newName)
     }
 
-    fun updateInfo(id: Long, description: String?, link: String?) {
-        val selected = contactMapRepository.findById(id).orElse(null)
+    fun updateInfo(id: UUID, description: String?, link: String?) {
+        val selected = contactMapRepository.findById(id).getOrNull()
             ?: throw NoContactMapFoundException(id)
 
         contactMapRepository.updateInfo(selected, description, link)
     }
 
-    fun attachToContactMap(contactMapId: Long, fileId: UUID, fileType: FileType) {
-        val contactMap = contactMapRepository.findById(contactMapId).orElse(null)
+    fun attachToContactMap(contactMapId: UUID, fileId: UUID, fileType: FileType) {
+        val contactMap = contactMapRepository.findById(contactMapId).getOrNull()
             ?: throw NoContactMapFoundException(contactMapId)
 
         val attach: (map: ContactMap, fileId: UUID) -> Unit = when (fileType) {

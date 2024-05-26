@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.sql.Timestamp
+import java.util.UUID
 
 @Entity
 @Table(
@@ -23,7 +24,7 @@ class ContactMapViews(
     @NotNull
     @Id
     @Column(name = "contact_map_id", insertable = false, updatable = false)
-    private val contactMapId: Long,
+    private val contactMapId: UUID,
 
     @NotNull
     @OneToOne(
@@ -66,10 +67,10 @@ class ContactMapTag(
     val name: String,
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "tag_id", unique = true, nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp

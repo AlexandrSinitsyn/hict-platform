@@ -8,9 +8,10 @@ import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import ru.itmo.hict.entity.User
 import java.util.Optional
+import java.util.UUID
 
 @Repository
-interface UserRepository : JpaRepository<User, Long> {
+interface UserRepository : JpaRepository<User, UUID> {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Query(
         value = """
@@ -35,6 +36,6 @@ interface UserRepository : JpaRepository<User, Long> {
         nativeQuery = true,
     )
     fun findByLoginOrEmailAndPassword(@Param("login") login: String?,
-                                         @Param("email") email: String?,
-                                         @Param("password") password: String): Optional<User>
+                                      @Param("email") email: String?,
+                                      @Param("password") password: String): Optional<User>
 }

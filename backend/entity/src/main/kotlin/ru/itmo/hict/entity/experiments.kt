@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
+import ru.itmo.hict.validator.NotBlankIfPresent
 import java.sql.Timestamp
+import java.util.UUID
 
 @Entity
 @Table(
@@ -52,8 +54,8 @@ class Experiment(
     @Nullable
     @NotBlankIfPresent
     @Size(max = 256)
-    @Column(name = "attribution", nullable = true)
-    val attribution: String? = null,
+    @Column(name = "acknowledgement", nullable = true)
+    val acknowledgement: String? = null,
 
     @NotNull
     @ManyToMany(
@@ -79,10 +81,10 @@ class Experiment(
     val fasta: List<FastaFile> = listOf(),
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "experiment_id", unique = true, nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp
@@ -172,11 +174,11 @@ class ContactMap(
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
     @JoinColumn(
-        name = "hic_id",
+        name = "hict_id",
         nullable = true,
     )
     // fixme
-    val hic: HiCFile? = null,
+    val hic: HictFile? = null,
 
     @NotNull
     @ManyToMany(
@@ -256,10 +258,10 @@ class ContactMap(
     val tags: List<ContactMapTag> = listOf(),
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "contact_map_id", unique = true, nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp

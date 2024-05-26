@@ -2,7 +2,7 @@ package ru.itmo.hict.server.form
 
 import jakarta.validation.constraints.*
 import ru.itmo.hict.dto.FileType
-import ru.itmo.hict.entity.EnumValues
+import ru.itmo.hict.validator.EnumValues
 import java.util.UUID
 
 class FileAttachmentForm(

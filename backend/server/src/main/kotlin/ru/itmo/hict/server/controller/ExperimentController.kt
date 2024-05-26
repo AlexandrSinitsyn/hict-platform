@@ -9,6 +9,7 @@ import ru.itmo.hict.dto.ExperimentInfoDto
 import ru.itmo.hict.dto.ExperimentInfoDto.Companion.toInfoDto
 import ru.itmo.hict.server.form.*
 import ru.itmo.hict.server.service.ExperimentService
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/experiment")
@@ -23,14 +24,14 @@ class ExperimentController(
 
     @PatchMapping("/{id}/update/name")
     fun updateName(
-        @PathVariable("id") id: Long,
+        @PathVariable("id") id: UUID,
         @RequestBody @Valid experimentNameUpdateForm: ExperimentNameUpdateForm,
         bindingResult: BindingResult,
     ): ResponseEntity<Boolean> = authorized { experimentService.updateName(id, experimentNameUpdateForm.name) }.success()
 
     @PatchMapping("/{id}/update/info")
     fun updateInfo(
-        @PathVariable("id") id: Long,
+        @PathVariable("id") id: UUID,
         @RequestBody @Valid experimentInfoUpdateForm: ExperimentInfoUpdateForm,
         bindingResult: BindingResult,
     ): ResponseEntity<Boolean> = authorized {

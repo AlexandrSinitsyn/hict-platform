@@ -3,6 +3,7 @@ package ru.itmo.hict.server.exception
 import org.springframework.validation.BindingResult
 import org.springframework.validation.DirectFieldBindingResult
 import ru.itmo.hict.dto.FileType
+import java.util.UUID
 
 open class InternalServerError(message: String) : Exception(message) {
     constructor() : this("")
@@ -74,13 +75,13 @@ open class NoSuchEntityException(entityName: String, fieldName: String, value: S
 class NoExperimentFoundException private constructor(field: String, value: String)
     : NoSuchEntityException("experiment", field, value) {
     constructor(experimentName: String) : this("name", experimentName)
-    constructor(experimentId: Long) : this("id", "$experimentId")
+    constructor(experimentId: UUID) : this("id", "$experimentId")
 }
 
 class NoContactMapFoundException private constructor(field: String, value: String)
     : NoSuchEntityException("contact-map", field, value) {
     constructor(contactMapName: String) : this("name", contactMapName)
-    constructor(contactMapId: Long) : this("id", "$contactMapId")
+    constructor(contactMapId: UUID) : this("id", "$contactMapId")
 }
 
 open class SameFieldException(fieldName: String, value: String)

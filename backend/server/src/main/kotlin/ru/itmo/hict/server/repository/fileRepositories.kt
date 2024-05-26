@@ -9,18 +9,18 @@ import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import ru.itmo.hict.entity.*
 import java.util.Optional
+import java.util.UUID
 
 @Repository
-interface FileRepository : JpaRepository<File, Long> {
+interface FileRepository : JpaRepository<File, UUID> {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Modifying
     @Query(
         value = """
-            insert into files (filename, sequence_level, file_size, visibility_group)
+            insert into files (filename, sequence_level, file_size)
             values (:#{#file.filename},
                     cast(:#{#file.sequenceLevel.name} as sequence_level_type),
-                    :#{#file.fileSize},
-                    :#{#file.visibilityGroup.id})
+                    :#{#file.fileSize})
         """,
         nativeQuery = true,
     )
@@ -30,16 +30,16 @@ interface FileRepository : JpaRepository<File, Long> {
 }
 
 @Repository
-interface HiCFileRepository : JpaRepository<HiCFile, Long>
+interface HictFileRepository : JpaRepository<HictFile, UUID>
 
 @Repository
-interface McoolFileRepository : JpaRepository<McoolFile, Long>
+interface McoolFileRepository : JpaRepository<McoolFile, UUID>
 
 @Repository
-interface AgpFileRepository : JpaRepository<AgpFile, Long>
+interface AgpFileRepository : JpaRepository<AgpFile, UUID>
 
 @Repository
-interface TracksFileRepository : JpaRepository<TracksFile, Long>
+interface TracksFileRepository : JpaRepository<TracksFile, UUID>
 
 @Repository
-interface FastaFileRepository : JpaRepository<FastaFile, Long>
+interface FastaFileRepository : JpaRepository<FastaFile, UUID>

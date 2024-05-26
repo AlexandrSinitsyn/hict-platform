@@ -5,12 +5,12 @@
 
 create table users
 (
-    user_id                   bigint                   not null generated always as identity,
+    user_id                   uuid                     not null default gen_random_uuid(),
     username                  varchar(100)             not null,
     login                     varchar(64)              not null,
     email                     varchar(100)             not null,
-    password                  varchar(60)              not null,
-    visualization_settings_id bigint                            default null,
+    password                  varchar(64)              not null,
+    visualization_settings_id uuid                              default null,
     creation_time             timestamp with time zone not null default now(),
     primary key (user_id),
     unique (user_id),
@@ -25,8 +25,9 @@ create unique index user_by_email on users using btree (email, user_id);
 
 create table groups
 (
-    group_id      bigint                   not null generated always as identity,
+    group_id      uuid                     not null default gen_random_uuid(),
     group_name    varchar(256)             not null,
+    affiliation   varchar(256),
     creation_time timestamp with time zone not null default now(),
     primary key (group_id),
     unique (group_id),
@@ -38,8 +39,8 @@ create unique index group_by_name on groups using btree (group_name, group_id);
 
 create table user_groups
 (
-    user_id    bigint                   not null,
-    group_id   bigint                   not null,
+    user_id    uuid                     not null,
+    group_id   uuid                     not null,
     setup_date timestamp with time zone not null default now(),
     primary key (user_id, group_id),
     unique (user_id, group_id),

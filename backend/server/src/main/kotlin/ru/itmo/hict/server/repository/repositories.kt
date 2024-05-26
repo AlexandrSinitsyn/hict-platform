@@ -11,7 +11,7 @@ import ru.itmo.hict.entity.*
 import java.util.*
 
 @Repository
-interface UserRepository : JpaRepository<User, Long> {
+interface UserRepository : JpaRepository<User, UUID> {
     @Query(
         value = """
             select *
@@ -37,22 +37,17 @@ interface UserRepository : JpaRepository<User, Long> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Modifying(clearAutomatically = true)
     @Query("update User u set u.username = :username where u.id = :id")
-    fun updateUsername(@Param("id") id: Long, @Param("username") username: String)
+    fun updateUsername(@Param("id") id: UUID, @Param("username") username: String)
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Modifying(clearAutomatically = true)
     @Query("update User u set u.login = :login where u.id = :id")
-    fun updateLogin(@Param("id") id: Long, @Param("login") login: String)
+    fun updateLogin(@Param("id") id: UUID, @Param("login") login: String)
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Modifying(clearAutomatically = true)
     @Query("update User u set u.email = :email where u.id = :id")
-    fun updateEmail(@Param("id") id: Long, @Param("email") email: String)
-
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    @Modifying(clearAutomatically = true)
-    @Query("update User u set u.role = :role where u.id = :id")
-    fun updateRole(@Param("id") id: Long, @Param("role") role: Role)
+    fun updateEmail(@Param("id") id: UUID, @Param("email") email: String)
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Modifying(flushAutomatically = true)
@@ -66,14 +61,14 @@ interface UserRepository : JpaRepository<User, Long> {
         nativeQuery = true,
     )
     fun updatePassword(
-        @Param("id") id: Long,
+        @Param("id") id: UUID,
         @Param("old_password") oldPassword: String,
         @Param("new_password") newPassword: String,
     )
 }
 
 @Repository
-interface GroupRepository : JpaRepository<Group, Long> {
+interface GroupRepository : JpaRepository<Group, UUID> {
     fun getByName(name: String): Optional<Group>
 
     @Query("select count(g.id) > 0 from Group g where g.name = :name")
@@ -99,7 +94,7 @@ interface GroupRepository : JpaRepository<Group, Long> {
 }
 
 @Repository
-interface ExperimentRepository : JpaRepository<Experiment, Long> {
+interface ExperimentRepository : JpaRepository<Experiment, UUID> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<Experiment>
 
@@ -136,7 +131,7 @@ interface ExperimentRepository : JpaRepository<Experiment, Long> {
 }
 
 @Repository
-interface ContactMapRepository : JpaRepository<ContactMap, Long> {
+interface ContactMapRepository : JpaRepository<ContactMap, UUID> {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     fun findByName(name: String): Optional<ContactMap>
 
@@ -171,7 +166,7 @@ interface ContactMapRepository : JpaRepository<ContactMap, Long> {
 }
 
 @Repository
-interface ViewsRepository : JpaRepository<ContactMapViews, Long> {
+interface ViewsRepository : JpaRepository<ContactMapViews, UUID> {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Modifying
     @Query(
@@ -186,5 +181,5 @@ interface ViewsRepository : JpaRepository<ContactMapViews, Long> {
         """,
         nativeQuery = true,
     )
-    fun viewById(@Param("id") hiCMapId: Long)
+    fun viewById(@Param("id") hiCMapId: UUID)
 }

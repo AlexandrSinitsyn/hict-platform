@@ -16,7 +16,7 @@ create unique index species_by_name on species using btree (species_name, tax_id
 
 create table biosamples
 (
-    biosample_id  bigint                   not null generated always as identity,
+    biosample_id  uuid                     not null default gen_random_uuid(),
     tax_id        varchar(100)             not null,
     description   text                     not null,
     creation_time timestamp with time zone not null default now(),

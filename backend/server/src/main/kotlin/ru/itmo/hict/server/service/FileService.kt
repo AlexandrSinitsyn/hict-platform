@@ -8,24 +8,21 @@ import java.util.*
 
 @Service
 class FileService(
-    private val groupService: GroupService,
     private val fileRepository: FileRepository,
-    private val hicFileRepository: HiCFileRepository,
+    private val hictFileRepository: HictFileRepository,
     private val mcoolFileRepository: McoolFileRepository,
     private val agpFileRepository: AgpFileRepository,
     private val tracksFileRepository: TracksFileRepository,
     private val fastaFileRepository: FastaFileRepository,
 ) {
     fun save(fileType: FileType, filename: String, fileSize: Long): AttachedFile {
-        val visibilityGroup = groupService.getByName("public")!!
-
         // fixme
-        fileRepository.save(File(filename, SequenceLevelType.SCAFFOLD, fileSize, visibilityGroup))
+        fileRepository.save(File(filename, SequenceLevelType.SCAFFOLD, fileSize))
 
         val saved = fileRepository.findByFilename(filename).orElseThrow()
 
         return when (fileType) {
-            FileType.HIC -> hicFileRepository.save(HiCFile(saved))
+            FileType.HIC -> hictFileRepository.save(HictFile(saved))
             FileType.MCOOL -> mcoolFileRepository.save(McoolFile(saved))
             FileType.AGP -> agpFileRepository.save(AgpFile(saved))
             FileType.TRACKS -> tracksFileRepository.save(TracksFile(saved))

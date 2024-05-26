@@ -19,6 +19,7 @@ import ru.itmo.hict.server.service.ExperimentService
 import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.MinioService
 import java.nio.file.Path
+import java.util.UUID
 import kotlin.io.path.*
 
 @RestController
@@ -68,7 +69,7 @@ class FilesController(
 
     @PostMapping("/attach/experiment/{experimentId}")
     fun attachToExperiment(
-        @PathVariable("experimentId") experimentId: Long,
+        @PathVariable("experimentId") experimentId: UUID,
         @RequestBody @Valid fileAttachmentForm: FileAttachmentForm,
     ): ResponseEntity<Boolean> = authorized {
         if (fileAttachmentForm.fileType != FileType.FASTA) {
@@ -80,7 +81,7 @@ class FilesController(
 
     @PostMapping("/attach/contact-map/{contactMapId}")
     fun attachToContactMap(
-        @PathVariable("contactMapId") contactMapId: Long,
+        @PathVariable("contactMapId") contactMapId: UUID,
         @RequestBody @Valid fileAttachmentForm: FileAttachmentForm,
     ): ResponseEntity<Boolean> = authorized {
         contactMapService.attachToContactMap(contactMapId, fileAttachmentForm.fileId, fileAttachmentForm.fileType)

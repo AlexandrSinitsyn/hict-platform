@@ -28,8 +28,8 @@ class ExperimentService(
 
     fun create(author: User): Experiment = experimentRepository.save(Experiment(UUID.randomUUID().toString(), author))
 
-    fun updateName(id: Long, newName: String) {
-        val selected = experimentRepository.findById(id).orElse(null)
+    fun updateName(id: UUID, newName: String) {
+        val selected = experimentRepository.findById(id).getOrNull()
             ?: throw NoExperimentFoundException(id)
 
         if (selected.name == newName) {
@@ -39,15 +39,15 @@ class ExperimentService(
         experimentRepository.updateName(selected, newName)
     }
 
-    fun updateInfo(id: Long, description: String?, paper: String?, acknowledgement: String?) {
-        val selected = experimentRepository.findById(id).orElse(null)
+    fun updateInfo(id: UUID, description: String?, paper: String?, acknowledgement: String?) {
+        val selected = experimentRepository.findById(id).getOrNull()
             ?: throw NoExperimentFoundException(id)
 
         experimentRepository.updateInfo(selected, description, paper, acknowledgement)
     }
 
-    fun attachToExperiment(experimentId: Long, fileId: UUID) {
-        val experiment = experimentRepository.findById(experimentId).orElse(null)
+    fun attachToExperiment(experimentId: UUID, fileId: UUID) {
+        val experiment = experimentRepository.findById(experimentId).getOrNull()
             ?: throw NoExperimentFoundException(experimentId)
 
         fileService.attachFastaFileToExperiment(experiment, fileId)
