@@ -1,9 +1,8 @@
 package ru.itmo.hict.server.controller
 
-import jakarta.annotation.PostConstruct
-import jakarta.annotation.PreDestroy
 import jakarta.validation.Valid
 import okio.IOException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -18,7 +17,6 @@ import ru.itmo.hict.server.service.ContactMapService
 import ru.itmo.hict.server.service.ExperimentService
 import ru.itmo.hict.server.service.FileService
 import ru.itmo.hict.server.service.MinioService
-import java.nio.file.Path
 import java.util.UUID
 import kotlin.io.path.*
 
@@ -29,20 +27,8 @@ class FilesController(
     private val minioService: MinioService,
     private val experimentService: ExperimentService,
     private val contactMapService: ContactMapService,
+    @Value("\${SERVER_LOCAL_STORAGE_PATH}") private val storagePath: String,
 ) : ApiExceptionController() {
-    private lateinit var tempDir: Path
-
-    @PostConstruct
-    fun init() {
-        tempDir = createTempDirectory("hict_temp_${System.currentTimeMillis()}")
-    }
-
-    @OptIn(ExperimentalPathApi::class)
-    @PreDestroy
-    fun cleanup() {
-        tempDir.deleteRecursively()
-    }
-
     @PostMapping("/publish")
     fun publish(
         @RequestPart("file") file: MultipartFile,
@@ -54,12 +40,14 @@ class FilesController(
 
         val filename = file.originalFilename ?: file.name
         try {
-            val tempFile = createTempFile(tempDir, filename, ".tmp")
-            file.transferTo(tempFile)
-
             val saved = fileService.save(fileType, filename, file.size)
 
-            minioService.upload(fileType, "${saved.file.id}", file.size, tempFile.inputStream())
+            val fileId = saved.file.id!!.toString()
+
+            val localFile = Path(storagePath, fileId)
+            file.transferTo(localFile)
+
+            minioService.upload(fileType, fileId, file.size, localFile.inputStream())
 
             saved.file
         } catch (e: IOException) {

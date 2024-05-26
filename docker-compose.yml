@@ -22,6 +22,8 @@ networks:
     driver: bridge
 
 volumes:
+  hict-local-files:
+    name: 'hict-local-files'
   hict-postgres-data:
     name: 'hict-postgres-data'
   hict-s3-data:
@@ -136,6 +138,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+    volumes:
+      - hict-local-files:${SERVER_LOCAL_STORAGE_PATH}
     depends_on:
       postgres:
         condition: service_healthy
