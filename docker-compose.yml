@@ -45,6 +45,7 @@ services:
         PROJECT_VERSION: '${PROJECT_VERSION}'
         AUTH_HOST: '${APP_HOST}:${APP_PORT}/auth'
         SERVER_HOST: '${APP_HOST}:${APP_PORT}/server'
+        HICT_CLUSTER_HOST: '${HICT_CLUSTER_HOST}'
         NGINX_VERSION: '${NGINX_VERSION}'
     restart: always
     <<: *env

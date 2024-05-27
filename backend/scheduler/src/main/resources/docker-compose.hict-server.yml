@@ -6,13 +6,23 @@ networks:
   hict-cluster-net:
     name: 'hict-cluster-net'
     driver: bridge
+    external: true
+
+volumes:
+  hict-local-files:
+    name: 'hict-local-files'
+    external: true
 
 services:
   hict-cluster-%1$s:
-     container_name: 'hict-cluster-%1$s'
-     image: '%2$s'
-     restart: no
-     expose:
-       - '%3$s'
-     networks:
-       - hict-cluster-net
+    container_name: 'hict-cluster-%1$s'
+    image: '%2$s'
+    restart: no
+    expose:
+      - '%3$s'
+    ports:
+      - '%4$s:%3$s'
+    networks:
+      - hict-cluster-net
+    volumes:
+      - hict-local-files:/data
