@@ -31,11 +31,10 @@ class GrpcContainerService(
     }
 
     fun publish(user: User) = containerController.create(userId {
-        id = user.id!!
-    }, ackReceiver)
         uuid = user.id!!.toString()
+    }, ackReceiver)
 
     fun ping(user: User) = containerController.ping(userId {
         uuid = user.id!!.toString()
-    }, ackReceiver())
+    }, ackReceiver)
 }
