@@ -6,7 +6,7 @@ export enum Role {
 }
 
 export interface User {
-    id: number;
+    id: string;
     username: string;
     login: string;
     email: string;
@@ -14,7 +14,7 @@ export interface User {
 }
 
 export interface Group {
-    id: number;
+    id: string;
     name: string;
 }
 
@@ -30,6 +30,6 @@ export interface UpdateUserPassword {
 }
 
 export interface UpdateUserRole {
-    id: number;
+    id: string;
     newRole: Role;
 }

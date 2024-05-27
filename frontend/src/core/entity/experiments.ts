@@ -1,7 +1,7 @@
 import type { User } from '@/core/entity/user';
 
 export interface Experiment {
-    id: number;
+    id: string;
     name: string;
     author: User;
     description: string | undefined;
@@ -14,7 +14,7 @@ export interface Experiment {
 }
 
 export interface ContactMap {
-    id: number;
+    id: string;
     name: string;
     description: string;
     link: string;
