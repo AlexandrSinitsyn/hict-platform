@@ -9,13 +9,13 @@ import ru.itmo.hict.dto.ContactMapInfoDto.Companion.toInfoDto
 import ru.itmo.hict.dto.ExperimentInfoDto
 import ru.itmo.hict.server.exception.NoExperimentFoundException
 import ru.itmo.hict.server.form.*
-import ru.itmo.hict.server.repository.HiCTRepository
 import ru.itmo.hict.server.service.ContactMapService
 import ru.itmo.hict.server.service.GrpcContainerService
 import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/contact-map")
+@CrossOrigin
 class ContactMapController(
     private val contactMapService: ContactMapService,
     private val containerService: GrpcContainerService,

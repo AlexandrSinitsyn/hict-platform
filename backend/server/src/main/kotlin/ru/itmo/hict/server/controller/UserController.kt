@@ -16,6 +16,7 @@ import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 
 @RestController
 @RequestMapping("/api/v1/users")
+@CrossOrigin
 class UserController(
     private val userService: UserService,
     private val updateUserInfoFormValidator: UpdateUserInfoFormValidator,

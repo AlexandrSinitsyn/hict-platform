@@ -10,6 +10,7 @@ import ru.itmo.hict.server.service.GroupService
 
 @RestController
 @RequestMapping("/api/v1/groups")
+@CrossOrigin
 class GroupController(
     private val groupService: GroupService,
 ) : ApiExceptionController() {

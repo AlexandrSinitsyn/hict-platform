@@ -22,6 +22,7 @@ import kotlin.io.path.*
 
 @RestController
 @RequestMapping("/api/v1/files")
+@CrossOrigin
 class FilesController(
     private val fileService: FileService,
     private val minioService: MinioService,

@@ -13,6 +13,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/experiment")
+@CrossOrigin
 class ExperimentController(
     private val experimentService: ExperimentService,
 ) : ApiExceptionController() {
