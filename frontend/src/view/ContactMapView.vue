@@ -17,7 +17,7 @@
 import { onMounted, type Ref, ref } from 'vue';
 import { acquireContactMap, pingContactMap } from '@/core/server-requests';
 import type { ContactMap } from '@types';
-import { HiCT, notify } from '@/core/config';
+import { __HiCT_CLUSTER__, notify } from '@/core/config';
 import { useAuthStore } from '@/stores/auth-store';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
@@ -37,7 +37,7 @@ const doRequest = () => {
         notify('error', 'You should be authorized');
     }
 
-    return `${HiCT}/${uid}`;
+    return `${__HiCT_CLUSTER__.value}/${uid}`;
 };
 
 onMounted(() => {
