@@ -34,14 +34,15 @@
                 :files="fasta"
                 type="FASTA"
                 :wrap="!fullfasta"
-                @upload="(f: File) => fasta.push(f)"
+                @upload="uploadFasta"
             />
         </div>
         <div class="experiment-activity">
             <div
-                v-for="{ type, name, creationTime } in activities()"
+                v-for="{ type, self, name, creationTime } in activities()"
                 :key="name"
                 :class="'experiment-activity-' + type"
+                @click="modify(self, type)"
             >
                 <div>
                     {{ name }}
@@ -67,14 +68,15 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import type { Experiment, ContactMap, File, Assembly } from '@types';
+import { type Experiment, type ContactMap, type File, type Assembly } from '@types';
 import FileListComponent from '@/components/FileListComponent.vue';
 import NewContactMapView from '@/view/NewContactMapView.vue';
 import {
     publishContactMap,
     updateExperimentInfo,
     updateExperimentName,
-} from '@/core/server-requests';
+} from '@/core/experiment-requests';
+import { attachFastaToExperiment } from '@/core/files-requests';
 
 const props = defineProps<{
     selected: Experiment | undefined;
@@ -91,19 +93,23 @@ const contactMaps: Ref<ContactMap[]> = ref(props.selected?.contactMaps ?? []);
 const assemblies: Ref<Assembly[]> = ref(props.selected?.assemblies ?? []);
 const fasta: Ref<File[]> = ref(props.selected?.fasta ?? []);
 
+type ActivityType = 'contactMap' | 'assembly';
+
 type Activity = {
-    type: 'contactMap' | 'assembly';
+    type: ActivityType;
+    self: ContactMap | Assembly;
     name: string;
     creationTime: Date;
 };
 
 function activities(): Activity[] {
-    function getInfo(
-        type: 'contactMap' | 'assembly'
-    ): (element: ContactMap | Assembly) => Activity {
-        return function <T extends { name: string; creationTime: Date }>(element: T): Activity {
+    type ActivityAccessor = { name: string; creationTime: Date } & (ContactMap | Assembly);
+
+    function getInfo(type: ActivityType): (element: ContactMap | Assembly) => Activity {
+        return function <T extends ActivityAccessor>(element: T): Activity {
             return {
                 type: type,
+                self: element,
                 name: element.name,
                 creationTime: element.creationTime,
             };
@@ -142,6 +148,20 @@ function updateInfo(): void {
     });
 }
 
+function uploadFasta(f: File): void {
+    const experiment = props.selected;
+
+    if (!experiment) {
+        return;
+    }
+
+    attachFastaToExperiment(experiment, f, (success) => {
+        if (success) {
+            fasta.value.push(f);
+        }
+    });
+}
+
 function newContactMap(): void {
     const experiment = props.selected;
 
@@ -152,6 +172,16 @@ function newContactMap(): void {
     publishContactMap(experiment, (contactMap: ContactMap) => {
         selectedContactMap.value = contactMap;
     });
+}
+
+function modify(object: ContactMap | Assembly, type: ActivityType) {
+    switch (type) {
+        case 'contactMap':
+            selectedContactMap.value = object as ContactMap;
+            break;
+        case 'assembly':
+            break;
+    }
 }
 </script>
 

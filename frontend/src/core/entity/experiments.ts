@@ -18,7 +18,7 @@ export interface ContactMap {
     name: string;
     description: string;
     link: string;
-    hic: File;
+    hict: File | undefined;
     agp: File[];
     mcool: File | undefined;
     tracks: File[];
@@ -41,10 +41,16 @@ export enum FileType {
 }
 
 export interface File {
+    id: string;
     name: string;
     filesize: number;
     sequenceLevel: string;
     creationTime: Date;
+}
+
+export interface FileAttachmentForm {
+    fileId: string;
+    fileType: FileType;
 }
 
 export interface UpdateExperimentName {
