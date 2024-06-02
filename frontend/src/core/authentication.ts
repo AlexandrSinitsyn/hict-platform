@@ -1,19 +1,32 @@
 import type { Jwt, LoginForm, RegisterForm, User } from '@types';
-import { authLogin, authRegister, requestUser } from '@/core/server-requests';
-import { notify } from '@/core/config';
+import {
+    authorizedGetRequest,
+    errorHandler,
+    forgetJwt,
+    getJwt,
+    handler,
+    saveJwt,
+    type SuccessCallback,
+} from '@/core/server-requests';
+import { __AUTH_HOST__, __SERVER_HOST__, notify } from '@/core/config';
+import axios, { type AxiosResponse } from 'axios';
 
-const JWT_STORAGE_KEY = 'JWT_STORAGE_KEY';
-
-export function getJwt(): Jwt | undefined {
-    return localStorage.getItem(JWT_STORAGE_KEY) ?? undefined;
+export function authLogin(form: LoginForm, onSuccess: SuccessCallback<Jwt>): void {
+    axios
+        .post<LoginForm, AxiosResponse<Jwt>>(`${__AUTH_HOST__.value}/auth/login`, form)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
 }
 
-function saveJwt(jwt: Jwt) {
-    localStorage.setItem(JWT_STORAGE_KEY, jwt);
+export function authRegister(form: RegisterForm, onSuccess: SuccessCallback<Jwt>): void {
+    axios
+        .post<RegisterForm, AxiosResponse<Jwt>>(`${__AUTH_HOST__.value}/auth/register`, form)
+        .then(handler(onSuccess))
+        .catch(errorHandler);
 }
 
-function forgetJwt() {
-    localStorage.removeItem(JWT_STORAGE_KEY);
+export function requestUser(onSuccess: SuccessCallback<User | undefined>): void {
+    authorizedGetRequest(`${__SERVER_HOST__.value}/users/self`, onSuccess);
 }
 
 export function login(form: LoginForm, then: () => void) {
@@ -43,7 +56,7 @@ export function getAuthorizedUser(doGet: (user: User) => void) {
         return;
     }
 
-    requestUser(jwt, (u) => {
+    requestUser((u) => {
         if (!u) {
             notify('error', 'Invalid JWT');
             return;
