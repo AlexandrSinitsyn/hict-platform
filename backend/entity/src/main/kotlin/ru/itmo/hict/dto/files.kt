@@ -1,5 +1,6 @@
 package ru.itmo.hict.dto
 
+import ru.itmo.hict.entity.AttachedFile
 import ru.itmo.hict.entity.File
 import ru.itmo.hict.entity.SequenceLevelType
 import java.util.*
@@ -22,5 +23,7 @@ data class FileInfoDto(
     companion object {
         fun File.toInfoDto(): FileInfoDto =
             FileInfoDto(id!!, filename, sequenceLevel, fileSize, creationTime!!)
+
+        fun AttachedFile.toInfoDto(): FileInfoDto = this.file.toInfoDto()
     }
 }

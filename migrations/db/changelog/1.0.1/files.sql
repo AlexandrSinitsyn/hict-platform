@@ -3,7 +3,7 @@
 --changeset AlexSin:4
 --Files and wrappers
 
-create type sequence_level_type as enum ('contigs', 'scaffolds', 'chromosomes');
+create type sequence_level_type as enum ('CONTIG', 'SCAFFOLD', 'CHROMOSOME');
 
 create table files
 (

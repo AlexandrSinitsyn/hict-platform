@@ -178,7 +178,7 @@ class ContactMap(
         nullable = true,
     )
     // fixme
-    val hic: HictFile? = null,
+    val hict: HictFile? = null,
 
     @NotNull
     @ManyToMany(
