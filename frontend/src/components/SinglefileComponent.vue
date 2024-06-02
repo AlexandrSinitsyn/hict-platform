@@ -18,10 +18,10 @@
 import AttachedFileInfo from '@/components/AttachedFileInfo.vue';
 import FileLoaderComponent from '@/components/FileLoaderComponent.vue';
 import { type File as AttachedFile, FileType } from '@types';
-import { uploadFile } from '@/core/server-requests';
+import { uploadFile } from '@/core/files-requests';
 
 const props = defineProps<{
-    file: AttachedFile;
+    file: AttachedFile | undefined;
     type: string;
     wrap: boolean;
 }>();

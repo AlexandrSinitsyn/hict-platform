@@ -61,7 +61,7 @@ import { ref, type Ref } from 'vue';
 import type { Experiment, ContactMap, File } from '@types';
 import FileListComponent from '@/components/FileListComponent.vue';
 import SinglefileComponent from '@/components/SinglefileComponent.vue';
-import { updateContactMapInfo, updateContactMapName } from '@/core/server-requests';
+import { updateContactMapInfo, updateContactMapName } from '@/core/experiment-requests';
 
 const props = defineProps<{
     experiment: Experiment | undefined;

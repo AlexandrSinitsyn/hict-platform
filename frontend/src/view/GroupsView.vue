@@ -18,11 +18,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue';
-import type { Experiment, Group, GroupCreationForm } from '@types';
-import { getAllGroups, joinGroup, publishGroup } from '@/core/server-requests';
+import type { Group, GroupCreationForm } from '@types';
+import { getAllGroups, joinGroup, publishGroup } from '@/core/user-account-requests';
 import CreationGroupFormComponent from '@/components/forms/CreationGroupFormComponent.vue';
 
-const groups: Ref<Experiment[]> = ref([]);
+const groups: Ref<Group[]> = ref([]);
 
 onMounted(() => {
     getAllGroups((all: Group[]) => {

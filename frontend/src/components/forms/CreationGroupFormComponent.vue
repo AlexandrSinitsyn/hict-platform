@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
-import { GroupCreationForm } from '@types';
+import type { GroupCreationForm } from '@types';
 import { notify } from '@/core/config';
 
 const emit = defineEmits<{

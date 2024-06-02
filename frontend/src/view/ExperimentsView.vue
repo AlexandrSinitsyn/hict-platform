@@ -9,15 +9,18 @@
         </div>
 
         <div class="experiments">
-            <div v-for="e in experiments" :key="e.name" @click="selectedExperiment = e" class="FASTA">
+            <div
+                v-for="e in experiments"
+                :key="e.name"
+                @click="selectedExperiment = e"
+                class="FASTA"
+            >
                 {{ e.name }}
 
                 <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)" class="HIC">
                     M: {{ cm.name }}
                 </div>
-                <div v-for="a in e.assemblies" :key="a.name" class="AGP">
-                    A: {{ a.name }}
-                </div>
+                <div v-for="a in e.assemblies" :key="a.name" class="AGP">A: {{ a.name }}</div>
             </div>
         </div>
     </div>
@@ -27,7 +30,7 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue';
 import type { ContactMap, Experiment } from '@types';
-import { getAllExperiments, publishExperiment } from '@/core/server-requests';
+import { getAllExperiments, publishExperiment } from '@/core/experiment-requests';
 import NewExperimentView from '@/view/NewExperimentView.vue';
 import router from '@/router';
 

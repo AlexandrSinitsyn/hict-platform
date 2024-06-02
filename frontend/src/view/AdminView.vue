@@ -35,7 +35,7 @@ import UpdateUserRoleFormComponent from '@/components/forms/UpdateUserRoleFormCo
 import { type User, Role } from '@types';
 import { isAtLeast } from '@/core/extensions';
 import { onMounted, type Ref, ref } from 'vue';
-import { getAllUsers, updateUserRole } from '@/core/server-requests';
+import { getAllUsers, updateUserRole } from '@/core/user-account-requests';
 import { notify } from '@/core/config';
 import { useAuthStore } from '@/stores/auth-store';
 import { storeToRefs } from 'pinia';

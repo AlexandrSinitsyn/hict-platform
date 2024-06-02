@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { onMounted, type Ref, ref } from 'vue';
-import { acquireContactMap, pingContactMap } from '@/core/server-requests';
+import { acquireContactMap, pingContactMap } from '@/core/experiment-requests';
 import type { ContactMap } from '@types';
 import { __HiCT_CLUSTER__, notify } from '@/core/config';
 import { useAuthStore } from '@/stores/auth-store';
@@ -24,6 +24,7 @@ import { useRoute } from 'vue-router';
 import { useRemoteHostStore } from '@hict/app/stores/remoteHost';
 
 import App from '@hict/App.vue';
+import { useSelectedMapStore } from '@hict/app/stores/selectedMapStore';
 
 const { user } = storeToRefs(useAuthStore());
 const selected: Ref<ContactMap | undefined> = ref(undefined);
@@ -42,10 +43,12 @@ const doRequest = () => {
 
 onMounted(() => {
     useRemoteHostStore().setDynamicRemoteHost(doRequest);
+    const { selectedMap } = storeToRefs(useSelectedMapStore());
 
     const router = useRoute();
     acquireContactMap(router.params.hiCMapName as string, (map) => {
         selected.value = map;
+        selectedMap.value = map.name;
     });
 });
 </script>
