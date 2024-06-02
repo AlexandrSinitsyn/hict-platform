@@ -5,6 +5,7 @@ import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.*
 import ru.itmo.hict.server.repository.*
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class FileService(
@@ -16,10 +17,7 @@ class FileService(
     private val fastaFileRepository: FastaFileRepository,
 ) {
     fun save(fileType: FileType, filename: String, fileSize: Long): AttachedFile {
-        // fixme
-        fileRepository.save(File(filename, SequenceLevelType.SCAFFOLD, fileSize))
-
-        val saved = fileRepository.findByFilename(filename).orElseThrow()
+        val saved = fileRepository.save(File(filename, SequenceLevelType.SCAFFOLD, fileSize))
 
         return when (fileType) {
             FileType.HIC -> hictFileRepository.save(HictFile(saved))
@@ -30,9 +28,14 @@ class FileService(
         }
     }
 
-    fun attachFastaFileToExperiment(experiment: Experiment, uuid: UUID) {}
-    fun attachHicFileToContactMap(contactMap: ContactMap, uuid: UUID) {}
-    fun attachMcoolFileToContactMap(contactMap: ContactMap, uuid: UUID) {}
-    fun attachAgpFileToContactMap(contactMap: ContactMap, uuid: UUID) {}
-    fun attachTracksFileToContactMap(contactMap: ContactMap, uuid: UUID) {}
+    fun attachFastaFileToExperiment(experiment: Experiment, uuid: UUID) =
+        fastaFileRepository.attach(experiment.id!!, uuid)
+    fun attachHicFileToContactMap(contactMap: ContactMap, uuid: UUID) =
+        hictFileRepository.attach(contactMap.id!!, uuid)
+    fun attachMcoolFileToContactMap(contactMap: ContactMap, uuid: UUID) =
+        mcoolFileRepository.attach(contactMap.id!!, uuid)
+    fun attachAgpFileToContactMap(contactMap: ContactMap, uuid: UUID) =
+        agpFileRepository.attach(contactMap.id!!, uuid)
+    fun attachTracksFileToContactMap(contactMap: ContactMap, uuid: UUID) =
+        tracksFileRepository.attach(contactMap.id!!, uuid)
 }

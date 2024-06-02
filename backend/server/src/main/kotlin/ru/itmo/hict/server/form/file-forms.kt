@@ -6,6 +6,6 @@ import ru.itmo.hict.validator.EnumValues
 import java.util.UUID
 
 class FileAttachmentForm(
-    @field:[NotNull NotBlank                                     Size(min = 3, max = 100)] val fileId: UUID,
-    @field:[NotNull NotBlank EnumValues(clazz = FileType::class) Size(min = 3, max = 100)] val fileType: FileType,
+    @field:[NotNull                                    ] val fileId: UUID,
+    @field:[NotNull EnumValues(clazz = FileType::class)] val fileType: FileType,
 )

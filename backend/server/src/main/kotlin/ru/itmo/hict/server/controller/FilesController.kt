@@ -1,5 +1,6 @@
 package ru.itmo.hict.server.controller
 
+import jakarta.annotation.PostConstruct
 import jakarta.validation.Valid
 import okio.IOException
 import org.springframework.beans.factory.annotation.Value
@@ -30,6 +31,11 @@ class FilesController(
     private val contactMapService: ContactMapService,
     @Value("\${SERVER_LOCAL_STORAGE_PATH}") private val storagePath: String,
 ) : ApiExceptionController() {
+    @PostConstruct
+    fun init() {
+        Path(storagePath).createDirectories()
+    }
+
     @PostMapping("/publish")
     fun publish(
         @RequestPart("file") file: MultipartFile,
