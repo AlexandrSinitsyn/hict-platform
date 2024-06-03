@@ -32,7 +32,7 @@
                 :file="hict"
                 :type="fileType(FileType.HICT)"
                 :wrap="!fullfileinfo"
-                @upload="(f: File) => hic = f"
+                @upload="(f: File) => upload(fileType(FileType.HICT), f)"
             />
             <FileListComponent
                 :files="agp"
@@ -62,7 +62,8 @@ import { type Experiment, type ContactMap, type File, FileType } from '@types';
 import FileListComponent from '@/components/FileListComponent.vue';
 import SinglefileComponent from '@/components/SinglefileComponent.vue';
 import { updateContactMapInfo, updateContactMapName } from '@/core/experiment-requests';
-import {fileType} from "@/core/extensions";
+import { fileType } from '@/core/extensions';
+import { attachHictToContactMap } from '@/core/files-requests';
 
 const props = defineProps<{
     experiment: Experiment | undefined;
@@ -101,6 +102,32 @@ function updateInfo(): void {
         description: description.value,
         link: link.value,
     });
+}
+
+function upload(type: keyof typeof FileType, f: File) {
+    const contactMap = props.selected;
+
+    if (!contactMap) {
+        return;
+    }
+
+    switch (type) {
+        case 'FASTA':
+            throw 'Unreachable';
+        case 'HICT':
+            attachHictToContactMap(contactMap, f, (success) => {
+                if (success) {
+                    hict.value = f;
+                }
+            });
+            break;
+        case 'MCOOL':
+            break;
+        case 'AGP':
+            break;
+        case 'TRACKS':
+            break;
+    }
 }
 </script>
 

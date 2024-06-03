@@ -50,7 +50,7 @@ class ContactMapService(
             ?: throw NoContactMapFoundException(contactMapId)
 
         val attach: (map: ContactMap, fileId: UUID) -> Unit = when (fileType) {
-            FileType.HIC -> fileService::attachHicFileToContactMap
+            FileType.HICT -> fileService::attachHicFileToContactMap
             FileType.MCOOL -> fileService::attachMcoolFileToContactMap
             FileType.AGP -> fileService::attachAgpFileToContactMap
             FileType.TRACKS -> fileService::attachTracksFileToContactMap

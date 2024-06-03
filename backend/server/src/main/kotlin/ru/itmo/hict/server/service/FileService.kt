@@ -20,7 +20,7 @@ class FileService(
         val saved = fileRepository.save(File(filename, SequenceLevelType.SCAFFOLD, fileSize))
 
         return when (fileType) {
-            FileType.HIC -> hictFileRepository.save(HictFile(saved))
+            FileType.HICT -> hictFileRepository.save(HictFile(saved))
             FileType.MCOOL -> mcoolFileRepository.save(McoolFile(saved))
             FileType.AGP -> agpFileRepository.save(AgpFile(saved))
             FileType.TRACKS -> tracksFileRepository.save(TracksFile(saved))

@@ -40,7 +40,7 @@ const doRequest = () => {
 
     if (!uid) {
         notify('error', 'You should be authorized');
-        return;
+        throw 'Not authorized';
     }
 
     pingContactMap(uid);
@@ -55,7 +55,15 @@ onMounted(() => {
     const router = useRoute();
     acquireContactMap(router.params.contactMapName as string, (map) => {
         selected.value = map;
-        selectedMap.value = `${map.name}${FileType.HICT}`;
+
+        const hicMap = map.hict;
+
+        if (!hicMap) {
+            notify('error', 'Nothing to show! No Hi-C map attached for this experiment!')
+            return;
+        }
+
+        selectedMap.value = `${hicMap.id}.${FileType.HICT}`;
     });
 });
 
