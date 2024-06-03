@@ -9,18 +9,22 @@
         </div>
 
         <div class="experiments">
-            <div
-                v-for="e in experiments"
-                :key="e.name"
-                @click="selectedExperiment = e"
-                class="FASTA"
-            >
-                {{ e.name }}
-
-                <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)" class="HICT">
-                    M: {{ cm.name }}
+            <div v-for="e in experiments" :key="e.name">
+                <div @click="selectedExperiment = e" class="view-experiment">
+                    [Experiment] {{ e.name }}
                 </div>
-                <div v-for="a in e.assemblies" :key="a.name" class="AGP">A: {{ a.name }}</div>
+                <div
+                    v-for="cm in e.contactMaps"
+                    :key="cm.name"
+                    @click="selectMap(cm)"
+                    class="view-contact-map"
+                    style="margin-left: 2rem"
+                >
+                    [Contact map] {{ cm.name }}
+                </div>
+                <div v-for="a in e.assemblies" :key="a.name" class="view-assembly">
+                    [Assembly] {{ a.name }}
+                </div>
             </div>
         </div>
     </div>
@@ -66,6 +70,18 @@ function selectMap(map: ContactMap): void {
     padding: 1rem;
     border: 1px solid $border-color;
     border-radius: $border-radius;
+
+    @each $type, $color in ['view-experiment', $danger], ['view-contact-map', $success], ['view-assembly', $info] {
+        .#{$type} {
+            padding: 0.5rem;
+            color: $color;
+            font-weight: bolder;
+
+            &:hover {
+                background-color: opacity($color, 0.2);
+            }
+        }
+    }
 }
 
 .experiments-filter {
