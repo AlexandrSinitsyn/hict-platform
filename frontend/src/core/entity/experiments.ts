@@ -16,8 +16,8 @@ export interface Experiment {
 export interface ContactMap {
     id: string;
     name: string;
-    description: string;
-    link: string;
+    description: string | undefined;
+    link: string | undefined;
     hict: File | undefined;
     agp: File[];
     mcool: File | undefined;
