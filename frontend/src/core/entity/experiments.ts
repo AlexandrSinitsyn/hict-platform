@@ -33,11 +33,11 @@ export interface Assembly {
 }
 
 export enum FileType {
-    FASTA,
-    HIC,
-    MCOOL,
-    AGP,
-    TRACKS,
+    FASTA = 'fasta',
+    HICT = 'hict.hdf5',
+    MCOOL = 'mcool',
+    AGP = 'agp',
+    TRACKS = 'bed',
 }
 
 export interface File {
@@ -50,7 +50,7 @@ export interface File {
 
 export interface FileAttachmentForm {
     fileId: string;
-    fileType: FileType;
+    fileType: keyof typeof FileType;
 }
 
 export interface UpdateExperimentName {

@@ -1,5 +1,5 @@
 <template>
-    <div :class="'attached-file ' + FileType[type]">
+    <div :class="'attached-file ' + type">
         <div v-if="!wrap" class="attached-file-info">
             <div>
                 {{ file.name }}
@@ -29,7 +29,7 @@ import { type File, FileType } from '@types';
 
 const props = defineProps<{
     file: File;
-    type: FileType;
+    type: keyof typeof FileType;
     wrap: boolean;
 }>();
 

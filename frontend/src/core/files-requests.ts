@@ -12,7 +12,7 @@ import type { FileAttachmentForm } from '@/core/entity/experiments';
 
 export function uploadFile(
     file: File,
-    fileType: string,
+    fileType: keyof typeof FileType,
     onSuccess: SuccessCallback<AttachedFile>
 ): void {
     const jwt = getJwt();
@@ -50,7 +50,7 @@ function attachFileTo<T = Experiment | ContactMap>(
     obj: T,
     objType: 'experiment' | 'contact-map',
     file: AttachedFile,
-    fileType: FileType,
+    fileType: keyof typeof FileType,
     onSuccess: SuccessCallback<boolean>
 ): void {
     const url =
@@ -62,7 +62,7 @@ function attachFileTo<T = Experiment | ContactMap>(
         `${__SERVER_HOST__.value}/files/attach/${url}`,
         {
             fileId: file.id,
-            fileType: FileType[fileType],
+            fileType: fileType,
         },
         onSuccess
     );
@@ -73,7 +73,7 @@ export function attachFastaToExperiment(
     fasta: AttachedFile,
     onSuccess: SuccessCallback<boolean>
 ): void {
-    attachFileTo<Experiment>(experiment, 'experiment', fasta, FileType.FASTA, onSuccess);
+    attachFileTo<Experiment>(experiment, 'experiment', fasta, FileType[FileType.FASTA], onSuccess);
 }
 
 export function attachHictToContactMap(
@@ -81,5 +81,5 @@ export function attachHictToContactMap(
     hict: AttachedFile,
     onSuccess: SuccessCallback<boolean>
 ): void {
-    attachFileTo<ContactMap>(contactMap, 'contact-map', hict, FileType.HIC, onSuccess);
+    attachFileTo<ContactMap>(contactMap, 'contact-map', hict, FileType[FileType.HICT], onSuccess);
 }

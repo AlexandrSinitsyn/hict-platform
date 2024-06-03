@@ -2,14 +2,10 @@
     <div class="files-list">
         <h3>{{ type }} file:</h3>
         <div v-if="file">
-            <AttachedFileInfo :file="file" :type="FileType[filetype]" :wrap="wrap" />
+            <AttachedFileInfo :file="file" :type="type" :wrap="wrap" />
         </div>
         <div v-else>
-            <FileLoaderComponent
-                :extensions="[filetype.toLowerCase()]"
-                :type="FileType[filetype]"
-                @loaded="doUpload"
-            />
+            <FileLoaderComponent :extensions="[FileType[type]]" :type="type" @loaded="doUpload" />
         </div>
     </div>
 </template>
@@ -22,7 +18,7 @@ import { uploadFile } from '@/core/files-requests';
 
 const props = defineProps<{
     file: AttachedFile | undefined;
-    type: string;
+    type: keyof typeof FileType;
     wrap: boolean;
 }>();
 
@@ -31,10 +27,8 @@ const emit = defineEmits<{
     // (e: 'remove', file: File): void;
 }>();
 
-const filetype = props.type?.trim().replace('-', '');
-
 function doUpload(f: File): void {
-    uploadFile(f, filetype, (attached: AttachedFile) => {
+    uploadFile(f, props.type, (attached: AttachedFile) => {
         emit('upload', attached);
     });
 }

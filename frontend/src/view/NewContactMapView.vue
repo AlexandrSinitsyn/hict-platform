@@ -30,25 +30,25 @@
         <div class="contact-map-attached">
             <SinglefileComponent
                 :file="hic"
-                type="HI-C"
+                :type="fileType(FileType.HICT)"
                 :wrap="!fullfileinfo"
                 @upload="(f: File) => hic = f"
             />
             <FileListComponent
                 :files="agp"
-                type="AGP"
+                :type="fileType(FileType.AGP)"
                 :wrap="!fullfileinfo"
                 @upload="(f: File) => agp.push(f)"
             />
             <SinglefileComponent
                 :file="mcool"
-                type="MCOOL"
+                :type="fileType(FileType.MCOOL)"
                 :wrap="!fullfileinfo"
                 @upload="(f: File) => mcool = f"
             />
             <FileListComponent
                 :files="tracks"
-                type="TRACKS"
+                :type="fileType(FileType.TRACKS)"
                 :wrap="!fullfileinfo"
                 @upload="(f: File) => tracks.push(f)"
             />
@@ -58,10 +58,11 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import type { Experiment, ContactMap, File } from '@types';
+import { type Experiment, type ContactMap, type File, FileType } from '@types';
 import FileListComponent from '@/components/FileListComponent.vue';
 import SinglefileComponent from '@/components/SinglefileComponent.vue';
 import { updateContactMapInfo, updateContactMapName } from '@/core/experiment-requests';
+import {fileType} from "@/core/extensions";
 
 const props = defineProps<{
     experiment: Experiment | undefined;
@@ -72,7 +73,7 @@ const fullfileinfo: Ref<boolean> = ref(true);
 const name: Ref<string> = ref(props.selected?.name ?? '');
 const description: Ref<string | undefined> = ref(props.selected?.description ?? '');
 const link: Ref<string | undefined> = ref(props.selected?.link ?? '');
-const hic: Ref<File | undefined> = ref(props.selected?.hic);
+const hic: Ref<File | undefined> = ref(props.selected?.hict);
 const agp: Ref<File[]> = ref(props.selected?.agp ?? []);
 const mcool: Ref<File | undefined> = ref(props.selected?.mcool);
 const tracks: Ref<File[]> = ref(props.selected?.tracks ?? []);

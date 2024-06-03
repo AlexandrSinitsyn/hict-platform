@@ -32,7 +32,7 @@
         <div class="experiment-files">
             <FileListComponent
                 :files="fasta"
-                type="FASTA"
+                :type="fileType(FileType.FASTA)"
                 :wrap="!fullfasta"
                 @upload="uploadFasta"
             />
@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
-import { type Experiment, type ContactMap, type File, type Assembly } from '@types';
+import { type Experiment, type ContactMap, type File, type Assembly, FileType } from '@types';
 import FileListComponent from '@/components/FileListComponent.vue';
 import NewContactMapView from '@/view/NewContactMapView.vue';
 import {
@@ -77,6 +77,7 @@ import {
     updateExperimentName,
 } from '@/core/experiment-requests';
 import { attachFastaToExperiment } from '@/core/files-requests';
+import {fileType} from "@/core/extensions";
 
 const props = defineProps<{
     selected: Experiment | undefined;

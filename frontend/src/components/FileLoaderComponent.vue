@@ -3,7 +3,7 @@
         <input
             id="fileLoader"
             type="file"
-            :class="'file-loader ' + FileType[type]"
+            :class="'file-loader ' + type"
             required
             @change="fileLoaded($event)"
         />
@@ -20,7 +20,7 @@ import { FileType } from '@types';
 
 const props = defineProps<{
     extensions: string[];
-    type: FileType;
+    type: keyof typeof FileType;
 }>();
 
 const emit = defineEmits<{
@@ -42,12 +42,7 @@ function fileLoaded(e: Event) {
         return;
     }
 
-    const ext = (() => {
-        const tmp = file.name.split(/\./);
-        return tmp[tmp.length - 1];
-    })();
-
-    if (!props.extensions.includes(ext)) {
+    if (!props.extensions?.find((ext) => file.name.endsWith(ext))) {
         notify('error', `Unsupported file type for "${file.name}"`);
         return;
     }
