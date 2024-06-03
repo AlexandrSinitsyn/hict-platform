@@ -17,7 +17,7 @@
             >
                 {{ e.name }}
 
-                <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)" class="HIC">
+                <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)" class="HICT">
                     M: {{ cm.name }}
                 </div>
                 <div v-for="a in e.assemblies" :key="a.name" class="AGP">A: {{ a.name }}</div>
