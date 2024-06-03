@@ -50,11 +50,12 @@ class FilesController(
             val saved = fileService.save(fileType, filename, file.size)
 
             val fileId = saved.file.id!!.toString()
+            val newFilename = "$fileId.${fileType.extension}"
 
-            val localFile = Path(storagePath, fileId)
+            val localFile = Path(storagePath, newFilename)
             file.transferTo(localFile)
 
-            minioService.upload(fileType, fileId, file.size, localFile.inputStream())
+            minioService.upload(fileType, newFilename, file.size, localFile.inputStream())
 
             saved.file
         } catch (e: IOException) {

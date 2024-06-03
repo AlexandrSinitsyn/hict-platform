@@ -5,11 +5,11 @@ import ru.itmo.hict.entity.File
 import ru.itmo.hict.entity.SequenceLevelType
 import java.util.*
 
-enum class FileType(val bucket: String) {
-    HIC("hic"),
+enum class FileType(val bucket: String, val extension: String = bucket) {
+    HICT("hict", "hict.hdf5"),
     MCOOL("mcool"),
     AGP("agp"),
-    TRACKS("tracks"),
+    TRACKS("tracks", "bed"),
     FASTA("fasta")
 }
 
