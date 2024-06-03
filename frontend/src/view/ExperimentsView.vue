@@ -53,7 +53,7 @@ function selectMap(map: ContactMap): void {
     router.push({
         name: 'view',
         params: {
-            hiCMapName: map.name,
+            contactMapName: map.name,
         },
     });
 }

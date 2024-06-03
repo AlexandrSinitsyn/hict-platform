@@ -27,7 +27,7 @@ const router = createRouter({
             component: ExperimentsView,
         },
         {
-            path: '/view/:hiCMapName',
+            path: '/view/:contactMapName',
             name: 'view',
             sensitive: true,
             component: () => import('@/view/ContactMapView.vue'),

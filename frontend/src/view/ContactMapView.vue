@@ -30,13 +30,14 @@ const { user } = storeToRefs(useAuthStore());
 const selected: Ref<ContactMap | undefined> = ref(undefined);
 
 const doRequest = () => {
-    pingContactMap(useRoute().params.hiCMapName as string);
-
     const uid = user.value?.id;
 
     if (!uid) {
         notify('error', 'You should be authorized');
+        return;
     }
+
+    pingContactMap(uid);
 
     return `${__HiCT_CLUSTER__.value}/${uid}`;
 };
@@ -46,7 +47,7 @@ onMounted(() => {
     const { selectedMap } = storeToRefs(useSelectedMapStore());
 
     const router = useRoute();
-    acquireContactMap(router.params.hiCMapName as string, (map) => {
+    acquireContactMap(router.params.contactMapName as string, (map) => {
         selected.value = map;
         selectedMap.value = map.name;
     });
