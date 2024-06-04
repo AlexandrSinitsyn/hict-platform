@@ -15,6 +15,9 @@ COPY vite.config.ts vite.config.ts
 COPY public public
 COPY src src
 
+ARG PROJECT_VERSION
+ENV VITE_PROJECT_VERSION $PROJECT_VERSION
+
 # FIXME
 RUN npm run build-only
 
@@ -24,9 +27,4 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-RUN echo 'vars="\${PROJECT_VERSION},\${APP_HOST},\${APP_PORT}"; \
-    envsubst $vars < /usr/share/nginx/html/assets/env.template.json > /usr/share/nginx/html/assets/env.json; \
-    nginx -g "daemon off;"' > /run.sh
-RUN chmod +x /run.sh && chown -R nginx:nginx /run.sh
-
-CMD ["/run.sh"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -42,6 +42,7 @@ services:
       context: frontend
       dockerfile: Dockerfile
       args:
+        PROJECT_VERSION: '${PROJECT_VERSION}'
         NGINX_VERSION: '${NGINX_VERSION}'
     restart: always
     <<: *env
