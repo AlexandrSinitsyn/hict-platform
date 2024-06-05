@@ -24,7 +24,7 @@ class AuthenticationInterceptor(
         val auth = request.getHeader("Authorization") ?: return true
 
         if (!auth.startsWith("Bearer")) {
-            throw InvalidAuthorizationTypeException("Expected Bearer but was $auth")
+            throw InvalidAuthorizationTypeException(auth)
         }
 
         val jwt: Jwt = auth.substring(7)

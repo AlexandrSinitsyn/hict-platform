@@ -16,6 +16,7 @@ import ru.itmo.hict.dto.Jwt
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@CrossOrigin
 class UserController(
     private val userService: UserService,
     private val jwtService: JwtService,

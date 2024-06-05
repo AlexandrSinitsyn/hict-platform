@@ -22,7 +22,7 @@ import { __VERSION__, __AUTHOR__ } from '@/core/config';
 import { onMounted, ref } from 'vue';
 import { getAuthorizedUser } from '@/core/authentication';
 import { useAuthStore } from '@/stores/auth-store';
-import { getUsersCount } from '@/core/server-requests';
+import { getUsersCount } from '@/core/user-account-requests';
 
 const authStore = useAuthStore();
 
@@ -52,8 +52,8 @@ header {
 }
 
 main {
-    margin: 1rem 1rem 0 calc(1rem + $aside-size);
-    padding: 1rem;
+    margin: 0 0 0 calc(1rem + $aside-size);
+    padding: 1rem 0 1rem 1rem;
     min-height: calc(100vh - 4rem);
     border-left: 1px solid gray;
 }

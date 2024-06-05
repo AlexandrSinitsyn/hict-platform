@@ -1,20 +1,20 @@
 package ru.itmo.hict.server.service
 
 import io.minio.*
-import io.minio.messages.Item
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.server.logging.Logger
 import java.io.InputStream
 
 @Configuration
-class MinioConfiguration(
-    @Value("\${minio.url}") private val url: String,
-    @Value("\${minio.access.key}") private val accessKey: String,
-    @Value("\${minio.access.secret}") private val secretKey: String,
+class S3Configuration(
+    @Value("\${s3.url}") private val url: String,
+    @Value("\${s3.access.key}") private val accessKey: String,
+    @Value("\${s3.access.secret}") private val secretKey: String,
 ) {
     @Bean
     fun minio(): MinioClient = MinioClient.builder()
@@ -40,43 +40,45 @@ class MinioService(
             .build())
     }
 
-    private fun path(folder: String?, filename: String) = (folder?.let { "$it/" } ?: "") + filename
-
     class FileObjectInfo(val name: String,
                          val size: Long,
                          val data: InputStream)
 
     @Async
-    fun upload(bucket: String, folder: String?, file: FileObjectInfo) {
+    fun upload(bucket: String, file: FileObjectInfo) {
         minioClient.putObject(PutObjectArgs.builder()
             .bucket(bucket)
-            .`object`(path(folder, file.name))
+            .`object`(file.name)
             .stream(file.data, file.size, -1)
             .build())
 
-        logger.info("uploading", "minio", "uploading completed `${path(folder, file.name)}`")
+        logger.info("uploading", "minio", "uploading completed `${file.name}`")
     }
 
-    fun downloadFile(bucket: String, folder: String?, filename: String): FileObjectInfo {
+    fun downloadFile(bucket: String, filename: String): FileObjectInfo {
         val size = minioClient.statObject(StatObjectArgs.builder()
             .bucket(bucket)
-            .`object`(path(folder, filename))
+            .`object`(filename)
             .build()).size()
 
         val input = minioClient.getObject(GetObjectArgs.builder()
             .bucket(bucket)
-            .`object`(path(folder, filename))
+            .`object`(filename)
             .build())
 
-        logger.info("downloading", "minio", "downloading completed `${path(folder, filename)}`")
+        logger.info("downloading", "minio", "downloading completed `${filename}`")
 
         return FileObjectInfo(filename, size, input)
     }
 
-    fun listInBucket(bucket: String, folder: String?): List<Item> {
+    fun listInBucket(bucket: String): List<String> {
         return minioClient.listObjects(ListObjectsArgs.builder()
             .bucket(bucket)
             .recursive(true)
-            .build()).map { it.get() }.filter { folder?.run { it.objectName().startsWith("$this/") } ?: true }
+            .build()).map { it.get().objectName() }
     }
+
+    @Async
+    fun upload(fileType: FileType, filename: String, filesize: Long, data: InputStream) =
+        upload(fileType.bucket, FileObjectInfo(filename, filesize, data))
 }

@@ -17,18 +17,18 @@ import ru.itmo.hict.entity.HiCMap
 import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
-import ru.itmo.hict.server.controller.HiCMapController
+import ru.itmo.hict.server.controller.ContactMapController
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.HiCMapCreationForm
 import ru.itmo.hict.server.service.HiCMapService
-import ru.itmo.hict.server.validator.HiCMapCreationFormValidator
+import ru.itmo.hict.server.validator.ContactMapCreationFormValidator
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.Timestamp
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 
-class HiCMapControllerTests {
+class ContactMapControllerTests {
     private companion object {
         private const val USER_ID = 1L
         private val user = User(
@@ -40,9 +40,9 @@ class HiCMapControllerTests {
         private val hicMap = HiCMap(user, NAME, "description",
             id = ID, creationTime = Timestamp(System.currentTimeMillis()))
 
-        private lateinit var hicController: HiCMapController
+        private lateinit var hicController: ContactMapController
         private lateinit var hicService: HiCMapService
-        private lateinit var creationValidator: HiCMapCreationFormValidator
+        private lateinit var creationValidator: ContactMapCreationFormValidator
 
         private val TEMP_PATH = Files.createTempDirectory("hic_controller_tests")
 
@@ -68,8 +68,8 @@ class HiCMapControllerTests {
         @BeforeAll
         fun init() {
             hicService = mock<HiCMapService>()
-            creationValidator = mock<HiCMapCreationFormValidator>()
-            hicController = HiCMapController(hicService, creationValidator)
+            creationValidator = mock<ContactMapCreationFormValidator>()
+            hicController = ContactMapController(hicService, creationValidator)
 
             setCorrectRequestUserInfo()
         }

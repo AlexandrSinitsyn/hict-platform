@@ -3,6 +3,7 @@ version: '3.9'
 x-envs: &env
   env_file:
     - .env
+    - hict-admin.env
 
 networks:
   global:
@@ -22,6 +23,8 @@ networks:
     driver: bridge
 
 volumes:
+  hict-local-files:
+    name: 'hict-local-files'
   hict-postgres-data:
     name: 'hict-postgres-data'
   hict-s3-data:
@@ -41,8 +44,6 @@ services:
       dockerfile: Dockerfile
       args:
         PROJECT_VERSION: '${PROJECT_VERSION}'
-        AUTH_HOST: '${APP_HOST}:${APP_PORT}/auth'
-        SERVER_HOST: '${APP_HOST}:${APP_PORT}/server'
         NGINX_VERSION: '${NGINX_VERSION}'
     restart: always
     <<: *env
@@ -121,6 +122,7 @@ services:
       context: backend
       dockerfile: server/Dockerfile
     restart: on-failure
+    user: root
     <<: *env
     expose:
       - '8080'
@@ -136,6 +138,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+    volumes:
+      - hict-local-files:${SERVER_LOCAL_STORAGE_PATH}
     depends_on:
       postgres:
         condition: service_healthy

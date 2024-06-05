@@ -1,134 +1,74 @@
 package ru.itmo.hict.server.controller
 
 import jakarta.validation.Valid
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
-import org.springframework.validation.DirectFieldBindingResult
 import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
-import ru.itmo.hict.entity.Role
-import ru.itmo.hict.entity.User
-import ru.itmo.hict.server.config.RequestUserInfo
-import ru.itmo.hict.server.exception.ValidationException
+import ru.itmo.hict.dto.UserInfoDto
+import ru.itmo.hict.dto.UserInfoDto.Companion.toInfoDto
+import ru.itmo.hict.server.exception.NotConfirmedException
+import ru.itmo.hict.server.exception.SamePasswordException
+import ru.itmo.hict.server.exception.ValidationException.Companion.alert
 import ru.itmo.hict.server.form.*
-import ru.itmo.hict.server.form.UserExtendedInfo.Companion.toExtendedInfo
 import ru.itmo.hict.server.service.UserService
 import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 
 @RestController
 @RequestMapping("/api/v1/users")
+@CrossOrigin
 class UserController(
     private val userService: UserService,
     private val updateUserInfoFormValidator: UpdateUserInfoFormValidator,
 ) : ApiExceptionController() {
-    @Autowired
-    private lateinit var requestUserInfo: RequestUserInfo
-
     @InitBinder("updateUserInfoForm")
     fun initPublishBinder(webDataBinder: WebDataBinder) {
         webDataBinder.addValidators(updateUserInfoFormValidator)
     }
 
+    private fun notSame(field: String, bindingResult: BindingResult): Unit =
+        bindingResult.reject("same-$field", "New $field should be different")
+
     @GetMapping("/count")
     fun count(): ResponseEntity<Long> = userService.count().run { ResponseEntity.ok(this) }
 
-    private fun authorized(bindingResult: BindingResult): User {
-        requestUserInfo.user?.let { return it }
-
-        bindingResult.reject("not-authorized", "You must be authorized to update your profile")
-        throw ValidationException(bindingResult)
-    }
-
     @GetMapping("/self")
-    fun self(): ResponseEntity<UserExtendedInfo> =
-        authorized(DirectFieldBindingResult(this, "jwt")).run { ResponseEntity.ok(this.toExtendedInfo()) }
+    fun self(): ResponseEntity<UserInfoDto> = authorized { this }.toInfoDto().response()
 
     @GetMapping("/all")
-    fun all(): ResponseEntity<List<UserExtendedInfo>> =
-        authorized(DirectFieldBindingResult(this, "jwt")).run {
-            ResponseEntity.ok(userService.getAll().map { it.toExtendedInfo() })
-        }
-
-    private fun notSame(field: String, bindingResult: BindingResult, test: () -> Boolean) {
-        if (!test()) {
-            bindingResult.reject("same-$field", "New $field should be different")
-            throw ValidationException(bindingResult)
-        }
-    }
-
-    private fun checkNoErrors(bindingResult: BindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw ValidationException(bindingResult)
-        }
-    }
+    fun all(): ResponseEntity<List<UserInfoDto>> = authorized { userService.getAll().map { it.toInfoDto() } }.response()
 
     @PatchMapping("/update/info")
     fun updateInfo(@RequestBody @Valid updateUserInfoForm: UpdateUserInfoForm,
-                   bindingResult: BindingResult): ResponseEntity<Boolean> {
-        checkNoErrors(bindingResult)
-
-        val user = authorized(bindingResult)
-
-        updateUserInfoForm.username?.let {
-            notSame("username", bindingResult) { user.username != it }
-
-            userService.updateUsername(user, it)
-        }
-
-        updateUserInfoForm.login?.let {
-            notSame("login", bindingResult) { user.login != it }
-
-            userService.updateLogin(user, it)
-        }
-
-        updateUserInfoForm.email?.let {
-            notSame("email", bindingResult) { user.email != it }
-
-            userService.updateEmail(user, it)
-        }
-
-        return ResponseEntity.ok(true)
-    }
-
-    @PatchMapping("/update/role")
-    fun updateRole(@RequestBody @Valid form: UpdateRoleForm,
-                   bindingResult: BindingResult): ResponseEntity<Boolean> {
-        val user = authorized(bindingResult)
-
-        val acceptor = userService.getById(form.id)
-
+                   bindingResult: BindingResult): ResponseEntity<Boolean> = authorized {
         when {
-            user.role < Role.ADMIN ->
-                bindingResult.reject("not-admin", "You must have an admin role to do this")
-            acceptor == null -> bindingResult.reject("no-user-found",
-                "No user found with provided ID=${form.id}")
-            user.role <= acceptor.role ->
-                bindingResult.reject("too-low-grade", "You must have a higher grade to do this")
+            this.username == updateUserInfoForm.username -> notSame("username", bindingResult)
+            this.login == updateUserInfoForm.login -> notSame("login", bindingResult)
+            this.email == updateUserInfoForm.email -> notSame("email", bindingResult)
         }
 
-        checkNoErrors(bindingResult)
+        bindingResult.alert()
 
-        userService.updateRole(acceptor!!, form.newRole)
-
-        return ResponseEntity.ok(true)
-    }
+        updateUserInfoForm.let {
+            userService.updateUsername(this, it.username!!)
+            userService.updateLogin(this, it.login!!)
+            userService.updateEmail(this, it.email!!)
+        }
+    }.success()
 
     @PatchMapping("/update/password")
     fun updatePassword(@RequestBody @Valid form: UpdatePasswordForm,
-                       bindingResult: BindingResult): ResponseEntity<Boolean> {
-        val user = authorized(bindingResult)
-
-        if (!userService.checkCredentials(user, form.oldPassword)) {
-            bindingResult.reject("invalid-password",
-                "You must confirm this action with a password")
+                       bindingResult: BindingResult): ResponseEntity<Boolean> = authorized {
+        if (!userService.checkCredentials(this, form.oldPassword)) {
+            throw NotConfirmedException()
         }
 
-        notSame("password", bindingResult) { form.oldPassword != form.newPassword }
+        if (form.oldPassword == form.newPassword) {
+            throw SamePasswordException()
+        }
 
-        checkNoErrors(bindingResult)
+        bindingResult.alert()
 
-        return userService.updatePassword(user, form.oldPassword, form.newPassword)
-            .run { ResponseEntity.ok(this) }
-    }
+        userService.updatePassword(this, form.oldPassword, form.newPassword)
+    }.response()
 }

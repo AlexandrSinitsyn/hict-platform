@@ -3,6 +3,7 @@ package ru.itmo.hict.server.service
 import com.google.protobuf.Empty
 import io.grpc.stub.StreamObserver
 import net.devh.boot.grpc.client.inject.GrpcClient
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.proto.user.ContainerControllerGrpc
@@ -30,11 +31,12 @@ class GrpcContainerService(
         }
     }
 
+    @Async
     fun publish(user: User) = containerController.create(userId {
-        id = user.id!!
+        uuid = user.id!!.toString()
     }, ackReceiver)
 
     fun ping(user: User) = containerController.ping(userId {
-        id = user.id!!
+        uuid = user.id!!.toString()
     }, ackReceiver)
 }

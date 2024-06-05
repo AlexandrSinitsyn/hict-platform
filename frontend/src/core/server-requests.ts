@@ -1,27 +1,31 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
-import { AUTH, notify, SERVER } from '@/core/config';
-import type {
-    HiCMap,
-    Jwt,
-    LoginForm,
-    RegisterForm,
-    UpdateUserInfo,
-    UpdateUserPassword,
-    UpdateUserRole,
-    User,
-} from '@types';
-import { getJwt } from '@/core/authentication';
+import { notify } from '@/core/config';
+import {type Experiment, type Jwt} from '@types';
+
+const JWT_STORAGE_KEY = 'JWT_STORAGE_KEY';
+
+export function getJwt(): Jwt | undefined {
+    return localStorage.getItem(JWT_STORAGE_KEY) ?? undefined;
+}
+
+export function saveJwt(jwt: Jwt) {
+    localStorage.setItem(JWT_STORAGE_KEY, jwt);
+}
+
+export function forgetJwt() {
+    localStorage.removeItem(JWT_STORAGE_KEY);
+}
 
 export type SuccessCallback<E> = (e: E) => void;
 
-function handler<T>(onSuccess: SuccessCallback<T>): (response: AxiosResponse<T>) => void {
+export function handler<T>(onSuccess: SuccessCallback<T>): (response: AxiosResponse<T>) => void {
     return (response) => {
         const { data } = response;
         onSuccess(data);
     };
 }
 
-const errorHandler = (error: AxiosError) => {
+export const errorHandler = (error: AxiosError) => {
     if (error.response) {
         const { data, status } = error.response;
         notify('error', `Error [${status}]:\n${data}`);
@@ -30,34 +34,7 @@ const errorHandler = (error: AxiosError) => {
     }
 };
 
-export function authLogin(form: LoginForm, onSuccess: SuccessCallback<Jwt>): void {
-    axios
-        .post<LoginForm, AxiosResponse<Jwt>>(`${AUTH}/auth/login`, form)
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-export function authRegister(form: RegisterForm, onSuccess: SuccessCallback<Jwt>): void {
-    axios
-        .post<RegisterForm, AxiosResponse<Jwt>>(`${AUTH}/auth/register`, form)
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-export function requestUser(jwt: Jwt, onSuccess: SuccessCallback<User | undefined>): void {
-    axios
-        .get<never, AxiosResponse<User>>(`${SERVER}/users/self`, {
-            headers: { Authorization: `Bearer ${jwt}` },
-        })
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-export function getAllHiCMaps(onSuccess: SuccessCallback<HiCMap[]>): void {
-    authorizedGetRequest(`${SERVER}/hi-c/all`, onSuccess);
-}
-
-function authorizedRequest<T, R>(
+export function authorizedRequest<T, R>(
     method: typeof axios.post,
     url: string,
     data: T,
@@ -79,7 +56,7 @@ function authorizedRequest<T, R>(
         .catch(errorHandler);
 }
 
-function authorizedGetRequest<R>(url: string, onSuccess: SuccessCallback<R>): void {
+export function authorizedGetRequest<R>(url: string, onSuccess: SuccessCallback<R>): void {
     const jwt = getJwt();
 
     if (!jwt) {
@@ -97,26 +74,7 @@ function authorizedGetRequest<R>(url: string, onSuccess: SuccessCallback<R>): vo
         .catch(errorHandler);
 }
 
-export function publishHiCMap(formData: FormData, onSuccess: SuccessCallback<HiCMap>): void {
-    const jwt = getJwt();
-
-    if (!jwt) {
-        notify('error', 'Not authorized');
-        return;
-    }
-
-    axios
-        .post<FormData, AxiosResponse<HiCMap>>(`${SERVER}/hi-c/publish`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${jwt}`,
-            },
-        })
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-const updateNotify: SuccessCallback<boolean> = (updated) => {
+export const updateNotify: SuccessCallback<boolean> = (updated) => {
     if (updated) {
         notify('info', `Successfully updated`);
     } else {
@@ -124,33 +82,5 @@ const updateNotify: SuccessCallback<boolean> = (updated) => {
     }
 };
 
-export function updateUserInfo(form: UpdateUserInfo): void {
-    authorizedRequest(axios.patch, `${SERVER}/users/update/info`, form, updateNotify);
-}
-
-export function updateUserPassword(form: UpdateUserPassword): void {
-    authorizedRequest(axios.patch, `${SERVER}/users/update/password`, form, updateNotify);
-}
-
-export function updateUserRole(form: UpdateUserRole): void {
-    authorizedRequest(axios.patch, `${SERVER}/users/update/role`, form, updateNotify);
-}
-
-export function getAllUsers(onSuccess: SuccessCallback<User[]>): void {
-    authorizedGetRequest(`${SERVER}/users/all`, onSuccess);
-}
-
-export function getUsersCount(onSuccess: SuccessCallback<number>): void {
-    axios
-        .get<never, AxiosResponse<number>>(`${SERVER}/users/count`)
-        .then(handler(onSuccess))
-        .catch(errorHandler);
-}
-
-export function acquireHiCMap(id: string, onSuccess: SuccessCallback<HiCMap>): void {
-    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}`, onSuccess);
-}
-
-export function pingHiCMap(id: string): void {
-    authorizedGetRequest(`${SERVER}/hi-c/acquire/${id}/ping`, () => {});
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const nop: SuccessCallback<never> = () => {};

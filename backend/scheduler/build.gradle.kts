@@ -26,7 +26,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
-    implementation(project(":entity"))
     implementation(project(":proto"))
     implementation("net.devh:grpc-server-spring-boot-starter:2.14.0.RELEASE")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

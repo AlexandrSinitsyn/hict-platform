@@ -7,6 +7,11 @@ grpc:
       negotiation-type: plaintext
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 8MB
+      max-request-size: 8MB
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema="public"&useUnicode=true&characterSetResults=UTF-8&characterEncoding=UTF-8&serverTimezone=Europe/Moscow
     username: ${POSTGRES_USER}
@@ -22,7 +27,7 @@ spring:
         use_sql_comments: true
         format_sql: true
 
-minio:
+s3:
   url: http://${MINIO_HOST}:9000
   access:
     key: ${MINIO_ROOT_USER}

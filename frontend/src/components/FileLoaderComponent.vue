@@ -1,27 +1,26 @@
 <template>
     <div>
-        <label for="fileLoader"
-            >Drag and drop here one of [{{
-                props.extensions.map((e) => `*.${e}`).join(', ')
-            }}]</label
-        >
-        <br />
         <input
             id="fileLoader"
             type="file"
-            class="file-loader"
+            :class="'file-loader ' + type"
             required
             @change="fileLoaded($event)"
         />
+        <label for="fileLoader">
+            Drag and drop here one of [{{ props.extensions.map((e) => `*.${e}`).join(', ') }}]
+        </label>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, type Ref } from 'vue';
 import { notify } from '@/core/config';
+import { FileType } from '@types';
 
 const props = defineProps<{
     extensions: string[];
+    type: keyof typeof FileType;
 }>();
 
 const emit = defineEmits<{
@@ -43,12 +42,7 @@ function fileLoaded(e: Event) {
         return;
     }
 
-    const ext = (() => {
-        const tmp = file.name.split(/\./);
-        return tmp[tmp.length - 1];
-    })();
-
-    if (!props.extensions.includes(ext)) {
+    if (!props.extensions?.find((ext) => file.name.endsWith(ext))) {
         notify('error', `Unsupported file type for "${file.name}"`);
         return;
     }
@@ -61,13 +55,4 @@ function fileLoaded(e: Event) {
 }
 </script>
 
-<style scoped lang="scss">
-@import 'public/css/main';
-
-.file-loader {
-    padding: 3rem;
-    text-align: center;
-    border: 2px dashed $border-color;
-    background-color: opacity($border-color, 0.3);
-}
-</style>
+<style scoped lang="scss"></style>
