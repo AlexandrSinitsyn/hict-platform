@@ -13,7 +13,7 @@ class JwtService(
 ) {
     fun create(user: User): Jwt {
         return JWT.create()
-            .withClaim(USER_ID_CLAIM, user.id)
+            .withClaim(USER_ID_CLAIM, user.id.toString())
             .sign(algorithm)
     }
 }

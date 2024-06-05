@@ -6,14 +6,10 @@
                 v-for="f in files"
                 :key="f.name"
                 :file="f"
-                :type="FileType[filetype]"
+                :type="type"
                 :wrap="wrap"
             />
-            <FileLoaderComponent
-                :extensions="[filetype.toLowerCase()]"
-                :type="FileType[filetype]"
-                @loaded="doUpload"
-            />
+            <FileLoaderComponent :extensions="[FileType[type]]" :type="type" @loaded="doUpload" />
         </div>
     </div>
 </template>
@@ -22,22 +18,20 @@
 import AttachedFileInfo from '@/components/AttachedFileInfo.vue';
 import FileLoaderComponent from '@/components/FileLoaderComponent.vue';
 import { type File as AttachedFile, FileType } from '@types';
-import { uploadFile } from '@/core/server-requests';
+import { uploadFile } from '@/core/files-requests';
 
 const props = defineProps<{
     files: AttachedFile[];
-    type: string;
+    type: keyof typeof FileType;
     wrap: boolean;
 }>();
 
 const emit = defineEmits<{
-    (e: 'upload', file: File): void;
+    (e: 'upload', file: AttachedFile): void;
 }>();
 
-const filetype = props.type?.trim().replace('-', '');
-
 function doUpload(f: File): void {
-    uploadFile(f, FileType[filetype], (attached: AttachedFile) => {
+    uploadFile(f, props.type, (attached: AttachedFile) => {
         emit('upload', attached);
     });
 }

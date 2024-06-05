@@ -158,7 +158,7 @@
   border-radius: $border-radius;
 }
 
-@each $file-type, $type-color in ['FASTA', $danger], ['AGP', $info], ['HIC', $success],
+@each $file-type, $type-color in ['FASTA', $danger], ['AGP', $info], ['HICT', $success],
 ['MCOOL', $purple], ['TRACKS', $warning] {
   .#{$file-type} {
     $bg: opacity($type-color, 0.2);

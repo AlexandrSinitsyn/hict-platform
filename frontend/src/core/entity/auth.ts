@@ -12,3 +12,7 @@ export interface RegisterForm {
     email: string;
     password: string;
 }
+
+export interface GroupCreationForm {
+    name: string;
+}

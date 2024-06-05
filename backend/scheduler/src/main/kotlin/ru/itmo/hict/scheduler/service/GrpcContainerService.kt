@@ -19,7 +19,7 @@ class GrpcContainerService (
     override fun create(request: UserId, responseObserver: StreamObserver<Empty>) = runBlocking {
         logger.info("grpc", "create", "$request")
 
-        val id = "u${request.id}"
+        val id = request.uuid
 
         containerMonitor.register(id)
 
@@ -39,7 +39,7 @@ class GrpcContainerService (
     override fun ping(request: UserId, responseObserver: StreamObserver<Empty>) = runBlocking {
         logger.info("grpc", "ping", "$request")
 
-        containerMonitor.extend("u${request.id}")
+        containerMonitor.extend(request.uuid)
 
         responseObserver.onNext(empty {})
 

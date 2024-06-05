@@ -5,7 +5,7 @@
 
 create table tags
 (
-    tag_id        bigint                   not null generated always as identity,
+    tag_id        uuid                     not null default gen_random_uuid(),
     tag_name      varchar(32)              not null,
     creation_time timestamp with time zone not null default now(),
     primary key (tag_id),
@@ -18,8 +18,8 @@ create unique index tags_by_name on tags using btree (tag_name, tag_id);
 
 create table contact_map_tags
 (
-    contact_map_id bigint not null,
-    tag_id         bigint not null,
+    contact_map_id uuid not null,
+    tag_id         uuid not null,
     primary key (contact_map_id, tag_id),
     unique (contact_map_id, tag_id),
     foreign key (contact_map_id) references contact_maps (contact_map_id),

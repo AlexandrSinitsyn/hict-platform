@@ -10,32 +10,35 @@
 
         <div class="experiments">
             <div v-for="e in experiments" :key="e.name">
-                {{ e.name }}
-
-                <div v-for="cm in e.contactMaps" :key="cm.name" @click="selectMap(cm)">
-                    {{ cm.name }}
+                <div @click="selectedExperiment = e" class="view-experiment">
+                    [Experiment] {{ e.name }}
                 </div>
-                <div v-for="a in e.assemblies" :key="a.name">
-                    {{ a.name }}
+                <div
+                    v-for="cm in e.contactMaps"
+                    :key="cm.name"
+                    @click="selectMap(cm)"
+                    class="view-contact-map"
+                    style="margin-left: 2rem"
+                >
+                    [Contact map] {{ cm.name }}
+                </div>
+                <div v-for="a in e.assemblies" :key="a.name" class="view-assembly">
+                    [Assembly] {{ a.name }}
                 </div>
             </div>
         </div>
     </div>
-    <NewExperimentView v-if="selectedExperiment" :selected="selectedExperiment" :user="user" />
+    <NewExperimentView v-if="selectedExperiment" :selected="selectedExperiment" />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue';
-import type {ContactMap, Experiment} from '@types';
-import { getAllExperiments, publishExperiment } from '@/core/server-requests';
+import type { ContactMap, Experiment } from '@types';
+import { getAllExperiments, publishExperiment } from '@/core/experiment-requests';
 import NewExperimentView from '@/view/NewExperimentView.vue';
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '@/stores/auth-store';
 import router from '@/router';
 
 const experiments: Ref<Experiment[]> = ref([]);
-
-const { user } = storeToRefs(useAuthStore());
 const selectedExperiment: Ref<Experiment | undefined> = ref(undefined);
 
 onMounted(() => {
@@ -45,13 +48,7 @@ onMounted(() => {
 });
 
 function newExperiment() {
-    const author = user.value;
-
-    if (!author) {
-        return;
-    }
-
-    publishExperiment(author, (experiment: Experiment) => {
+    publishExperiment((experiment: Experiment) => {
         selectedExperiment.value = experiment;
     });
 }
@@ -60,7 +57,7 @@ function selectMap(map: ContactMap): void {
     router.push({
         name: 'view',
         params: {
-            hiCMapName: map.name,
+            contactMapName: map.name,
         },
     });
 }
@@ -73,6 +70,18 @@ function selectMap(map: ContactMap): void {
     padding: 1rem;
     border: 1px solid $border-color;
     border-radius: $border-radius;
+
+    @each $type, $color in ['view-experiment', $danger], ['view-contact-map', $success], ['view-assembly', $info] {
+        .#{$type} {
+            padding: 0.5rem;
+            color: $color;
+            font-weight: bolder;
+
+            &:hover {
+                background-color: opacity($color, 0.2);
+            }
+        }
+    }
 }
 
 .experiments-filter {

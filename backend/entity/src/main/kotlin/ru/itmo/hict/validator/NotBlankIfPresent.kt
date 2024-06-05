@@ -1,4 +1,4 @@
-package ru.itmo.hict.server.validator
+package ru.itmo.hict.validator
 
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator

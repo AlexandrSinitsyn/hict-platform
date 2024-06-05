@@ -5,29 +5,24 @@
 
 create table species
 (
-    species_id   bigint       not null generated always as identity,
     tax_id       varchar(100) not null,
     species_name varchar(100) not null,
-    primary key (species_id),
-    unique (species_id),
+    primary key (tax_id),
     unique (tax_id),
     unique (species_name)
 );
-
-create index species_by_id on species using hash (species_id);
-create index species_by_tax_id on species using hash (tax_id);
-create unique index species_by_name on species using btree (species_name, species_id);
+create unique index species_by_tax_id on species using btree (tax_id, species_name);
+create unique index species_by_name on species using btree (species_name, tax_id);
 
 create table biosamples
 (
-    biosample_id  bigint                   not null generated always as identity,
-    species_id    bigint                   not null,
+    biosample_id  uuid                     not null default gen_random_uuid(),
+    tax_id        varchar(100)             not null,
     description   text                     not null,
     creation_time timestamp with time zone not null default now(),
     primary key (biosample_id),
     unique (biosample_id),
-    unique (species_id),
-    foreign key (species_id) references species (species_id)
+    foreign key (tax_id) references species (tax_id)
 );
 
 create index biosamples_by_id on biosamples using hash (biosample_id);

@@ -3,6 +3,7 @@ version: '3.9'
 x-envs: &env
   env_file:
     - .env
+    - hict-admin.env
 
 networks:
   loki:

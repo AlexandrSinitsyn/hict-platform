@@ -6,22 +6,22 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
 import java.sql.Timestamp
+import java.util.UUID
 
 @Entity
 @Table(
     name = "species",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["species_id"]),
         UniqueConstraint(columnNames = ["tax_id"]),
         UniqueConstraint(columnNames = ["species_name"]),
     ],
     indexes = [
-        Index(name = "species_by_id", columnList = "species_id", unique = true),
-        Index(name = "species_by_tax_id", columnList = "tax_id", unique = true),
-        Index(name = "species_by_name", columnList = "species_name,species_id", unique = true),
+        Index(name = "species_by_tax_id", columnList = "tax_id,species_name", unique = true),
+        Index(name = "species_by_name", columnList = "species_name,tax_id", unique = true),
     ],
 )
 class Species(
+    @Id
     @NotNull
     @NotBlank
     @Size(max = 100)
@@ -33,12 +33,6 @@ class Species(
     @Size(max = 100)
     @Column(name = "species_name", unique = true, nullable = false)
     val speciesName: String,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "species_id", unique = true, nullable = false)
-    val id: Long? = null,
 )
 
 @Entity
@@ -46,7 +40,6 @@ class Species(
     name = "biosamples",
     uniqueConstraints = [
         UniqueConstraint(columnNames = ["biosample_id"]),
-        UniqueConstraint(columnNames = ["species_id"]),
     ],
     indexes = [
         Index(name = "biosamples_by_id", columnList = "biosample_id", unique = true),
@@ -54,8 +47,13 @@ class Species(
 )
 class Biosample(
     @NotNull
-    @Column(name = "species_id", unique = true, nullable = false)
-    val speciesId: Long,
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "tax_id",
+        referencedColumnName = "tax_id",
+        nullable = false
+    )
+    val species: Species,
 
     @NotNull
     @NotBlank
@@ -66,10 +64,10 @@ class Biosample(
     val description: String,
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
-    @Column(name = "species_id", unique = true, nullable = false)
-    val id: Long? = null,
+    @Column(name = "biosample_id", unique = true, nullable = false)
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
 import java.sql.Timestamp
+import java.util.UUID
 
 @Entity
 @Table(
@@ -44,12 +45,9 @@ class User(
 
     @NotNull
     @NotBlank
+    @Size(min = 3, max = 64)
     @Column(name = "password", nullable = false)
     val password: String,
-
-    @Nullable
-    @Column(name = "visualization_settings_id", nullable = true)
-    val visualizationSettings: Long? = null,
 
     @NotNull
     @ManyToMany(
@@ -59,11 +57,15 @@ class User(
     )
     val groups: List<Group> = listOf(),
 
+    @Nullable
+    @Column(name = "visualization_settings_id", nullable = true)
+    val visualizationSettings: UUID? = null,
+
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "user_id", nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp
@@ -94,7 +96,6 @@ class Group(
     @ManyToMany(
         fetch = FetchType.LAZY,
         cascade = [CascadeType.DETACH],
-        mappedBy = "groups",
     )
     @JoinTable(
         name = "user_groups",
@@ -116,10 +117,16 @@ class Group(
     val users: List<User> = listOf(),
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotBlank
+    @Size(min = 3, max = 256)
+    @Column(name = "affiliation", nullable = true)
+    val affiliation: String? = null,
+
+    @NotNull
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "group_id", nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
 
     @NotNull
     @CreationTimestamp

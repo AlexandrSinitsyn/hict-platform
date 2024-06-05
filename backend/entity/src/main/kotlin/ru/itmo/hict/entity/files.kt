@@ -6,13 +6,18 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.CreationTimestamp
-import java.io.Serializable
+import ru.itmo.hict.validator.NotBlankIfPresent
 import java.sql.Timestamp
+import java.util.UUID
 
 enum class SequenceLevelType {
     CONTIG,
     SCAFFOLD,
     CHROMOSOME,
+}
+
+sealed interface AttachedFile {
+    val file: File
 }
 
 @Entity
@@ -24,8 +29,7 @@ enum class SequenceLevelType {
     indexes = [
         Index(name = "file_by_id", columnList = "file_id", unique = true),
         Index(name = "file_by_filename", columnList = "filename,file_id", unique = true),
-        Index(name = "file_by_group", columnList = "sequence_level,file_id", unique = true),
-        Index(name = "file_by_sequence_level", columnList = "visibility_group,file_id", unique = true),
+        Index(name = "file_by_sequence_level", columnList = "sequence_level,file_id", unique = true),
     ],
 )
 class File(
@@ -37,52 +41,45 @@ class File(
 
     @NotNull
     @NotBlank
-    @Column(name = "sequence_level", nullable = false)
+    @Column(name = "sequence_level", columnDefinition = "VARCHAR", nullable = false)
+    @Enumerated(EnumType.STRING)
     val sequenceLevel: SequenceLevelType,
 
     @NotNull
     @NotBlank
     @Column(name = "file_size", nullable = false)
-    val fileSize: String,
+    val fileSize: Long,
 
     @NotNull
-    @Column(name = "public", nullable = false)
-    val public: Boolean = false,
-
-    @Nullable
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
-    @JoinColumn(
-        name = "visibility_group",
-        nullable = true,
-    )
-    val visibilityGroup: Group? = null,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
     @Column(name = "file_id", nullable = false)
-    val id: Long? = null,
+    val id: UUID? = null,
+
+    @NotNull
+    @CreationTimestamp
+    @Column(name = "creation_time", nullable = false)
+    val creationTime: Timestamp? = null,
 )
 
 @Entity
 @Table(
     name = "files_hict",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["hict_id"]),
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_hict_by_id", columnList = "hict_id", unique = true),
+        Index(name = "files_hict_by_id", columnList = "file_id", unique = true),
     ],
 )
-class HiCTFile(
+class HictFile(
     @NotNull
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
+    override val file: File,
 
     @Nullable
     @Column(name = "min_resolutions", nullable = true)
@@ -93,60 +90,30 @@ class HiCTFile(
     val maxResolutions: Long? = null,
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "hict_id", nullable = false)
-    val id: Long? = null,
-)
-
-@Entity
-@Table(
-    name = "files_tracks",
-    uniqueConstraints = [
-        UniqueConstraint(columnNames = ["tracks_id"]),
-        UniqueConstraint(columnNames = ["file_id"]),
-    ],
-    indexes = [
-        Index(name = "files_tracks_by_id", columnList = "tracks_id", unique = true),
-    ],
-)
-class TracksFile(
-    @NotNull
-    @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
-    @JoinColumn(
-        name = "file_id",
-        nullable = false,
-    )
-    val file: File,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "tracks_id", nullable = false)
-    val id: Long? = null,
-)
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: UUID = file.id!!,
+) : AttachedFile
 
 @Entity
 @Table(
     name = "files_mcool",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["mcool_id"]),
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_mcool_by_id", columnList = "mcool_id", unique = true),
+        Index(name = "files_mcool_by_id", columnList = "file_id", unique = true),
     ],
 )
 class McoolFile(
     @NotNull
     @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
+    override val file: File,
 
     @Nullable
     @Column(name = "min_resolutions", nullable = true)
@@ -157,72 +124,133 @@ class McoolFile(
     val maxResolutions: Long? = null,
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "mcool_id", nullable = false)
-    val id: Long? = null,
-)
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: UUID = file.id!!,
+) : AttachedFile
 
 @Entity
 @Table(
     name = "files_agp",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["agp_id"]),
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_agp_by_id", columnList = "agp_id", unique = true),
+        Index(name = "files_agp_by_id", columnList = "file_id", unique = true),
     ],
 )
 class AgpFile(
     @NotNull
     @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
+    override val file: File,
 
     @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "agp_id", nullable = false)
-    val id: Long? = null,
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: UUID = file.id!!,
+) : AttachedFile
+
+@Entity
+@Table(
+    name = "files_tracks",
+    uniqueConstraints = [
+        UniqueConstraint(columnNames = ["file_id"]),
+    ],
+    indexes = [
+        Index(name = "files_tracks_by_id", columnList = "file_id", unique = true),
+    ],
+)
+class TracksFile(
+    @NotNull
+    @NotBlank
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(
+        name = "file_id",
+        nullable = false,
+    )
+    override val file: File,
+
+    @Nullable
+    @NotBlankIfPresent
+    @Size(min = 3, max = 100)
+    @Column(name = "data_source", nullable = true)
+    val dataSource: String? = null,
+
+    @Nullable
+    @NotBlankIfPresent
+    @Size(max = 65536)
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "description", columnDefinition = "TEXT", nullable = true)
+    val description: String? = null,
+
+    @Nullable
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "tracks_type_id",
+        nullable = true,
+    )
+    val tracksTypes: TracksTypes? = null,
+
+    @NotNull
+    @Id
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: UUID = file.id!!,
+) : AttachedFile
+
+@Entity
+@Table(
+    name = "tracks_types",
+    uniqueConstraints = [
+        UniqueConstraint(columnNames = ["tracks_type_id"]),
+        UniqueConstraint(columnNames = ["tracks_type_name"]),
+    ],
+    indexes = [
+        Index(name = "tracks_types_by_id", columnList = "tracks_type_id", unique = true),
+        Index(name = "tracks_types_by_name", columnList = "tracks_type_name,tracks_type_id", unique = true),
+    ],
+)
+class TracksTypes(
+    @NotNull
+    @NotBlank
+    @Size(min = 3, max = 100)
+    @Column(name = "tracks_type_name", nullable = false)
+    val name: String,
+
+    @NotNull
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Id
+    @Column(name = "tracks_type_id", nullable = false)
+    val id: UUID? = null,
 )
 
 @Entity
 @Table(
     name = "files_fasta",
     uniqueConstraints = [
-        UniqueConstraint(columnNames = ["fasta_id"]),
         UniqueConstraint(columnNames = ["file_id"]),
     ],
     indexes = [
-        Index(name = "files_fasta_by_id", columnList = "fasta_id", unique = true),
+        Index(name = "files_fasta_by_id", columnList = "file_id", unique = true),
     ],
 )
 class FastaFile(
     @NotNull
     @NotBlank
-    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "file_id",
         nullable = false,
     )
-    val file: File,
+    override val file: File,
 
     @NotNull
-    @Column(name = "draft", nullable = false)
-    val draft: Boolean,
-
-    @NotNull
-    @Column(name = "scaffolded", nullable = false)
-    val scaffolded: Boolean,
-
-    @NotNull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "fasta_id", nullable = false)
-    val id: Long? = null,
-)
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private val fileId: UUID = file.id!!,
+) : AttachedFile

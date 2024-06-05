@@ -15,5 +15,5 @@ service ContainerController {
 }
 
 message UserId {
-    int64 id = 1;
+     string uuid = 1;
 }

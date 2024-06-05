@@ -1,7 +1,7 @@
 import type { User } from '@/core/entity/user';
 
 export interface Experiment {
-    id: number;
+    id: string;
     name: string;
     author: User;
     description: string | undefined;
@@ -14,11 +14,11 @@ export interface Experiment {
 }
 
 export interface ContactMap {
-    id: number;
+    id: string;
     name: string;
-    description: string;
-    link: string;
-    hic: File;
+    description: string | undefined;
+    link: string | undefined;
+    hict: File | undefined;
     agp: File[];
     mcool: File | undefined;
     tracks: File[];
@@ -33,18 +33,30 @@ export interface Assembly {
 }
 
 export enum FileType {
-    FASTA,
-    HIC,
-    MCOOL,
-    AGP,
-    TRACKS,
+    FASTA = 'fasta',
+    HICT = 'hict.hdf5',
+    MCOOL = 'mcool',
+    AGP = 'agp',
+    TRACKS = 'bed',
 }
 
 export interface File {
+    id: string;
     name: string;
     filesize: number;
     sequenceLevel: string;
     creationTime: Date;
+}
+
+export interface FileUploadingStreamForm {
+    type: keyof typeof FileType;
+    filename: string;
+    fileSize: number;
+}
+
+export interface FileAttachmentForm {
+    fileId: string;
+    fileType: keyof typeof FileType;
 }
 
 export interface UpdateExperimentName {

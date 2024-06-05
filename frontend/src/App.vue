@@ -22,7 +22,7 @@ import { __VERSION__, __AUTHOR__ } from '@/core/config';
 import { onMounted, ref } from 'vue';
 import { getAuthorizedUser } from '@/core/authentication';
 import { useAuthStore } from '@/stores/auth-store';
-import { getUsersCount } from '@/core/server-requests';
+import { getUsersCount } from '@/core/user-account-requests';
 
 const authStore = useAuthStore();
 

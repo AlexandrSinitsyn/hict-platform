@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { type Ref, ref } from 'vue';
 import { notify } from '@/core/config';
-import { updateUserInfo, updateUserPassword } from '@/core/server-requests';
+import { updateUserInfo, updateUserPassword } from '@/core/user-account-requests';
 import { useAuthStore } from '@/stores/auth-store';
 import { storeToRefs } from 'pinia';
 
