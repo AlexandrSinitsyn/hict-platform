@@ -77,7 +77,7 @@ import {
     updateExperimentName,
 } from '@/core/experiment-requests';
 import { attachFastaToExperiment } from '@/core/files-requests';
-import {fileType} from "@/core/extensions";
+import { fileType } from '@/core/extensions';
 
 const props = defineProps<{
     selected: Experiment | undefined;

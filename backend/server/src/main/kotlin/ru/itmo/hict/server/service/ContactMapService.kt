@@ -1,5 +1,6 @@
 package ru.itmo.hict.server.service
 
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.ContactMap
@@ -25,6 +26,7 @@ class ContactMapService(
             contactMapRepository.save(ContactMap(UUID.randomUUID().toString(), this))
         }
 
+    @Async
     fun view(contactMap: ContactMap) = viewsRepository.viewById(contactMap.id!!)
 
     fun updateName(id: UUID, newName: String) {

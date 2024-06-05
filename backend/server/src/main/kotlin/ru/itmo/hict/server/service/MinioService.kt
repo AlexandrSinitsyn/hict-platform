@@ -78,6 +78,7 @@ class MinioService(
             .build()).map { it.get().objectName() }
     }
 
+    @Async
     fun upload(fileType: FileType, filename: String, filesize: Long, data: InputStream) =
         upload(fileType.bucket, FileObjectInfo(filename, filesize, data))
 }

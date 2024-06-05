@@ -14,7 +14,7 @@
         <nav>
             <ul>
                 <li v-for="p in pages" :key="p">
-                    <RouterLink :to="p.toLowerCase()">{{ p }}</RouterLink>
+                    <RouterLink :to="{ name: p.toLowerCase() }">{{ p }}</RouterLink>
                 </li>
             </ul>
         </nav>

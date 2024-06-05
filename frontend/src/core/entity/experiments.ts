@@ -48,6 +48,12 @@ export interface File {
     creationTime: Date;
 }
 
+export interface FileUploadingStreamForm {
+    type: keyof typeof FileType;
+    filename: string;
+    fileSize: number;
+}
+
 export interface FileAttachmentForm {
     fileId: string;
     fileType: keyof typeof FileType;

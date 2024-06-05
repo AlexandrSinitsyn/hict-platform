@@ -7,38 +7,38 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path: '/',
+            path: import.meta.env.BASE_URL + '/',
             name: 'index',
             component: HomeView,
         },
         {
-            path: '/home',
+            path: import.meta.env.BASE_URL + '/home',
             name: 'home',
             component: HomeView,
         },
         {
-            path: '/groups',
+            path: import.meta.env.BASE_URL + '/groups',
             name: 'groups',
             component: GroupsView,
         },
         {
-            path: '/experiments',
+            path: import.meta.env.BASE_URL + '/experiments',
             name: 'experiments',
             component: ExperimentsView,
         },
         {
-            path: '/view/:contactMapName',
+            path: import.meta.env.BASE_URL + '/view/:contactMapName',
             name: 'view',
             sensitive: true,
             component: () => import('@/view/ContactMapView.vue'),
         },
         {
-            path: '/account',
+            path: import.meta.env.BASE_URL + '/account',
             name: 'account',
             component: () => import('@/view/AccountView.vue'),
         },
         {
-            path: '/admin',
+            path: import.meta.env.BASE_URL + '/admin',
             name: 'admin',
             component: () => import('@/view/AdminView.vue'),
         },

@@ -8,7 +8,7 @@ export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), '');
 
     return defineConfig({
-        base: './',
+        base: '/',
         define: {
             'process.env': env,
         },
@@ -21,7 +21,7 @@ export default ({ mode }: { mode: string }) => {
             },
         },
         server: {
-            port: 80,
+            port: 82,
         },
         build: {
             sourcemap: false,

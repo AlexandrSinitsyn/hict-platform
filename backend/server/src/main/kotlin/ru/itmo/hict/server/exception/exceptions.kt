@@ -96,4 +96,8 @@ class EmptyLoadedFileException : LoadedFileException("File should not be empty")
 class InvalidFileTypeException(fileType: FileType)
     : LoadedFileException("Uploaded file with unexpected type `$fileType`")
 
-class LoadingFailedException(message: String) : LoadedFileException("Error while loading file: $message")
+open class LoadingFailedException(message: String) : LoadedFileException("Error while loading file: $message")
+
+class InvalidFileSessionException(session: UUID, partIndex: Long? = null)
+    : LoadingFailedException("session `$session` is invalid or has already expired"
+        + (partIndex?.let { "when part $it was loading" } ?: ""))
