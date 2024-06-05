@@ -5,17 +5,16 @@ import {
     authorizedRequest,
     errorHandler,
     getJwt,
-    handler,
     type SuccessCallback,
 } from '@/core/server-requests';
-import type { FileAttachmentForm } from '@/core/entity/experiments';
-import {fileType} from "@/core/extensions";
+import type { FileAttachmentForm, FileUploadingStreamForm } from '@/core/entity/experiments';
+import { fileType } from '@/core/extensions';
 
-export function uploadFile(
+export async function uploadFile(
     file: File,
     fileType: keyof typeof FileType,
     onSuccess: SuccessCallback<AttachedFile>
-): void {
+) {
     const jwt = getJwt();
 
     if (!jwt) {
@@ -23,28 +22,89 @@ export function uploadFile(
         return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append(
-        'type',
-        new Blob([JSON.stringify(fileType)], {
-            type: 'application/json',
-        })
-    );
+    const session = (
+        await axios.get<never, AxiosResponse<string>>(`${__SERVER_HOST__.value}/files/session/init`)
+    ).data;
 
-    axios
-        .post<FormData, AxiosResponse<AttachedFile>>(
-            `${__SERVER_HOST__.value}/files/publish`,
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${jwt}`,
-                },
-            }
-        )
-        .then(handler(onSuccess))
-        .catch(errorHandler);
+    // noinspection PointlessArithmeticExpressionJS
+    const $1mb = 1 * 1024 * 1024 - 1;
+
+    function append(formData: FormData, partName: string, value: string) {
+        formData.append(
+            partName,
+            new Blob([JSON.stringify(value)], {
+                type: 'application/json',
+            })
+        );
+    }
+
+    // async function convertToBase64Async(file: File): Promise<string | undefined> {
+    //     return new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.onload = () => resolve(reader.result?.toString()?.replace(/^data:(.*,)?/, ''));
+    //         reader.onerror = (error) => reject(error);
+    //         reader.readAsDataURL(file);
+    //     });
+    // }
+    //
+    // const base64 = await convertToBase64Async(file);
+    //
+    // if (!base64) {
+    //     notify('error', 'Invalid file was converted to a null base64!');
+    //     return;
+    // }
+
+    const fileSize = file.size;//base64.length;
+
+    const parts: Promise<void>[] = [];
+
+    let start = 0;
+    while (start < fileSize) {
+        const end = Math.min(start + $1mb, fileSize);
+
+        const formData = new FormData();
+
+        append(formData, 'session', session);
+
+        append(formData, 'partIndex', `${start}`);
+
+        // formData.append(
+        //     'file',
+        //     new Blob([base64.slice(start, end)], {
+        //         type: 'application/text',
+        //     })
+        // );
+        //
+        // console.log(start, '>', base64.slice(start, end));
+
+        formData.append(`file`, file.slice(start, end));
+
+        // parts.push(
+            await axios
+                .post<FormData, never>(`${__SERVER_HOST__.value}/files/publish`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                })
+                .catch(errorHandler)
+        // );
+        start = end;
+    }
+
+    // for (const p of parts) {
+    //     await p;
+    // }
+
+    authorizedRequest<FileUploadingStreamForm, AttachedFile>(
+        axios.post,
+        `${__SERVER_HOST__.value}/files/session/${session}/close`,
+        {
+            type: fileType,
+            filename: file.name,
+            fileSize: file.size,
+        },
+        onSuccess
+    );
 }
 
 function attachFileTo<T = Experiment | ContactMap>(
