@@ -3,6 +3,7 @@ version: '3.9'
 x-envs: &env
   env_file:
     - .env
+    - hict-admin.env
 
 networks:
   global:
@@ -121,6 +122,7 @@ services:
       context: backend
       dockerfile: server/Dockerfile
     restart: on-failure
+    user: root
     <<: *env
     expose:
       - '8080'

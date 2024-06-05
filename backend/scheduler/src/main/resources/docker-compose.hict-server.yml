@@ -20,8 +20,8 @@ services:
     restart: no
     expose:
       - '%3$s'
-    ports:
-      - '%4$s:%3$s'
+#    ports:
+#      - '7777:%3$s'
     networks:
       - hict-cluster-net
     volumes:
