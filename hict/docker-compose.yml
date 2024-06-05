@@ -1,0 +1,24 @@
+version: '3.9'
+
+name: hict-server-cluster
+
+networks:
+  hict-cluster-net:
+    name: 'hict-cluster-net'
+    driver: bridge
+    external: true
+
+services:
+  hict-service-test:
+    container_name: 'hict-service-test'
+    image: hict/hict-service:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        HICT_SERVER_PORT: '${HICT_SERVER_PORT}'
+    ports:
+      - '5000:5000'
+      - '7777:8080'
+    networks:
+      - hict-cluster-net
