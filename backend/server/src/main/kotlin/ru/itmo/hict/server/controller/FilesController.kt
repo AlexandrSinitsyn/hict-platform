@@ -14,6 +14,7 @@ import ru.itmo.hict.server.exception.EmptyLoadedFileException
 import ru.itmo.hict.server.exception.InvalidFileTypeException
 import ru.itmo.hict.server.exception.LoadingFailedException
 import ru.itmo.hict.server.form.FileAttachmentForm
+import ru.itmo.hict.server.form.FileUploadingStreamForm
 import ru.itmo.hict.server.service.ContactMapService
 import ru.itmo.hict.server.service.ExperimentService
 import ru.itmo.hict.server.service.FileService
@@ -36,32 +37,61 @@ class FilesController(
         Path(storagePath).createDirectories()
     }
 
-    @PostMapping("/publish")
-    fun publish(
-        @RequestPart("file") file: MultipartFile,
-        @RequestPart("type") fileType: FileType,
-    ): ResponseEntity<FileInfoDto> = authorized {
-        if (file.isEmpty) {
-            throw EmptyLoadedFileException()
-        }
+    private fun UUID.tmpDir() = Path(storagePath, this.toString())
 
-        val filename = file.originalFilename ?: file.name
+    @GetMapping("/session/init")
+    fun initSession(): ResponseEntity<UUID> =
+        UUID.randomUUID().also { it.tmpDir().createDirectories() }.response()
+
+    @OptIn(ExperimentalPathApi::class)
+    @PostMapping("/session/{session}/close")
+    fun closeSession(
+        @PathVariable("session") session: UUID,
+        @RequestBody @Valid form: FileUploadingStreamForm,
+    ): ResponseEntity<FileInfoDto> = authorized {
         try {
-            val saved = fileService.save(fileType, filename, file.size)
+            val saved = fileService.save(form.type, form.filename, form.fileSize)
 
             val fileId = saved.file.id!!.toString()
-            val newFilename = "$fileId.${fileType.extension}"
+            val filename = "$fileId.${form.type.extension}"
 
-            val localFile = Path(storagePath, newFilename)
-            file.transferTo(localFile)
+            val file = Path(storagePath, filename)
 
-            minioService.upload(fileType, newFilename, file.size, localFile.inputStream())
+            session.tmpDir().listDirectoryEntries().sortedBy { it.name.toLong() }.forEach {
+                if (file.exists()) {
+                    file.appendBytes(it.toFile().readBytes())
+                } else {
+                    file.writeBytes(it.toFile().readBytes())
+                }
+            }
+
+            minioService.upload(form.type, filename, form.fileSize, file.toFile().inputStream())
+
+            session.tmpDir().deleteRecursively()
 
             saved.file
         } catch (e: IOException) {
             throw LoadingFailedException(e.message ?: "I/O exception")
         }
     }.toInfoDto().response()
+
+    @PostMapping("/publish")
+    fun publish(
+        @RequestPart("session") session: UUID,
+        @RequestPart("partIndex") partIndex: Long,
+        @RequestPart("file") file: MultipartFile,
+    ): ResponseEntity<Boolean> = authorized {
+        if (file.isEmpty) {
+            throw EmptyLoadedFileException()
+        }
+
+        try {
+            val localFile = session.tmpDir().resolve("$partIndex")
+            file.transferTo(localFile)
+        } catch (e: IOException) {
+            throw LoadingFailedException(e.message ?: "I/O exception")
+        }
+    }.success()
 
     @PostMapping("/attach/experiment/{experimentId}")
     fun attachToExperiment(

@@ -1,17 +1,22 @@
 package ru.itmo.hict.server.controller
 
 import jakarta.validation.Valid
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import ru.itmo.hict.dto.ContactMapInfoDto
 import ru.itmo.hict.dto.ContactMapInfoDto.Companion.toInfoDto
 import ru.itmo.hict.dto.ExperimentInfoDto
+import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.server.exception.NoExperimentFoundException
 import ru.itmo.hict.server.form.*
+import ru.itmo.hict.server.logging.Logger
 import ru.itmo.hict.server.service.ContactMapService
 import ru.itmo.hict.server.service.GrpcContainerService
+import ru.itmo.hict.server.service.MinioService
 import java.util.UUID
+import kotlin.io.path.*
 
 @RestController
 @RequestMapping("/api/v1/contact-map")
@@ -19,6 +24,9 @@ import java.util.UUID
 class ContactMapController(
     private val contactMapService: ContactMapService,
     private val containerService: GrpcContainerService,
+    private val minioService: MinioService,
+    private val logger: Logger,
+    @Value("\${SERVER_LOCAL_STORAGE_PATH}") private val storagePath: String,
 ) : ApiExceptionController() {
     @PostMapping("/new")
     fun publish(@RequestBody @Valid experimentInfoDto: ExperimentInfoDto): ResponseEntity<ContactMapInfoDto> =
@@ -51,6 +59,21 @@ class ContactMapController(
             ?: return@authorized ResponseEntity.notFound().build()
 
         contactMapService.view(contactMap)
+
+        contactMap.hict?.let {
+            val filename = "${it.file.id!!}.${FileType.HICT.extension}"
+
+            val alreadySavedFile = Path(storagePath).listDirectoryEntries().find { f -> f.name == filename }
+
+            if (alreadySavedFile == null) {
+                logger.warn("search-file", filename, "not found")
+
+                minioService.downloadFile(FileType.HICT.bucket, filename)
+                    .data.transferTo(Path(storagePath, filename).outputStream())
+            } else {
+                logger.info("search-file", filename, "found")
+            }
+        }
 
         containerService.publish(this)
 
