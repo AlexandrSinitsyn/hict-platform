@@ -38,7 +38,7 @@ import type { LoginForm, RegisterForm } from '@types';
 const { user } = storeToRefs(useAuthStore());
 const authStore = useAuthStore();
 
-const pages: string[] = ['Home', 'Groups', 'Experiments', 'Account', 'Admin'];
+const pages: string[] = ['Home', 'Groups', 'Account', 'Admin'];
 
 function loginSubmit(form: LoginForm) {
     login(form, () => getAuthorizedUser(authStore.login));
