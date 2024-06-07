@@ -73,7 +73,9 @@ function selectMap(map: ContactMap): void {
     border: 1px solid $border-color;
     border-radius: $border-radius;
 
-    @each $type, $color in ('view-experiment': $danger, 'view-contact-map': $success, 'view-assembly': $info) {
+    @each $type,
+        $color in ('view-experiment': $danger, 'view-contact-map': $success, 'view-assembly': $info)
+    {
         .#{$type} {
             padding: 0.5rem;
             color: $color;
