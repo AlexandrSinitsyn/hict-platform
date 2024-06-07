@@ -1,16 +1,25 @@
 <template>
     <div v-if="!selectedExperiment">
-        <h1>{{ __NAME__ }}</h1>
-        <h3>Experiments</h3>
+        <h1>Experiments</h1>
 
-        <div class="experiments-filter">
-            <label for="experiments-filter">Filter:</label>
-            <input id="experiments-filter" type="text" />
-            <div class="btn btn-outline-primary" @click="newExperiment">Create new</div>
+        <div style="display: flex; justify-content: space-between; margin: 3rem">
+            <div class="experiments-filter">
+                <label for="experiments-filter">Filter:</label>
+                <input
+                    id="experiments-filter"
+                    type="text"
+                    placeholder="name"
+                    v-model="nameFilter"
+                />
+            </div>
+            <div class="btn btn-success" style="color: white" @click="newExperiment">
+                Create new
+            </div>
         </div>
 
         <div class="experiments">
-            <div v-for="e in experiments" :key="e.name">
+            <div v-if="filteredExperiments.length === 0">No experiments found</div>
+            <div v-else v-for="e in filteredExperiments" :key="e.name">
                 <div @click="selectedExperiment = e" class="view-experiment">
                     [Experiment] {{ e.name }}
                 </div>
@@ -33,19 +42,52 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue';
+import { onMounted, ref, type Ref, watch } from 'vue';
 import type { ContactMap, Experiment } from '@types';
 import { getAllExperiments, publishExperiment } from '@/core/experiment-requests';
 import NewExperimentView from '@/view/NewExperimentView.vue';
 import router from '@/router';
-import { __NAME__ } from '@/core/config';
 
 const experiments: Ref<Experiment[]> = ref([]);
 const selectedExperiment: Ref<Experiment | undefined> = ref(undefined);
+const nameFilter: Ref<string> = ref('');
+const filteredExperiments: Ref<Experiment[]> = ref(experiments.value);
+
+watch(
+    () => nameFilter.value,
+    (value) => {
+        if (!value) {
+            filteredExperiments.value = experiments.value;
+            return;
+        }
+
+        filteredExperiments.value = experiments.value
+            .map<Experiment | undefined>((e) => {
+                if (e.name.includes(value)) {
+                    return e;
+                }
+
+                const maps = e.contactMaps.filter(({ name }) => name.includes(value));
+                const assemblies = e.assemblies.filter(({ name }) => name.includes(value));
+
+                if (maps.length === 0 && assemblies.length === 0) {
+                    return undefined;
+                }
+
+                return {
+                    ...e,
+                    contactMaps: maps,
+                    assemblies: assemblies,
+                };
+            })
+            .filter((e) => !!e) as Experiment[];
+    }
+);
 
 onMounted(() => {
     getAllExperiments((all: Experiment[]) => {
         experiments.value = all;
+        filteredExperiments.value = all;
     });
 });
 
@@ -89,17 +131,14 @@ function selectMap(map: ContactMap): void {
 }
 
 .experiments-filter {
-    margin: 3rem;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
+    width: 90%;
 
     & > label {
-        margin: auto 0;
+        margin-right: 1rem;
     }
 
     & > input {
-        width: 70%;
+        width: 80%;
         padding: 0.5rem;
         border: 1px solid $border-color;
         border-radius: $border-radius;
