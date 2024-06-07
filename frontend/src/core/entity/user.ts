@@ -10,12 +10,14 @@ export interface User {
     username: string;
     login: string;
     email: string;
-    role: Role;
+    groups: Group[];
 }
 
 export interface Group {
     id: string;
     name: string;
+    affiliation: string | undefined;
+    creationTime: Date;
 }
 
 export interface UpdateUserInfo {
