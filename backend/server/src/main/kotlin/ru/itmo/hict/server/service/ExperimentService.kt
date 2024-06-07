@@ -1,11 +1,12 @@
 package ru.itmo.hict.server.service
 
-import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Service
-import ru.itmo.hict.dto.FileType
 import ru.itmo.hict.entity.Experiment
+import ru.itmo.hict.entity.Group
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.exception.NoExperimentFoundException
+import ru.itmo.hict.server.exception.NoGroupFoundException
+import ru.itmo.hict.server.exception.NotGroupMemberException
 import ru.itmo.hict.server.exception.SameFieldException
 import ru.itmo.hict.server.repository.ExperimentRepository
 import java.util.UUID
@@ -14,19 +15,26 @@ import kotlin.jvm.optionals.getOrNull
 @Service
 class ExperimentService(
     private val experimentRepository: ExperimentRepository,
-    private val minioService: MinioService,
+    private val groupService: GroupService,
     private val fileService: FileService,
 ) {
-    @PostConstruct
-    fun init() {
-        FileType.entries.forEach { minioService.newBucketIfAbsent(it.bucket) }
-    }
+    fun getAll(groups: List<Group>?): List<Experiment> = experimentRepository.findAll().run {
+        groups ?: return@run this
 
-    fun getAll(): List<Experiment> = experimentRepository.findAll()
+        this.filter { it.visibilityGroup in groups }
+    }
 
     fun getByName(name: String): Experiment? = experimentRepository.findByName(name).getOrNull()
 
-    fun create(author: User): Experiment = experimentRepository.save(Experiment(UUID.randomUUID().toString(), author))
+    fun create(author: User, groupName: String): Experiment {
+        val group = groupService.getByName(groupName) ?: throw NoGroupFoundException(groupName)
+
+        if (!author.groups.contains(group)) {
+            throw NotGroupMemberException(author.username, groupName)
+        }
+
+        return experimentRepository.save(Experiment(UUID.randomUUID().toString(), author, group))
+    }
 
     fun updateName(id: UUID, newName: String) {
         val selected = experimentRepository.findById(id).getOrNull()

@@ -1,4 +1,11 @@
-import { type ContactMap, type Experiment, type File as AttachedFile, FileType } from '@types';
+import {
+    type ContactMap,
+    type Experiment,
+    type File as AttachedFile,
+    FileType,
+    type FileAttachmentForm,
+    type FileUploadingStreamForm,
+} from '@types';
 import { __SERVER_HOST__, notify } from '@/core/config';
 import axios, { type AxiosResponse } from 'axios';
 import {
@@ -7,7 +14,6 @@ import {
     getJwt,
     type SuccessCallback,
 } from '@/core/server-requests';
-import type { FileAttachmentForm, FileUploadingStreamForm } from '@/core/entity/experiments';
 import { fileType } from '@/core/extensions';
 
 export async function uploadFile(
@@ -54,7 +60,7 @@ export async function uploadFile(
     //     return;
     // }
 
-    const fileSize = file.size;//base64.length;
+    const fileSize = file.size; //base64.length;
 
     const parts: Promise<void>[] = [];
 

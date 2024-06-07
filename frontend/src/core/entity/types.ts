@@ -7,5 +7,17 @@ export type {
     UpdateUserRole,
     UpdateUserPassword,
 } from '@/core/entity/user';
-export type { Experiment, ContactMap, Assembly, File } from '@/core/entity/experiments';
+export type {
+    Experiment,
+    ContactMap,
+    Assembly,
+    File,
+    FileUploadingStreamForm,
+    FileAttachmentForm,
+    ExperimentCreationForm,
+    UpdateContactMapInfo,
+    UpdateContactMapName,
+    UpdateExperimentInfo,
+    UpdateExperimentName,
+} from '@/core/entity/experiments';
 export { FileType } from '@/core/entity/experiments';

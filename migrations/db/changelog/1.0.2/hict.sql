@@ -9,6 +9,7 @@ create table experiments
     experiment_name varchar(100)             not null,
     description     text,
     user_id         uuid                     not null,
+    group_id        uuid                     not null,
     acknowledgement varchar(256),
     paper           varchar(512),
     creation_time   timestamp with time zone not null default now(),
@@ -37,7 +38,6 @@ create table contact_maps
 (
     contact_map_id   uuid                     not null default gen_random_uuid(),
     contact_map_name varchar(100)             not null,
-    -- fixme
     hict_id          uuid,
     mcool_id         uuid                              default null,
     experiment_id    uuid                     not null,

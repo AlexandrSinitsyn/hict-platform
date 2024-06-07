@@ -59,6 +59,10 @@ export interface FileAttachmentForm {
     fileType: keyof typeof FileType;
 }
 
+export interface ExperimentCreationForm {
+    groupName: string;
+}
+
 export interface UpdateExperimentName {
     name: string;
 }

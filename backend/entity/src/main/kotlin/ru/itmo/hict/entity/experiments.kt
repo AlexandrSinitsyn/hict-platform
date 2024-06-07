@@ -37,6 +37,14 @@ class Experiment(
     )
     val author: User,
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.DETACH])
+    @JoinColumn(
+        name = "group_id",
+        nullable = false,
+    )
+    val visibilityGroup: Group,
+
     @Nullable
     @NotBlankIfPresent
     @Size(max = 65536)
@@ -137,7 +145,6 @@ class ContactMap(
         nullable = true,
         referencedColumnName = "tax_id",
     )
-    // fixme
     val reference: Species? = null,
 
     @Nullable
@@ -177,7 +184,6 @@ class ContactMap(
         name = "hict_id",
         nullable = true,
     )
-    // fixme
     val hict: HictFile? = null,
 
     @NotNull
