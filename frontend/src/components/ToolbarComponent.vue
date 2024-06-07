@@ -10,10 +10,19 @@
             </button>
             <button type="button" class="btn btn-danger" @click="logout">Logout</button>
         </div>
-        <div v-else class="btn-group headername" role="group" aria-label="Basic example">
-            <LoginFormComponent @submit="loginSubmit" />
+        <div v-else>
+            <button
+                class="btn btn-warning"
+                style="width: 100%; margin-bottom: 0.5rem"
+                @click="anonymous"
+            >
+                Continue as an anonymous
+            </button>
+            <div class="btn-group headername" role="group" aria-label="Basic example">
+                <LoginFormComponent @submit="loginSubmit" />
 
-            <RegisterFormComponent @submit="registerSubmit" />
+                <RegisterFormComponent @submit="registerSubmit" />
+            </div>
         </div>
 
         <nav>
@@ -46,6 +55,13 @@ function loginSubmit(form: LoginForm) {
 
 function registerSubmit(form: RegisterForm) {
     register(form, () => getAuthorizedUser(authStore.login));
+}
+
+function anonymous() {
+    loginSubmit({
+        login: 'anonymous',
+        password: 'nopass',
+    });
 }
 </script>
 
