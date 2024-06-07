@@ -12,9 +12,7 @@
                     v-model="nameFilter"
                 />
             </div>
-            <div class="btn btn-success" style="color: white" @click="newExperiment">
-                Create new
-            </div>
+            <ExperimentCreationFormComponent @submit="newExperiment" />
         </div>
 
         <div class="experiments">
@@ -43,10 +41,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref, type Ref, watch } from 'vue';
-import type { ContactMap, Experiment } from '@types';
+import type { ContactMap, Experiment, Group } from '@types';
 import { getAllExperiments, publishExperiment } from '@/core/experiment-requests';
 import NewExperimentView from '@/view/NewExperimentView.vue';
 import router from '@/router';
+import ExperimentCreationFormComponent from '@/components/forms/ExperimentCreationFormComponent.vue';
 
 const experiments: Ref<Experiment[]> = ref([]);
 const selectedExperiment: Ref<Experiment | undefined> = ref(undefined);
@@ -91,8 +90,8 @@ onMounted(() => {
     });
 });
 
-function newExperiment() {
-    publishExperiment((experiment: Experiment) => {
+function newExperiment(group: Group) {
+    publishExperiment(group, (experiment: Experiment) => {
         selectedExperiment.value = experiment;
     });
 }
