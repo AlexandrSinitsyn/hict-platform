@@ -1,13 +1,11 @@
 <template>
-    <div>
-        <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#registerFormModal"
-        >
-            Register
-        </button>
+    <button
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#registerFormModal"
+    >
+        Register
         <AbstractFormComponent id="registerFormModal" title="Register" @submit="submit">
             <div class="register">
                 <span class="username-label">Username</span>
@@ -20,7 +18,7 @@
                 <input class="password" type="password" v-model="password" />
             </div>
         </AbstractFormComponent>
-    </div>
+    </button>
 </template>
 
 <script setup lang="ts">
