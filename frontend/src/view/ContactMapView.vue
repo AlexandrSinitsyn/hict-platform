@@ -1,7 +1,12 @@
 <template>
+    <aside class="hiding-switcher">
+        <div class="btn btn-outline-primary" @click="hidden = !hidden">
+            <span class="bi bi-info-circle"></span>
+        </div>
+    </aside>
     <div>
         <div v-if="selected">
-            <aside>
+            <aside v-if="!hidden" class="contact-map-info">
                 <h1>Hi-C Map</h1>
 
                 <table v-if="selected">
@@ -11,7 +16,7 @@
                     </tr>
                 </table>
             </aside>
-            <div class="main-screen">
+            <div class="main-screen" :style="hidden ? '' : 'margin-right: calc(20vw + 2rem)'">
                 <App />
             </div>
         </div>
@@ -34,6 +39,7 @@ import { useSelectedMapStore } from '@hict/app/stores/selectedMapStore';
 
 const { user } = storeToRefs(useAuthStore());
 const selected: Ref<ContactMap | undefined> = ref(undefined);
+const hidden: Ref<boolean> = ref(false);
 
 const doRequest = () => {
     const uid = user.value?.id;
@@ -87,7 +93,11 @@ function mapInfo(): { columnName: string; value: string }[] {
 <style scoped lang="scss">
 @import '/public/css/main';
 
-$aside-width: calc(20vw + 2rem);
+.hiding-switcher {
+    position: absolute;
+    top: 5rem;
+    left: 0.7rem;
+}
 
 .main-screen {
     position: absolute;
@@ -95,14 +105,13 @@ $aside-width: calc(20vw + 2rem);
     right: 0;
     left: calc(15vw + 3rem); // header width
 
-    margin-right: calc($aside-width);
     padding-right: 1rem;
 }
 
-aside {
+.contact-map-info {
     position: absolute;
     right: 0;
-    width: $aside-width;
+    width: calc(20vw + 2rem);
     //margin: 0 1rem;
     padding: 1rem;
     font-size: 0.8rem;

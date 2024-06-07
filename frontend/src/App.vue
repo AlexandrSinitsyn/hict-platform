@@ -1,9 +1,9 @@
 <template>
-    <header v-if="!hidden" :style="{ width: hidden ? 0 : '15vw' }">
+    <header v-if="!hidden">
         <ToolbarComponent />
     </header>
 
-    <aside :style="{ width: hidden ? 0 : '15vw' }">
+    <aside>
         <div class="btn btn-outline-primary" @click="hidden = !hidden">
             <span class="bi bi-justify"></span>
         </div>
@@ -13,7 +13,7 @@
         <RouterView />
     </main>
 
-    <footer v-if="!hidden" :style="{ width: hidden ? 0 : '15vw' }">
+    <footer v-if="!hidden">
         <p>
             &copy; Powered by <code>{{ __AUTHOR__ }}</code>
         </p>
@@ -44,6 +44,7 @@ onMounted(() => {
 <style lang="scss">
 header {
     position: fixed;
+    width: 15vw;
     padding: 1rem;
     text-align: center;
     height: calc(100% - 2rem);
@@ -69,6 +70,7 @@ footer {
     position: fixed;
     left: 0;
     bottom: 0;
+    width: 15vw;
     margin: 1rem;
     padding: 1rem;
     border-top: 1px solid gray;
