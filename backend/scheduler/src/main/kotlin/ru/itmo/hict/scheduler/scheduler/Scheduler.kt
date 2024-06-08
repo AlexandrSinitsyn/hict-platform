@@ -14,7 +14,7 @@ class Scheduler(
     private val dindService: DindService,
     private val logger: Logger,
 ) {
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "0 */15 * * * *")
     fun testDeadline() {
         runBlocking {
             logger.info("scheduler", "deadline", "check")

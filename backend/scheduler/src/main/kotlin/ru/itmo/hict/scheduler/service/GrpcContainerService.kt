@@ -33,6 +33,8 @@ class GrpcContainerService (
 
         responseObserver.onNext(empty {})
 
+        logger.info("grpc", "create", "$request")
+
         responseObserver.onCompleted()
     }
 
@@ -42,6 +44,8 @@ class GrpcContainerService (
         containerMonitor.extend(request.uuid)
 
         responseObserver.onNext(empty {})
+
+        logger.info("grpc", "ping", "responded")
 
         responseObserver.onCompleted()
     }
