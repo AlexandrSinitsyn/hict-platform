@@ -19,6 +19,8 @@ class DindService(
     private val FILENAME = "docker-compose.yml"
     private val DOCKER_COMPOSE = resourceLoader.getResource("classpath:" +
             "docker-compose.hict-server.yml").getContentAsString(Charsets.UTF_8)
+    private val consoleCommandPrefix =
+        if ("win" in System.getProperty("os.name").lowercase()) arrayOf("cmd.exe", "/C") else arrayOf()
 
     suspend fun runDocker(id: String): Result<Boolean> {
         val filepath = Path(id, FILENAME)
@@ -53,7 +55,7 @@ class DindService(
         runProcess("docker", "compose", "-f", "\"${Path(id, FILENAME).pathString}\"", "down")
 
     private suspend fun runProcess(vararg command: String): Result<Boolean> = runCatching {
-        val process = ProcessBuilder(*command).start()
+        val process = ProcessBuilder(*consoleCommandPrefix, *command).start()
         if (!process.waitFor(5, TimeUnit.SECONDS)) {
             throw IllegalStateException("Waiting time elapsed")
         }
@@ -66,8 +68,8 @@ class DindService(
 
         throw IllegalStateException("""
             Command `${command.joinToString(" ")}` failed with ${process.exitValue()} code:
-                stdout: ${process.inputReader().use { it.readText() }}
-                stderr: ${process.errorReader().use { it.readText() }}
+                stdout: ${process.inputReader(Charsets.UTF_8).use { it.readText() }}
+                stderr: ${process.errorReader(Charsets.UTF_8).use { it.readText() }}
         """.trimIndent())
     }
 }
