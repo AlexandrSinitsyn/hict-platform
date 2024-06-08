@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import ru.itmo.hict.authorization.repository.UserRepository
 import ru.itmo.hict.authorization.service.UserService
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -24,7 +23,7 @@ class UserServiceTests {
         private const val INVALID = "invalid"
     }
 
-    private val user = User(USERNAME, LOGIN, EMAIL, PASS, Role.ANONYMOUS)
+    private val user = User(USERNAME, LOGIN, EMAIL, PASS)
     private val optUser = Optional.of(user)
     private val empty = Optional.empty<User>()
 

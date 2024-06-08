@@ -10,25 +10,26 @@ import org.junit.jupiter.api.Test
 import ru.itmo.hict.authorization.service.JwtService
 import ru.itmo.hict.dto.Jwt
 import ru.itmo.hict.dto.USER_ID_CLAIM
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
+import java.util.*
+import kotlin.collections.HashSet
 import kotlin.random.Random
 
 class JwtServiceTests {
     private class JwtDecoder(algorithm: Algorithm) {
         private val verifier: JWTVerifier = JWT.require(algorithm).build()
 
-        fun find(jwt: Jwt): Long? {
+        fun find(jwt: Jwt): UUID? {
             val decodedJwt: DecodedJWT = verifier.verify(jwt)
-            return decodedJwt.getClaim(USER_ID_CLAIM).asLong()
+            return decodedJwt.getClaim(USER_ID_CLAIM)?.asString()?.run { UUID.fromString(this) }
         }
     }
 
     private lateinit var encoder: JwtService
     private lateinit var decoder: JwtDecoder
     private val user = User(
-        "test", "test", "test@test.com", "test", Role.ANONYMOUS,
-        id = System.currentTimeMillis()
+        "test", "test", "test@test.com", "test",
+        id = UUID.randomUUID()
     )
 
     @BeforeEach
@@ -58,7 +59,7 @@ class JwtServiceTests {
         val decoded = decoder.find(encoder.create(user))
 
         Assertions.assertNotNull(decoded)
-        Assertions.assertInstanceOf(Long::class.javaObjectType, decoded)
+        Assertions.assertInstanceOf(UUID::class.javaObjectType, decoded)
         Assertions.assertEquals(user.id, decoded)
     }
 
@@ -71,10 +72,10 @@ class JwtServiceTests {
         }
 
         val jwts = HashSet<String>()
-        val ids = HashSet<Long>()
+        val ids = HashSet<UUID>()
 
         repeat(10_000) {
-            val test = User(rndString(), rndString(), rndString(), rndString(), Role.ANONYMOUS, id = it.toLong())
+            val test = User(rndString(), rndString(), rndString(), rndString(), id = UUID.randomUUID())
 
             val encoded = encoder.create(test)
 

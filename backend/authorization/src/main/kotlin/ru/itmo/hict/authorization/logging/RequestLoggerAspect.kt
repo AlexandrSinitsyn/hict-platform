@@ -48,7 +48,7 @@ class RequestLoggerAspect(
     fun exceptionHandleBefore(jp: JoinPoint, eh: ExceptionHandler) =
         logger.error("exceptionHandler", eh.value::class.java.simpleName, jp.signature.name)
 
-    @Around("execution(* ru.itmo.hict.authorization.controller.*(bindingResult, ..))")
+    @Around("execution(* ru.itmo.hict.authorization.controller.*.*(..)) && args(.., bindingResult)")
     fun validatedController(jp: ProceedingJoinPoint, bindingResult: BindingResult): Any? {
         if (bindingResult.hasErrors()) {
             throw ValidationException(bindingResult)

@@ -1,35 +1,41 @@
 package ru.itmo.hict.authorization
 
 import jakarta.annotation.PostConstruct
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.*
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.EnableAspectJAutoProxy
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.validation.BindingResult
+import org.springframework.validation.DirectFieldBindingResult
 import ru.itmo.hict.authorization.controller.UserController
 import ru.itmo.hict.authorization.exception.ValidationException
+import ru.itmo.hict.authorization.form.EnterForm
+import ru.itmo.hict.authorization.form.RegisterForm
+import ru.itmo.hict.authorization.logging.RequestLoggerAspect
 import ru.itmo.hict.authorization.repository.UserRepository
 import ru.itmo.hict.authorization.service.JwtService
 import ru.itmo.hict.authorization.service.UserService
 import ru.itmo.hict.authorization.validator.EnterFormValidator
 import ru.itmo.hict.authorization.validator.RegisterFormValidator
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import java.util.*
 
+@EnableAspectJAutoProxy
 @WebMvcTest(UserController::class)
 @ContextConfiguration(
-    classes = [UserController::class, UserService::class, RegisterFormValidator::class, EnterFormValidator::class]
+    classes = [RequestLoggerAspect::class,
+        UserController::class, UserService::class, RegisterFormValidator::class, EnterFormValidator::class]
 )
+@Import(LoggerConfig::class)
 class UserRestTests {
     @Autowired
     private lateinit var mvc: MockMvc
@@ -280,13 +286,47 @@ class UserRestTests {
         }
     }
 
+    @Nested
+    inner class RequestInterceptor {
+        @Autowired
+        private lateinit var userController: UserController
+
+        @Test
+        fun `invalid register form`() {
+            val registerForm = RegisterForm(USERNAME, LOGIN, EMAIL, PASS)
+
+            val bindingResult: BindingResult = DirectFieldBindingResult(this, "test")
+            bindingResult.reject("not-found", "test")
+
+            assertThrows<ValidationException> {
+                userController.register(registerForm, bindingResult)
+            }
+
+            assert(bindingResult.hasErrors())
+        }
+
+        @Test
+        fun `invalid enter form`() {
+            val enterForm = EnterForm(LOGIN, EMAIL, PASS)
+
+            val bindingResult: BindingResult = DirectFieldBindingResult(this, "test")
+            bindingResult.reject("not-found", "test")
+
+            assertThrows<ValidationException> {
+                userController.login(enterForm, bindingResult)
+            }
+
+            assert(bindingResult.hasErrors())
+        }
+    }
+
     private companion object {
         private const val USERNAME = "test"
         private const val LOGIN = "login"
         private const val EMAIL = "email@test.com"
         private const val PASS = "pass"
 
-        private val user = User(USERNAME, LOGIN, EMAIL, PASS, Role.ANONYMOUS)
+        private val user = User(USERNAME, LOGIN, EMAIL, PASS)
         
         private const val IS_BLANK = "blank"
         private const val INVALID_SIZE = "size must be between"

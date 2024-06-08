@@ -2,6 +2,7 @@ package ru.itmo.hict.authorization
 
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
@@ -11,6 +12,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 import org.springframework.http.ResponseEntity
+import org.springframework.test.context.ActiveProfiles
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -25,6 +27,7 @@ import java.net.URI
 @EntityScan(basePackages = ["ru.itmo.hict.entity"])
 @ComponentScan("ru.itmo.hict.dto", "ru.itmo.hict.authorization")
 @Import(LiquibaseConfig::class)
+@ActiveProfiles("full-app-test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthorizationApplicationTests {
     companion object {

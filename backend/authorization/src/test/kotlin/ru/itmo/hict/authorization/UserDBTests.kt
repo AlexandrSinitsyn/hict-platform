@@ -16,7 +16,6 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import ru.itmo.hict.authorization.repository.UserRepository
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import kotlin.jvm.optionals.getOrNull
 
@@ -71,7 +70,6 @@ class UserDBTests {
         Assertions.assertEquals("user", user.username)
         Assertions.assertEquals("user", user.login)
         Assertions.assertEquals("user@test.com", user.email)
-        Assertions.assertEquals(Role.USER, user.role)
     }
 
     @Test
@@ -98,7 +96,7 @@ class UserDBTests {
 
     @Test
     fun `new user`() {
-        val user = User("username", "login", "email@test.com", "pass", Role.ANONYMOUS)
+        val user = User("username", "login", "email@test.com", "pass")
 
         val saved = userRepository.save(user).run {
             Assertions.assertTrue(this.isPresent)
@@ -109,7 +107,6 @@ class UserDBTests {
         Assertions.assertEquals(user.username, saved.username)
         Assertions.assertEquals(user.login, saved.login)
         Assertions.assertEquals(user.email, saved.email)
-        Assertions.assertEquals(user.role, saved.role)
 
         Assertions.assertNotNull(saved.id)
         Assertions.assertNotNull(saved.creationTime)
@@ -118,7 +115,7 @@ class UserDBTests {
     @Test
     fun `no duplicate users`() {
         val duplicatedUser = userRepository.save(
-            User("user", "user", "user@test.com", "user", Role.USER)).getOrNull()
+            User("user", "user", "user@test.com", "user")).getOrNull()
 
         Assertions.assertNull(duplicatedUser)
     }
@@ -126,16 +123,16 @@ class UserDBTests {
     @Test
     fun `different users`() {
         val first = userRepository.save(
-            User("first", "first", "first@email.com", "first", Role.ANONYMOUS)).get()
+            User("first", "first", "first@email.com", "first")).get()
         val second = userRepository.save(
-            User("second", "second", "second@email.com", "second", Role.ANONYMOUS)).get()
+            User("second", "second", "second@email.com", "second")).get()
 
         Assertions.assertNotEquals(second.id, first.id)
     }
 
     @Test
     fun `search for new user`() {
-        val user = User("username", "login", "email@test.com", "pass", Role.ANONYMOUS)
+        val user = User("username", "login", "email@test.com", "pass")
 
         val saved = userRepository.save(user).run {
             Assertions.assertTrue(this.isPresent)
@@ -146,7 +143,6 @@ class UserDBTests {
         Assertions.assertEquals(user.username, saved.username)
         Assertions.assertEquals(user.login, saved.login)
         Assertions.assertEquals(user.email, saved.email)
-        Assertions.assertEquals(user.role, saved.role)
 
         Assertions.assertNotNull(saved.id)
         Assertions.assertNotNull(saved.creationTime)
