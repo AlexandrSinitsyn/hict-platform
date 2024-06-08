@@ -1,15 +1,19 @@
 package ru.itmo.hict.authorization.logging
 
 import org.aspectj.lang.JoinPoint
+import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.After
+import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.springframework.stereotype.Component
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import ru.itmo.hict.authorization.exception.ValidationException
 
 @Aspect
 @Component
@@ -43,6 +47,15 @@ class RequestLoggerAspect(
     @Before("@annotation(eh)")
     fun exceptionHandleBefore(jp: JoinPoint, eh: ExceptionHandler) =
         logger.error("exceptionHandler", eh.value::class.java.simpleName, jp.signature.name)
+
+    @Around("execution(* ru.itmo.hict.authorization.controller.*(bindingResult, ..))")
+    fun validatedController(jp: ProceedingJoinPoint, bindingResult: BindingResult): Any? {
+        if (bindingResult.hasErrors()) {
+            throw ValidationException(bindingResult)
+        }
+
+        return jp.proceed()
+    }
 
     private fun before(method: String, paths: Array<String>, jp: JoinPoint) =
         logRequest(method, paths.joinToString(), "before", jp.signature.name)
