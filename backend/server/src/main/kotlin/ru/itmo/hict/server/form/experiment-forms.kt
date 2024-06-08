@@ -2,6 +2,10 @@ package ru.itmo.hict.server.form
 
 import jakarta.validation.constraints.*
 
+class ExperimentCreationForm(
+    @field:[NotNull NotBlank Size(min = 3, max = 100)] val groupName: String,
+)
+
 class ExperimentNameUpdateForm(
     @field:[NotNull NotBlank Size(min = 4, max = 256)] val name: String,
 )

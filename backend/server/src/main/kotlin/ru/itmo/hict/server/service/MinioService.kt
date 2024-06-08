@@ -1,6 +1,7 @@
 package ru.itmo.hict.server.service
 
 import io.minio.*
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,6 +29,11 @@ class MinioService(
     private val minioClient: MinioClient,
     private val logger: Logger,
 ) {
+    @PostConstruct
+    fun init() {
+        FileType.entries.forEach { newBucketIfAbsent(it.bucket) }
+    }
+
     fun newBucketIfAbsent(name: String) {
         if (minioClient.bucketExists(BucketExistsArgs.builder()
                 .bucket(name)

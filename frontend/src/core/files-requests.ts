@@ -1,4 +1,11 @@
-import { type ContactMap, type Experiment, type File as AttachedFile, FileType } from '@types';
+import {
+    type ContactMap,
+    type Experiment,
+    type File as AttachedFile,
+    FileType,
+    type FileAttachmentForm,
+    type FileUploadingStreamForm,
+} from '@types';
 import { __SERVER_HOST__, notify } from '@/core/config';
 import axios, { type AxiosResponse } from 'axios';
 import {
@@ -7,7 +14,6 @@ import {
     getJwt,
     type SuccessCallback,
 } from '@/core/server-requests';
-import type { FileAttachmentForm, FileUploadingStreamForm } from '@/core/entity/experiments';
 import { fileType } from '@/core/extensions';
 
 export async function uploadFile(
@@ -54,7 +60,7 @@ export async function uploadFile(
     //     return;
     // }
 
-    const fileSize = file.size;//base64.length;
+    const fileSize = file.size; //base64.length;
 
     const parts: Promise<void>[] = [];
 
@@ -79,21 +85,21 @@ export async function uploadFile(
 
         formData.append(`file`, file.slice(start, end));
 
-        // parts.push(
-            await axios
+        parts.push(
+            axios
                 .post<FormData, never>(`${__SERVER_HOST__.value}/files/publish`, formData, {
                     headers: {
                         Authorization: `Bearer ${jwt}`,
                     },
                 })
                 .catch(errorHandler)
-        // );
+        );
         start = end;
     }
 
-    // for (const p of parts) {
-    //     await p;
-    // }
+    for (const p of parts) {
+        await p;
+    }
 
     authorizedRequest<FileUploadingStreamForm, AttachedFile>(
         axios.post,
@@ -112,13 +118,13 @@ function attachFileTo<T = Experiment | ContactMap>(
     objType: 'experiment' | 'contact-map',
     file: AttachedFile,
     type: FileType,
-    onSuccess: SuccessCallback<boolean>
+    onSuccess: SuccessCallback<never>
 ): void {
     const url =
         objType === 'experiment'
             ? `experiment/${(obj as Experiment).id}`
             : `contact-map/${(obj as ContactMap).id}`;
-    authorizedRequest<FileAttachmentForm, boolean>(
+    authorizedRequest<FileAttachmentForm, never>(
         axios.post,
         `${__SERVER_HOST__.value}/files/attach/${url}`,
         {
@@ -132,7 +138,7 @@ function attachFileTo<T = Experiment | ContactMap>(
 export function attachFastaToExperiment(
     experiment: Experiment,
     fasta: AttachedFile,
-    onSuccess: SuccessCallback<boolean>
+    onSuccess: SuccessCallback<never>
 ): void {
     attachFileTo<Experiment>(experiment, 'experiment', fasta, FileType.FASTA, onSuccess);
 }
@@ -140,7 +146,31 @@ export function attachFastaToExperiment(
 export function attachHictToContactMap(
     contactMap: ContactMap,
     hict: AttachedFile,
-    onSuccess: SuccessCallback<boolean>
+    onSuccess: SuccessCallback<never>
 ): void {
     attachFileTo<ContactMap>(contactMap, 'contact-map', hict, FileType.HICT, onSuccess);
+}
+
+export function attachMcoolToContactMap(
+    contactMap: ContactMap,
+    mcool: AttachedFile,
+    onSuccess: SuccessCallback<never>
+): void {
+    attachFileTo<ContactMap>(contactMap, 'contact-map', mcool, FileType.MCOOL, onSuccess);
+}
+
+export function attachAgpToContactMap(
+    contactMap: ContactMap,
+    agp: AttachedFile,
+    onSuccess: SuccessCallback<never>
+): void {
+    attachFileTo<ContactMap>(contactMap, 'contact-map', agp, FileType.AGP, onSuccess);
+}
+
+export function attachTracksToContactMap(
+    contactMap: ContactMap,
+    tracks: AttachedFile,
+    onSuccess: SuccessCallback<never>
+): void {
+    attachFileTo<ContactMap>(contactMap, 'contact-map', tracks, FileType.TRACKS, onSuccess);
 }

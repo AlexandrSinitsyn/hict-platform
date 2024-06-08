@@ -38,19 +38,19 @@
                 :files="agp"
                 :type="fileType(FileType.AGP)"
                 :wrap="!fullfileinfo"
-                @upload="(f: File) => agp.push(f)"
+                @upload="(f: File) => upload(fileType(FileType.AGP), f)"
             />
             <SinglefileComponent
                 :file="mcool"
                 :type="fileType(FileType.MCOOL)"
                 :wrap="!fullfileinfo"
-                @upload="(f: File) => mcool = f"
+                @upload="(f: File) => upload(fileType(FileType.MCOOL), f)"
             />
             <FileListComponent
                 :files="tracks"
                 :type="fileType(FileType.TRACKS)"
                 :wrap="!fullfileinfo"
-                @upload="(f: File) => tracks.push(f)"
+                @upload="(f: File) => upload(fileType(FileType.TRACKS), f)"
             />
         </div>
     </div>
@@ -63,7 +63,12 @@ import FileListComponent from '@/components/FileListComponent.vue';
 import SinglefileComponent from '@/components/SinglefileComponent.vue';
 import { updateContactMapInfo, updateContactMapName } from '@/core/experiment-requests';
 import { fileType } from '@/core/extensions';
-import { attachHictToContactMap } from '@/core/files-requests';
+import {
+    attachAgpToContactMap,
+    attachHictToContactMap,
+    attachMcoolToContactMap,
+    attachTracksToContactMap,
+} from '@/core/files-requests';
 
 const props = defineProps<{
     experiment: Experiment | undefined;
@@ -115,17 +120,16 @@ function upload(type: keyof typeof FileType, f: File) {
         case 'FASTA':
             throw 'Unreachable';
         case 'HICT':
-            attachHictToContactMap(contactMap, f, (success) => {
-                if (success) {
-                    hict.value = f;
-                }
-            });
+            attachHictToContactMap(contactMap, f, () => (hict.value = f));
             break;
         case 'MCOOL':
+            attachMcoolToContactMap(contactMap, f, () => (mcool.value = f));
             break;
         case 'AGP':
+            attachAgpToContactMap(contactMap, f, () => agp.value.push(f));
             break;
         case 'TRACKS':
+            attachTracksToContactMap(contactMap, f, () => tracks.value.push(f));
             break;
     }
 }

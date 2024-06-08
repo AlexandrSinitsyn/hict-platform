@@ -18,10 +18,12 @@ class ExperimentController(
     private val experimentService: ExperimentService,
 ) : ApiExceptionController() {
     @GetMapping("/all")
-    fun getAll(): ResponseEntity<List<ExperimentInfoDto>> = experimentService.getAll().map { it.toInfoDto() }.response()
+    fun getAll(): ResponseEntity<List<ExperimentInfoDto>> =
+        experimentService.getAll(requestUserInfo.user?.groups).map { it.toInfoDto() }.response()
 
     @PostMapping("/new")
-    fun create(): ResponseEntity<ExperimentInfoDto> = authorized { experimentService.create(this) }.toInfoDto().response()
+    fun create(@RequestBody @Valid experimentForm: ExperimentCreationForm): ResponseEntity<ExperimentInfoDto> =
+        authorized { experimentService.create(this, experimentForm.groupName) }.toInfoDto().response()
 
     @PatchMapping("/{id}/update/name")
     fun updateName(

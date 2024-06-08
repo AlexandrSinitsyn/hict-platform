@@ -1,13 +1,11 @@
 <template>
-    <div>
-        <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#loginFormModal"
-        >
-            Login
-        </button>
+    <button
+        type="button"
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#loginFormModal"
+    >
+        Login
         <AbstractFormComponent id="loginFormModal" title="Log in" @submit="submit">
             <div class="login">
                 <span class="loginOrEmail-label">Login or email</span>
@@ -16,7 +14,7 @@
                 <input class="password" type="password" v-model="password" />
             </div>
         </AbstractFormComponent>
-    </div>
+    </button>
 </template>
 
 <script setup lang="ts">

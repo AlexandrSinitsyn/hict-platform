@@ -78,11 +78,17 @@ class NoExperimentFoundException private constructor(field: String, value: Strin
     constructor(experimentId: UUID) : this("id", "$experimentId")
 }
 
+class NoGroupFoundException(name: String) : NoSuchEntityException("group", "name", name)
+
 class NoContactMapFoundException private constructor(field: String, value: String)
     : NoSuchEntityException("contact-map", field, value) {
     constructor(contactMapName: String) : this("name", contactMapName)
     constructor(contactMapId: UUID) : this("id", "$contactMapId")
 }
+
+class NotGroupMemberException(username: String, groupName: String) : ValidationException(
+    "group-rights", "not-group-member", "You [$username] are not a member of this group `$groupName`"
+)
 
 open class SameFieldException(fieldName: String, value: String)
     : ClientException("New $fieldName should be different: `$value`")

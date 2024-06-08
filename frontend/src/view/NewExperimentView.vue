@@ -156,11 +156,7 @@ function uploadFasta(f: File): void {
         return;
     }
 
-    attachFastaToExperiment(experiment, f, (success) => {
-        if (success) {
-            fasta.value.push(f);
-        }
-    });
+    attachFastaToExperiment(experiment, f, () => fasta.value.push(f));
 }
 
 function newContactMap(): void {

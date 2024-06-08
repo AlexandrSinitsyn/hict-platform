@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/view/HomeView.vue';
 import GroupsView from '@/view/GroupsView.vue';
-import ExperimentsView from '@/view/ExperimentsView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,11 +19,6 @@ const router = createRouter({
             path: import.meta.env.BASE_URL + '/groups',
             name: 'groups',
             component: GroupsView,
-        },
-        {
-            path: import.meta.env.BASE_URL + '/experiments',
-            name: 'experiments',
-            component: ExperimentsView,
         },
         {
             path: import.meta.env.BASE_URL + '/view/:contactMapName',

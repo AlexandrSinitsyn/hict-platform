@@ -10,18 +10,27 @@ import axios from 'axios';
 import type {
     ContactMap,
     Experiment,
+    Group,
+    ExperimentCreationForm,
     UpdateContactMapInfo,
     UpdateContactMapName,
     UpdateExperimentInfo,
     UpdateExperimentName,
-} from '@/core/entity/experiments';
+} from '@types';
 
 export function getAllExperiments(onSuccess: SuccessCallback<Experiment[]>): void {
     authorizedGetRequest(`${__SERVER_HOST__.value}/experiment/all`, onSuccess);
 }
 
-export function publishExperiment(onSuccess: SuccessCallback<Experiment>): void {
-    authorizedRequest(axios.post, `${__SERVER_HOST__.value}/experiment/new`, {}, onSuccess);
+export function publishExperiment(group: Group, onSuccess: SuccessCallback<Experiment>): void {
+    authorizedRequest<ExperimentCreationForm, Experiment>(
+        axios.post,
+        `${__SERVER_HOST__.value}/experiment/new`,
+        {
+            groupName: group.name,
+        },
+        onSuccess
+    );
 }
 
 export function publishContactMap(
