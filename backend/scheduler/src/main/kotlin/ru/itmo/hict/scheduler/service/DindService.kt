@@ -33,7 +33,12 @@ class DindService(
 
         logger.info("process", "fileWriter", filepath.pathString)
 
-        val result = runProcess("docker", "compose", "-f", filepath.pathString, "-p", "hict-server-cluster", "up", "-d")
+        val result = runProcess(
+            "docker", "compose",
+            "-f", "\"${filepath.pathString}\"",
+            "-p", "hict-server-cluster",
+            "up", "-d"
+        )
 
         withContext(Dispatchers.IO) {
             filepath.deleteExisting()
@@ -44,13 +49,11 @@ class DindService(
         return result
     }
 
-    suspend fun stopDocker(containerId: String): Result<Boolean> {
-        return runProcess("docker", "stop", containerId)
-    }
+    suspend fun stopDocker(id: String): Result<Boolean> =
+        runProcess("docker", "compose", "-f", "\"${Path(id, FILENAME).pathString}\"", "down")
 
     private suspend fun runProcess(vararg command: String): Result<Boolean> = runCatching {
         val process = ProcessBuilder(*command).start()
-        process.waitFor(5, TimeUnit.SECONDS)
         if (!process.waitFor(5, TimeUnit.SECONDS)) {
             throw IllegalStateException("Waiting time elapsed")
         }
