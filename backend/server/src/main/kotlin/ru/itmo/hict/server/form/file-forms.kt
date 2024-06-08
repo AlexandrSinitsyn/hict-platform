@@ -12,6 +12,6 @@ class FileUploadingStreamForm(
 )
 
 class FileAttachmentForm(
-    @field:[NotNull                                    ] val fileId: UUID,
-    @field:[NotNull EnumValues(clazz = FileType::class)] val fileType: FileType,
+    @field:[NotNull org.hibernate.validator.constraints.UUID] val fileId: UUID,
+    @field:[NotNull EnumValues(clazz = FileType::class)     ] val fileType: FileType,
 )

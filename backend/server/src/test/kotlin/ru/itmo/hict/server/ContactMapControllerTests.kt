@@ -9,40 +9,47 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import org.mockito.kotlin.*
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.validation.BindingResult
 import org.springframework.validation.DirectFieldBindingResult
-import org.springframework.web.multipart.MultipartFile
-import ru.itmo.hict.entity.HiCMap
-import ru.itmo.hict.entity.Role
+import ru.itmo.hict.entity.ContactMap
+import ru.itmo.hict.entity.Experiment
+import ru.itmo.hict.entity.Group
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.controller.ContactMapController
 import ru.itmo.hict.server.exception.ValidationException
-import ru.itmo.hict.server.form.HiCMapCreationForm
-import ru.itmo.hict.server.service.HiCMapService
-import ru.itmo.hict.server.validator.ContactMapCreationFormValidator
+import ru.itmo.hict.server.form.ContactMapCreationForm
+import ru.itmo.hict.server.logging.Logger
+import ru.itmo.hict.server.service.ContactMapService
+import ru.itmo.hict.server.service.GrpcContainerService
+import ru.itmo.hict.server.service.MinioService
 import java.nio.file.Files
 import java.nio.file.Path
-import java.sql.Timestamp
+import java.util.UUID
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.pathString
 
 class ContactMapControllerTests {
     private companion object {
-        private const val USER_ID = 1L
+        private val USER_ID = UUID.randomUUID()
         private val user = User(
-            "username", "login", "email@test.com", "pass", Role.USER,
-            id = USER_ID, creationTime = Timestamp(System.currentTimeMillis())
+            "username", "login", "email@test.com", "pass",
+            id = USER_ID
         )
-        private const val ID = 2L
+        private val EXPERIMENT_ID = UUID.randomUUID()
+        private val experiment = Experiment(
+            "test-experiment", user, Group("test-group"),
+            id = EXPERIMENT_ID
+        )
+        private val ID = UUID.randomUUID()
         private const val NAME = "name"
-        private val hicMap = HiCMap(user, NAME, "description",
-            id = ID, creationTime = Timestamp(System.currentTimeMillis()))
+        private val contactMap = ContactMap(NAME, experiment, id = ID)
 
-        private lateinit var hicController: ContactMapController
-        private lateinit var hicService: HiCMapService
-        private lateinit var creationValidator: ContactMapCreationFormValidator
+        private lateinit var contactMapController: ContactMapController
+        private lateinit var contactMapService: ContactMapService
+        private lateinit var containerService: GrpcContainerService
+        private lateinit var minioService: MinioService
 
         private val TEMP_PATH = Files.createTempDirectory("hic_controller_tests")
 
@@ -51,25 +58,25 @@ class ContactMapControllerTests {
         private fun noUserRequestUserInfo() = RequestUserInfo("test-jwt", null)
 
         private fun setCorrectRequestUserInfo() {
-            hicController::class.java.getDeclaredField("requestUserInfo").run {
+            contactMapController::class.java.getDeclaredField("requestUserInfo").run {
                 isAccessible = true
-                set(hicController, testRequestUserInfo())
+                set(contactMapController, testRequestUserInfo())
             }
         }
 
         private fun setNullRequestUserInfo() {
-            hicController::class.java.getDeclaredField("requestUserInfo").run {
+            contactMapController::class.java.getDeclaredField("requestUserInfo").run {
                 isAccessible = true
-                set(hicController, noUserRequestUserInfo())
+                set(contactMapController, noUserRequestUserInfo())
             }
         }
 
         @JvmStatic
         @BeforeAll
         fun init() {
-            hicService = mock<HiCMapService>()
-            creationValidator = mock<ContactMapCreationFormValidator>()
-            hicController = ContactMapController(hicService, creationValidator)
+            contactMapService = mock<ContactMapService>()
+            contactMapController =
+                ContactMapController(contactMapService, containerService, minioService, Logger("test"), TEMP_PATH.pathString)
 
             setCorrectRequestUserInfo()
         }
@@ -98,9 +105,9 @@ class ContactMapControllerTests {
 
     @Test
     fun `get existing by id`() {
-        whenever(hicService.getByName(NAME)) doReturn hicMap
+        whenever(contactMapService.getByName(NAME)) doReturn contactMap
 
-        val response = hicController.getByName(NAME)
+        val response = contactMapController.getByName(NAME)
 
         Assertions.assertTrue(response.statusCode.is2xxSuccessful)
         Assertions.assertNotNull(response.body)
@@ -109,29 +116,27 @@ class ContactMapControllerTests {
 
     @Test
     fun `get invalid by id`() {
-        whenever(hicService.getByName(any())) doReturn null
+        whenever(contactMapService.getByName(any())) doReturn null
 
-        val response = hicController.getByName(NAME)
+        val response = contactMapController.getByName(NAME)
 
         Assertions.assertTrue(response.statusCode.is4xxClientError)
         Assertions.assertNull(response.body)
     }
 
+    @Suppress("ClassName")
     @TestMethodOrder(OrderAnnotation::class)
     @Nested
-    inner class Publish {
-        private val fileName = "test.hic"
-        private val content = "Hello, World!".toByteArray()
-        private val file: MultipartFile = MockMultipartFile(fileName, content)
-        private val form = HiCMapCreationForm("name", "description")
+    inner class `Publish and Ping` {
+        private val form = ContactMapCreationForm(EXPERIMENT_ID)
         private val bindingResult: BindingResult = DirectFieldBindingResult(this, "test")
 
         @Order(1)
         @Test
         fun `correct publish`() {
-            whenever(hicService.load(any(), any(), any(), any())) doReturn hicMap
+            whenever(contactMapService.create(any())) doReturn contactMap
 
-            val response = hicController.publish(file, form, bindingResult)
+            val response = contactMapController.publish(form, bindingResult)
 
             Assertions.assertTrue(response.statusCode.is2xxSuccessful)
             Assertions.assertNotNull(response.body)
@@ -140,11 +145,33 @@ class ContactMapControllerTests {
 
         @Order(1)
         @Test
-        fun `not authorized`() {
+        fun `incorrect publish`() {
+            val response = contactMapController.publish(ContactMapCreationForm(UUID.randomUUID()), bindingResult)
+
+            Assertions.assertTrue(response.statusCode.is2xxSuccessful)
+            Assertions.assertNotNull(response.body)
+            Assertions.assertEquals(ID, response.body!!.id)
+        }
+
+        @Order(2)
+        @Test
+        fun `authorized ping`() {
+            doNothing().whenever(containerService.ping(any()))
+
+            val response = contactMapController.ping(NAME)
+
+            Assertions.assertTrue(response.statusCode.is2xxSuccessful)
+            Assertions.assertNotNull(response.body)
+            Assertions.assertEquals(true, response.body!!)
+        }
+
+        @Order(2)
+        @Test
+        fun `unauthorized ping`() {
             setNullRequestUserInfo()
 
             try {
-                hicController.publish(file, form, bindingResult)
+                contactMapController.ping(NAME)
             } catch (e: ValidationException) {
                 Assertions.assertNotNull(e.bindingResult)
                 Assertions.assertTrue(e.bindingResult.hasErrors())
@@ -155,25 +182,12 @@ class ContactMapControllerTests {
             }
         }
 
-        @Order(1)
-        @Test
-        fun `empty file`() {
-            try {
-                hicController.publish(MockMultipartFile("invalid.hic", ByteArray(0)), form, bindingResult)
-            } catch (e: ValidationException) {
-                Assertions.assertNotNull(e.bindingResult)
-                Assertions.assertTrue(e.bindingResult.hasErrors())
-                Assertions.assertNotNull(e.bindingResult.allErrors.first().defaultMessage)
-                Assertions.assertTrue("should not be empty" in e.bindingResult.allErrors.first().defaultMessage!!)
-            }
-        }
-
-        @Order(2)
+        @Order(3)
         @Test
         fun `has validation errors`() {
             Assertions.assertThrows(ValidationException::class.java) {
                 bindingResult.reject("some-error", "Default test error")
-                hicController.publish(file, form, bindingResult)
+                contactMapController.publish(form, bindingResult)
             }
         }
     }

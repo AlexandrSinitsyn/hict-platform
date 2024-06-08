@@ -41,8 +41,10 @@ class UserController(
     fun all(): ResponseEntity<List<UserInfoDto>> = authorized { userService.getAll().map { it.toInfoDto() } }.response()
 
     @PatchMapping("/update/info")
-    fun updateInfo(@RequestBody @Valid updateUserInfoForm: UpdateUserInfoForm,
-                   bindingResult: BindingResult): ResponseEntity<Boolean> = authorized {
+    fun updateInfo(
+        @RequestBody @Valid updateUserInfoForm: UpdateUserInfoForm,
+        bindingResult: BindingResult,
+    ): ResponseEntity<Boolean> = authorized {
         when {
             this.username == updateUserInfoForm.username -> notSame("username", bindingResult)
             this.login == updateUserInfoForm.login -> notSame("login", bindingResult)
@@ -63,8 +65,10 @@ class UserController(
     }.success()
 
     @PatchMapping("/update/password")
-    fun updatePassword(@RequestBody @Valid form: UpdatePasswordForm,
-                       bindingResult: BindingResult): ResponseEntity<Boolean> = authorized {
+    fun updatePassword(
+        @RequestBody @Valid form: UpdatePasswordForm,
+        bindingResult: BindingResult,
+    ): ResponseEntity<Boolean> = authorized {
         if (!userService.checkCredentials(this, form.oldPassword)) {
             throw NotConfirmedException()
         }

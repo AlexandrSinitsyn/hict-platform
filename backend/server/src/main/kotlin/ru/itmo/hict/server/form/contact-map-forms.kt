@@ -1,6 +1,11 @@
 package ru.itmo.hict.server.form
 
 import jakarta.validation.constraints.*
+import java.util.*
+
+class ContactMapCreationForm(
+    @field:[NotNull org.hibernate.validator.constraints.UUID] val experimentId: UUID,
+)
 
 class ContactMapNameUpdateForm(
     @field:[NotNull NotBlank Size(min = 4, max = 256)] val name: String,

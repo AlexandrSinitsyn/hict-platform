@@ -23,8 +23,8 @@ class ContactMapService(
 ) {
     fun getByName(name: String): ContactMap? = contactMapRepository.findByName(name).getOrNull()
 
-    fun create(experimentName: String): ContactMap? =
-        experimentService.getByName(experimentName)?.run {
+    fun create(experimentId: UUID): ContactMap? =
+        experimentService.getById(experimentId)?.run {
             contactMapRepository.save(ContactMap(UUID.randomUUID().toString(), this))
         }
 

@@ -28,6 +28,8 @@ class ExperimentService(
 
     fun getByName(name: String): Experiment? = experimentRepository.findByName(name).getOrNull()
 
+    fun getById(id: UUID): Experiment? = experimentRepository.findById(id).getOrNull()
+
     fun create(author: User, groupName: String): Experiment {
         val group = groupService.getByName(groupName) ?: throw NoGroupFoundException(groupName)
 

@@ -25,17 +25,19 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import ru.itmo.hict.dto.HiCMapInfoDto
+import ru.itmo.hict.dto.ContactMapInfoDto
 import ru.itmo.hict.dto.Jwt
 import ru.itmo.hict.dto.USER_ID_CLAIM
-import ru.itmo.hict.server.form.HiCMapCreationForm
+import ru.itmo.hict.entity.Experiment
+import ru.itmo.hict.server.form.ContactMapCreationForm
 import ru.itmo.hict.server.form.UpdatePasswordForm
-import ru.itmo.hict.server.repository.HiCMapRepository
+import ru.itmo.hict.server.repository.ContactMapRepository
 import ru.itmo.hict.server.repository.UserRepository
-import ru.itmo.hict.server.service.MinioConfiguration
 import ru.itmo.hict.server.service.MinioService
+import ru.itmo.hict.server.service.S3Configuration
 import java.net.URI
 import java.time.Duration
+import java.util.UUID
 
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -80,7 +82,7 @@ class HiCTPlatformServerApplicationTests {
     }
 
     @MockBean
-    private lateinit var miniConfiguration: MinioConfiguration
+    private lateinit var s3Configuration: S3Configuration
 
     @TestConfiguration
     @Profile("full-app-test")
@@ -103,7 +105,7 @@ class HiCTPlatformServerApplicationTests {
     private lateinit var algorithm: Algorithm
 
     @Autowired
-    private lateinit var hiCMapRepository: HiCMapRepository
+    private lateinit var contactMapRepository: ContactMapRepository
 
     @Autowired
     private lateinit var minioService: MinioService
@@ -117,7 +119,7 @@ class HiCTPlatformServerApplicationTests {
     private val userPass = "user"
     private val userId by lazy { userRepository.findByLoginAndPassword("user", userPass).get().id!! }
 
-    private val jwt by lazy { JWT.create().withClaim(USER_ID_CLAIM, userId).sign(algorithm) }
+    private val jwt by lazy { JWT.create().withClaim(USER_ID_CLAIM, "$userId").sign(algorithm) }
 
     @Order(0)
 	@Test
@@ -130,18 +132,18 @@ class HiCTPlatformServerApplicationTests {
 
     @AfterEach
     fun clearDb() {
-        hiCMapRepository.deleteAll()
+        contactMapRepository.deleteAll()
     }
 
     @Test
     fun `search for nothing`() {
-        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/hi-c/all")).run {
+        restTemplate.getForEntity<List<ContactMapInfoDto>>(URI("$server/hi-c/all")).run {
             Assertions.assertTrue(statusCode.is2xxSuccessful)
             Assertions.assertNotNull(body)
             Assertions.assertTrue(body!!.isEmpty())
         }
 
-        restTemplate.getForEntity<List<HiCMapInfoDto>>(URI("$server/hi-c/acquire/unknown")).run {
+        restTemplate.getForEntity<List<ContactMapInfoDto>>(URI("$server/hi-c/acquire/unknown")).run {
             Assertions.assertTrue(statusCode.is4xxClientError)
             Assertions.assertNull(body)
         }
@@ -160,7 +162,7 @@ class HiCTPlatformServerApplicationTests {
 
         val body = LinkedMultiValueMap<String, Any>()
         body.add("file", file(content ?: ""))
-        body.add("form", HiCMapCreationForm(NAME, DESCRIPTION))
+        body.add("form", ContactMapCreationForm(UUID.randomUUID()))
 
         return restTemplate.postForEntity(
             URI("$server/hi-c/publish"),
@@ -171,18 +173,17 @@ class HiCTPlatformServerApplicationTests {
 
     @Test
     fun `save one Hi-C map`() {
-        Assertions.assertEquals(0, minioService.listInBucket("hi-c", null).size)
+        Assertions.assertEquals(0, minioService.listInBucket("hi-c").size)
 
-        publish<HiCMapInfoDto>(FILE_CONTENT, jwt).run {
+        publish<ContactMapInfoDto>(FILE_CONTENT, jwt).run {
             Assertions.assertTrue(statusCode.is2xxSuccessful)
             Assertions.assertNotNull(body)
-            Assertions.assertEquals(body!!.author.id, userId)
         }
 
-        Assertions.assertEquals(1, minioService.listInBucket("hi-c", null).size)
-        Assertions.assertTrue(minioService.listInBucket("hi-c", null)[0].objectName().startsWith("u$userId"))
-        Assertions.assertEquals(1, minioService.listInBucket("hi-c", "u$userId").size)
-        Assertions.assertEquals("u$userId/$NAME.hic", minioService.listInBucket("hi-c", "u$userId")[0].objectName())
+        Assertions.assertEquals(1, minioService.listInBucket("hi-c").size)
+        Assertions.assertTrue(minioService.listInBucket("hi-c")[0].startsWith("u$userId"))
+        Assertions.assertEquals(1, minioService.listInBucket("hi-c").size)
+        Assertions.assertEquals("u$userId/$NAME.hic", minioService.listInBucket("hi-c")[0])
     }
 
     @Test

@@ -2,6 +2,7 @@ package ru.itmo.hict.server.controller
 
 import jakarta.annotation.PostConstruct
 import jakarta.validation.Valid
+import jakarta.validation.constraints.PositiveOrZero
 import okio.IOException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
@@ -116,7 +117,7 @@ class FilesController(
     @PostMapping("/publish")
     fun publish(
         @RequestPart("session") session: UUID,
-        @RequestPart("partIndex") partIndex: Long,
+        @RequestPart("partIndex") @PositiveOrZero partIndex: Long,
         @RequestPart("file") file: MultipartFile,
     ): ResponseEntity<Boolean> = authorized {
         when {
