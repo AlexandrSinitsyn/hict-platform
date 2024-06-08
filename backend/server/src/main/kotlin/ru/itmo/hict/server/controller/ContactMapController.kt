@@ -60,6 +60,8 @@ class ContactMapController(
 
         contactMapService.view(contactMap)
 
+        logger.info("request-map", name, "viewed")
+
         contactMap.hict?.let {
             val filename = "${it.file.id!!}.${FileType.HICT.extension}"
 

@@ -8,12 +8,14 @@ import ru.itmo.hict.server.exception.NoExperimentFoundException
 import ru.itmo.hict.server.exception.NoGroupFoundException
 import ru.itmo.hict.server.exception.NotGroupMemberException
 import ru.itmo.hict.server.exception.SameFieldException
+import ru.itmo.hict.server.logging.Logger
 import ru.itmo.hict.server.repository.ExperimentRepository
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 
 @Service
 class ExperimentService(
+    private val logger: Logger,
     private val experimentRepository: ExperimentRepository,
     private val groupService: GroupService,
     private val fileService: FileService,
@@ -57,6 +59,8 @@ class ExperimentService(
     fun attachToExperiment(experimentId: UUID, fileId: UUID) {
         val experiment = experimentRepository.findById(experimentId).getOrNull()
             ?: throw NoExperimentFoundException(experimentId)
+
+        logger.info("attach", "file", "file[$fileId] of [FASTA] to experiment[$experimentId]")
 
         fileService.attachFastaFileToExperiment(experiment, fileId)
     }

@@ -11,6 +11,7 @@ import ru.itmo.hict.server.exception.NotConfirmedException
 import ru.itmo.hict.server.exception.SamePasswordException
 import ru.itmo.hict.server.exception.ValidationException.Companion.alert
 import ru.itmo.hict.server.form.*
+import ru.itmo.hict.server.logging.Logger
 import ru.itmo.hict.server.service.UserService
 import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 
@@ -18,6 +19,7 @@ import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 @RequestMapping("/api/v1/users")
 @CrossOrigin
 class UserController(
+    private val logger: Logger,
     private val userService: UserService,
     private val updateUserInfoFormValidator: UpdateUserInfoFormValidator,
 ) : ApiExceptionController() {
@@ -49,6 +51,8 @@ class UserController(
 
         bindingResult.alert()
 
+        logger.info("validation", "user-info", "succeed")
+
         updateUserInfoForm.let {
             userService.updateUsername(this, it.username!!)
             userService.updateLogin(this, it.login!!)
@@ -68,6 +72,8 @@ class UserController(
         }
 
         bindingResult.alert()
+
+        logger.info("validation", "user-password", "succeed")
 
         userService.updatePassword(this, form.oldPassword, form.newPassword)
     }.response()
