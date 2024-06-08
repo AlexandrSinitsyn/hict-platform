@@ -96,7 +96,7 @@ type RowType = {
 
 const headers: Header[] = [
     { text: 'Только в которых участвуете', value: 'member' },
-    { text: 'Название группы ', value: 'name' },
+    { text: 'Название группы', value: 'name' },
     { text: 'Описание', value: 'affiliation' },
     { text: 'Дата создания', value: 'creationTime' },
 ];
