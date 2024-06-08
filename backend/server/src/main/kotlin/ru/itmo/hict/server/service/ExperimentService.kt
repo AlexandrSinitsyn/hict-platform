@@ -43,7 +43,7 @@ class ExperimentService(
             ?: throw NoExperimentFoundException(id)
 
         if (selected.name == newName) {
-            throw SameFieldException("name", newName)
+            throw SameFieldException("experiment", "name", newName)
         }
 
         experimentRepository.updateName(selected, newName)

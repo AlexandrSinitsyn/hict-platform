@@ -36,7 +36,7 @@ class ContactMapService(
             ?: throw NoContactMapFoundException(id)
 
         if (selected.name == newName) {
-            throw SameFieldException("name", newName)
+            throw SameFieldException("contact-map", "name", newName)
         }
 
         contactMapRepository.updateName(selected, newName)

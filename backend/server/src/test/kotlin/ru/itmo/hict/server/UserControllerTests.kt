@@ -11,23 +11,25 @@ import org.mockito.kotlin.*
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.validation.DirectFieldBindingResult
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.controller.UserController
+import ru.itmo.hict.server.exception.UnauthorizedException
 import ru.itmo.hict.server.exception.ValidationException
 import ru.itmo.hict.server.form.UpdatePasswordForm
 import ru.itmo.hict.server.form.UpdateUserInfoForm
+import ru.itmo.hict.server.logging.Logger
 import ru.itmo.hict.server.service.UserService
 import ru.itmo.hict.server.validator.UpdateUserInfoFormValidator
 import java.sql.Timestamp
+import java.util.UUID
 import kotlin.random.Random
 
 class UserControllerTests {
     private companion object {
-        private const val USER_ID = 1L
+        private val USER_ID = UUID.randomUUID()
         private val user = User(
-            "username", "login", "email@test.com", "pass", Role.USER,
+            "username", "login", "email@test.com", "pass",
             id = USER_ID, creationTime = Timestamp(System.currentTimeMillis())
         )
 
@@ -40,14 +42,14 @@ class UserControllerTests {
         private fun noUserRequestUserInfo() = RequestUserInfo("test-jwt", null)
 
         private fun setCorrectRequestUserInfo() {
-            userController::class.java.getDeclaredField("requestUserInfo").run {
+            userController::class.java.superclass.getDeclaredField("requestUserInfo").run {
                 isAccessible = true
                 set(userController, testRequestUserInfo())
             }
         }
 
         private fun setNullRequestUserInfo() {
-            userController::class.java.getDeclaredField("requestUserInfo").run {
+            userController::class.java.superclass.getDeclaredField("requestUserInfo").run {
                 isAccessible = true
                 set(userController, noUserRequestUserInfo())
             }
@@ -58,7 +60,7 @@ class UserControllerTests {
         fun init() {
             userService = mock<UserService>()
             updateUserInfoFormValidator = mock<UpdateUserInfoFormValidator>()
-            userController = UserController(userService, updateUserInfoFormValidator)
+            userController = UserController(Logger("test"), userService, updateUserInfoFormValidator)
 
             setCorrectRequestUserInfo()
         }
@@ -101,11 +103,9 @@ class UserControllerTests {
 
             try {
                 method(form, bindingResult)
-            } catch (e: ValidationException) {
-                Assertions.assertNotNull(e.bindingResult)
-                Assertions.assertTrue(e.bindingResult.hasErrors())
-                Assertions.assertNotNull(e.bindingResult.allErrors.first().defaultMessage)
-                Assertions.assertTrue("must be authorized" in e.bindingResult.allErrors.first().defaultMessage!!)
+            } catch (e: UnauthorizedException) {
+                Assertions.assertNotNull(e.message)
+                Assertions.assertTrue("should be authorized" in e.message)
             } finally {
                 setCorrectRequestUserInfo()
             }

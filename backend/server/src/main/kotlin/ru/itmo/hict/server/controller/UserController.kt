@@ -53,11 +53,13 @@ class UserController(
 
         logger.info("validation", "user-info", "succeed")
 
-        updateUserInfoForm.let {
-            userService.updateUsername(this, it.username!!)
-            userService.updateLogin(this, it.login!!)
-            userService.updateEmail(this, it.email!!)
+        updateUserInfoForm.let { u ->
+            u.username?.let { userService.updateUsername(this, it) }
+            u.login?.let { userService.updateLogin(this, it) }
+            u.email?.let { userService.updateEmail(this, it) }
         }
+
+        Unit
     }.success()
 
     @PatchMapping("/update/password")

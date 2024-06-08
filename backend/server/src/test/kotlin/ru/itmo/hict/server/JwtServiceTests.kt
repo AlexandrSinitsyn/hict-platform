@@ -10,17 +10,18 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import ru.itmo.hict.dto.Jwt
 import ru.itmo.hict.dto.USER_ID_CLAIM
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.service.JwtService
 import ru.itmo.hict.server.service.UserService
+import java.util.*
+import kotlin.collections.HashSet
 import kotlin.random.Random
 
 class JwtServiceTests {
-    private class JwtEncoder(private val algorithm: Algorithm,) {
+    private class JwtEncoder(private val algorithm: Algorithm) {
         fun create(user: User): Jwt {
             return JWT.create()
-                .withClaim(USER_ID_CLAIM, user.id)
+                .withClaim(USER_ID_CLAIM, "${user.id}")
                 .sign(algorithm)
         }
     }
@@ -31,8 +32,8 @@ class JwtServiceTests {
     private companion object {
         private lateinit var userService: UserService
         private val user = User(
-            "test", "test", "test@test.com", "test", Role.ANONYMOUS,
-            id = System.currentTimeMillis()
+            "test", "test", "test@test.com", "test",
+            id = UUID.randomUUID()
         )
 
         @JvmStatic
@@ -80,7 +81,7 @@ class JwtServiceTests {
         val jwts = HashSet<String>()
 
         repeat(10_000) {
-            val test = User(rndString(), rndString(), rndString(), rndString(), Role.ANONYMOUS, id = it.toLong())
+            val test = User(rndString(), rndString(), rndString(), rndString(), id = UUID.randomUUID())
 
             whenever(userService.getById(test.id!!)).thenReturn(test)
 

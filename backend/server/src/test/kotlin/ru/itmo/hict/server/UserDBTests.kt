@@ -18,7 +18,6 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import ru.itmo.hict.server.repository.UserRepository
-import ru.itmo.hict.entity.Role
 import kotlin.jvm.optionals.getOrNull
 
 @Testcontainers
@@ -55,11 +54,11 @@ class UserDBTests {
 
     @Test
     fun `check not empty database`() {
-        Assertions.assertEquals(4, userRepository.count())
+        Assertions.assertEquals(3, userRepository.count())
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["anonymous", "user", "admin", "superuser"])
+    @ValueSource(strings = ["user", "test"])
     fun `find existing user`(name: String) {
         val user = userRepository.findByLoginAndPassword(name, name).run {
             Assertions.assertNotNull(getOrNull())
@@ -72,7 +71,17 @@ class UserDBTests {
         Assertions.assertEquals(name, user.username)
         Assertions.assertEquals(name, user.login)
         Assertions.assertEquals("$name@test.com", user.email)
-        Assertions.assertEquals(Role.valueOf(name.uppercase()), user.role)
+    }
+
+    @Test
+    fun `find anonymous user`() {
+        Assertions.assertDoesNotThrow {
+            val user = userRepository.findByLoginAndPassword("anonymous", "nopass").get()
+
+            Assertions.assertNotNull(user.id)
+            Assertions.assertNotNull(user.creationTime)
+            Assertions.assertEquals("anonymous", user.username)
+        }
     }
 
     @Test

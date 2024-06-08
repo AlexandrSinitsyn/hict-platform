@@ -90,10 +90,10 @@ class NotGroupMemberException(username: String, groupName: String) : ValidationE
     "group-rights", "not-group-member", "You [$username] are not a member of this group `$groupName`"
 )
 
-open class SameFieldException(fieldName: String, value: String)
-    : ClientException("New $fieldName should be different: `$value`")
+open class SameFieldException(target: String, fieldName: String, value: String)
+    : ValidationException(target, "same-field", "New $fieldName should be different: `$value`")
 
-class SamePasswordException : SameFieldException("password", "***")
+class SamePasswordException : SameFieldException("user", "password", "***")
 
 open class LoadedFileException(message: String) : ClientException(message)
 
