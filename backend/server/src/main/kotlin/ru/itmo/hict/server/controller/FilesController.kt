@@ -53,11 +53,11 @@ class FilesController(
         scheduler.schedule({
             sessions[session]?.let {
                 if (it.isBefore(Instant.now())) {
-                    logger.info("cleanup", session.toString(), "deleting")
+                    logger.info("cleanup", "$session", "deleting")
                     session.tmpDir().deleteRecursively()
                     sessions -= session
                 } else {
-                    logger.info("cleanup", session.toString(), "delay")
+                    logger.info("cleanup", "$session", "delay")
                     delayCleaning(session)
                 }
             }
@@ -77,6 +77,7 @@ class FilesController(
             it.tmpDir().createDirectories()
             extendLifetime(it)
             delayCleaning(it)
+            logger.info("session-init", "$it", "schedule setup")
         }.response()
 
     @PostMapping("/session/{session}/close")
@@ -91,6 +92,8 @@ class FilesController(
         try {
             val saved = fileService.save(form.type, form.filename, form.fileSize)
 
+            logger.info("uploading", "$session", "file info saved")
+
             val filename = "${saved.file.id!!}.${form.type.extension}"
 
             val file = Path(storagePath, filename)
@@ -98,7 +101,7 @@ class FilesController(
             session.tmpDir().listDirectoryEntries().sortedBy { it.name.toLong() }.map { it.toFile().readBytes() }
                 .forEach { file.run { if (!exists()) writeBytes(it) else appendBytes(it) } }
 
-            logger.info("uploading", session.toString(), filename)
+            logger.info("uploading", "$session", filename)
 
             minioService.upload(form.type, filename, form.fileSize, file.toFile().inputStream())
 
@@ -124,7 +127,7 @@ class FilesController(
         try {
             val localFile = session.tmpDir().resolve("$partIndex")
             file.transferTo(localFile)
-            logger.info("uploading", session.toString(), "arrived: $partIndex")
+            logger.info("uploading", "$session", "arrived: $partIndex")
         } catch (e: IOException) {
             throw LoadingFailedException(e.message ?: "I/O exception")
         }

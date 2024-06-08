@@ -5,10 +5,12 @@ import org.springframework.validation.Errors
 import org.springframework.validation.Validator
 import ru.itmo.hict.server.form.UpdateUserInfoForm
 import ru.itmo.hict.server.logging.Info
+import ru.itmo.hict.server.logging.Logger
 import ru.itmo.hict.server.service.UserService
 
 @Component
 class UpdateUserInfoFormValidator(
+    private val logger: Logger,
     private val userService: UserService,
 ) : Validator {
     override fun supports(clazz: Class<*>): Boolean = UpdateUserInfoForm::class.java == clazz
@@ -24,6 +26,7 @@ class UpdateUserInfoFormValidator(
             }
 
             if (!userService.isUniqueLoginAndEmail(form.login, form.email)) {
+                logger.warn("validation-failed", "update-info", "$form")
                 errors.reject("occupied-login-or-email", "Already taken login or email")
             }
         }

@@ -7,6 +7,7 @@ import ru.itmo.hict.entity.ContactMap
 import ru.itmo.hict.server.exception.InvalidFileTypeException
 import ru.itmo.hict.server.exception.NoContactMapFoundException
 import ru.itmo.hict.server.exception.SameFieldException
+import ru.itmo.hict.server.logging.Logger
 import ru.itmo.hict.server.repository.ContactMapRepository
 import ru.itmo.hict.server.repository.ViewsRepository
 import java.util.UUID
@@ -14,6 +15,7 @@ import kotlin.jvm.optionals.getOrNull
 
 @Service
 class ContactMapService(
+    private val logger: Logger,
     private val contactMapRepository: ContactMapRepository,
     private val experimentService: ExperimentService,
     private val viewsRepository: ViewsRepository,
@@ -58,6 +60,8 @@ class ContactMapService(
             FileType.TRACKS -> fileService::attachTracksFileToContactMap
             FileType.FASTA -> throw InvalidFileTypeException(FileType.FASTA)
         }
+
+        logger.info("attach", "file", "file[$fileId] of [$fileType] to contact-map[$contactMapId]")
 
         attach(contactMap, fileId)
     }

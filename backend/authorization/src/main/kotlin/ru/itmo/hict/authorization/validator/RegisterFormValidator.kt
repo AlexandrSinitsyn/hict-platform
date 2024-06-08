@@ -5,10 +5,12 @@ import org.springframework.validation.Errors
 import org.springframework.validation.Validator
 import ru.itmo.hict.authorization.form.RegisterForm
 import ru.itmo.hict.authorization.logging.Info
+import ru.itmo.hict.authorization.logging.Logger
 import ru.itmo.hict.authorization.service.UserService
 
 @Component
 class RegisterFormValidator(
+    private val logger: Logger,
     private val userService: UserService,
 ) : Validator {
     override fun supports(clazz: Class<*>): Boolean = RegisterForm::class.java == clazz
@@ -19,6 +21,7 @@ class RegisterFormValidator(
             val form = target as RegisterForm
 
             if (!userService.checkUnique(form.login, form.email)) {
+                logger.warn("validation-failed", "register", "$form")
                 errors.reject("occupied-login-or-email", "Already occupied login or email")
             }
         }

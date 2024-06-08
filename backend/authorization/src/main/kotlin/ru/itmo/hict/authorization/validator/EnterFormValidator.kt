@@ -5,10 +5,12 @@ import org.springframework.validation.Errors
 import org.springframework.validation.Validator
 import ru.itmo.hict.authorization.form.EnterForm
 import ru.itmo.hict.authorization.logging.Info
+import ru.itmo.hict.authorization.logging.Logger
 import ru.itmo.hict.authorization.service.UserService
 
 @Component
 class EnterFormValidator(
+    private val logger: Logger,
     private val userService: UserService,
 ) : Validator {
     override fun supports(clazz: Class<*>): Boolean = EnterForm::class.java == clazz
@@ -23,6 +25,7 @@ class EnterFormValidator(
             }
 
             if (userService.findByCredentials(form.login, form.email, form.password).isEmpty) {
+                logger.warn("validation-failed", "enter", "$form")
                 errors.reject("invalid-login-or-password", "Invalid login or password")
             }
         }

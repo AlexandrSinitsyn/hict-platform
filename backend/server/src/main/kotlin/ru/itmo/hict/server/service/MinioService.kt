@@ -44,6 +44,8 @@ class MinioService(
         minioClient.makeBucket(MakeBucketArgs.builder()
             .bucket(name)
             .build())
+
+        logger.info("minio", "bucket: $name", "created")
     }
 
     class FileObjectInfo(val name: String,
@@ -87,4 +89,5 @@ class MinioService(
     @Async
     fun upload(fileType: FileType, filename: String, filesize: Long, data: InputStream) =
         upload(fileType.bucket, FileObjectInfo(filename, filesize, data))
+            .also { logger.info("minio", filename, "successfully uploaded") }
 }
