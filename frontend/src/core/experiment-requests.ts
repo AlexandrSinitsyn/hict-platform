@@ -40,7 +40,9 @@ export function publishContactMap(
     authorizedRequest(
         axios.post,
         `${__SERVER_HOST__.value}/contact-map/new`,
-        experiment,
+        {
+            experimentId: experiment.id,
+        },
         onSuccess
     );
 }
