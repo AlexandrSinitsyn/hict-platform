@@ -8,7 +8,7 @@ export default ({ mode }: { mode: string }) => {
     const env = loadEnv(mode, process.cwd(), '');
 
     return defineConfig({
-        base: '/',
+        base: 'https://genome.ifmo.ru/hict/',
         define: {
             'process.env': env,
         },
@@ -21,7 +21,7 @@ export default ({ mode }: { mode: string }) => {
             },
         },
         server: {
-            port: 82,
+            port: 80,
         },
         build: {
             sourcemap: false,
