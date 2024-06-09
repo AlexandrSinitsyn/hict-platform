@@ -81,7 +81,7 @@ onMounted(() => {
 
 function createGroup(groupForm: GroupCreationForm): void {
     publishGroup(groupForm, (group: Group) => {
-        joinGroup(group);
+        // joinGroup(group);
     });
 }
 
