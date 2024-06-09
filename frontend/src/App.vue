@@ -41,7 +41,7 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 header {
     position: fixed;
     width: 15vw;
