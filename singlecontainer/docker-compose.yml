@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  singlecontainer:
+    container_name: singlecontainer
+    image: hict/singlecontainer:1.0.0
+    build:
+      context: ..
+      dockerfile: singlecontainer/Dockerfile
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro,Z
