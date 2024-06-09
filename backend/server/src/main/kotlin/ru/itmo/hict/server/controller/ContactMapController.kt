@@ -29,9 +29,12 @@ class ContactMapController(
     @Value("\${SERVER_LOCAL_STORAGE_PATH}") private val storagePath: String,
 ) : ApiExceptionController() {
     @PostMapping("/new")
-    fun publish(@RequestBody @Valid experimentInfoDto: ExperimentInfoDto): ResponseEntity<ContactMapInfoDto> =
-        contactMapService.create(experimentInfoDto.name)?.toInfoDto()?.response()
-            ?: throw NoExperimentFoundException(experimentInfoDto.name)
+    fun publish(
+        @RequestBody @Valid form: ContactMapCreationForm,
+        bindingResult: BindingResult,
+    ): ResponseEntity<ContactMapInfoDto> =
+        contactMapService.create(form.experimentId)?.toInfoDto()?.response()
+            ?: throw NoExperimentFoundException(form.experimentId)
 
     @PatchMapping("/{id}/update/name")
     fun updateName(

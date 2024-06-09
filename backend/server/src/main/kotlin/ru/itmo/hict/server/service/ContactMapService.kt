@@ -23,8 +23,8 @@ class ContactMapService(
 ) {
     fun getByName(name: String): ContactMap? = contactMapRepository.findByName(name).getOrNull()
 
-    fun create(experimentName: String): ContactMap? =
-        experimentService.getByName(experimentName)?.run {
+    fun create(experimentId: UUID): ContactMap? =
+        experimentService.getById(experimentId)?.run {
             contactMapRepository.save(ContactMap(UUID.randomUUID().toString(), this))
         }
 
@@ -36,7 +36,7 @@ class ContactMapService(
             ?: throw NoContactMapFoundException(id)
 
         if (selected.name == newName) {
-            throw SameFieldException("name", newName)
+            throw SameFieldException("contact-map", "name", newName)
         }
 
         contactMapRepository.updateName(selected, newName)

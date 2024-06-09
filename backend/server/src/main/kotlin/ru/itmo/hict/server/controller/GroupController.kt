@@ -2,6 +2,7 @@ package ru.itmo.hict.server.controller
 
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import ru.itmo.hict.dto.GroupInfoDto
 import ru.itmo.hict.dto.GroupInfoDto.Companion.toInfoDto
@@ -18,13 +19,17 @@ class GroupController(
     fun all(): ResponseEntity<List<GroupInfoDto>> = authorized { groupService.getAll().map { it.toInfoDto() } }.response()
 
     @PostMapping("/new")
-    fun new(@RequestBody @Valid groupCreationForm: GroupCreationForm): ResponseEntity<GroupInfoDto> =
+    fun new(
+        @RequestBody @Valid groupCreationForm: GroupCreationForm,
+        bindingResult: BindingResult,
+    ): ResponseEntity<GroupInfoDto> =
         authorized { groupService.create(this, groupCreationForm.name) }.toInfoDto().response()
 
     @PatchMapping("/{name}/update/name")
     fun updateName(
         @PathVariable("name") name: String,
         @RequestBody @Valid groupUpdateNameForm: GroupUpdateNameForm,
+        bindingResult: BindingResult,
     ): ResponseEntity<Boolean> = authorized { groupService.updateName(name, groupUpdateNameForm.name) }.success()
 
     @PostMapping("/{name}/join")

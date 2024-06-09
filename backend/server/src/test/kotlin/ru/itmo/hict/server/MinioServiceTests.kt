@@ -66,7 +66,7 @@ class MinioServiceTests {
     @Test
     fun `new bucket if absent`() {
         try {
-            minioService.listInBucket(BUCKET, null)
+            minioService.listInBucket(BUCKET)
             Assertions.assertTrue(false) { "Exception expected" }
         } catch (e: ErrorResponseException) {
             Assertions.assertTrue("bucket does not exist" in e.message!!)
@@ -76,13 +76,13 @@ class MinioServiceTests {
             minioService.newBucketIfAbsent(BUCKET)
         }
 
-        Assertions.assertTrue(minioService.listInBucket(BUCKET, null).isEmpty())
+        Assertions.assertTrue(minioService.listInBucket(BUCKET).isEmpty())
 
         Assertions.assertDoesNotThrow {
             minioService.newBucketIfAbsent(BUCKET)
         }
 
-        Assertions.assertTrue(minioService.listInBucket(BUCKET, null).isEmpty())
+        Assertions.assertTrue(minioService.listInBucket(BUCKET).isEmpty())
     }
 
     private fun Path.toFileObject() =
@@ -94,85 +94,64 @@ class MinioServiceTests {
     fun `upload existing`(filepath: String) {
         val path = Path(RESOURCES, filepath)
 
-        minioService.upload(BUCKET, "existing", path.toFileObject())
+        minioService.upload(BUCKET, path.toFileObject())
 
-        Assertions.assertNotNull(minioService.listInBucket(BUCKET, "existing")
-            .find { "existing/${path.fileName}" == it.objectName() })
+        Assertions.assertNotNull(minioService.listInBucket(BUCKET).find { "${path.fileName}" == it })
     }
 
     @Test
     fun `upload not existing`() {
         Assertions.assertThrows(NoSuchFileException::class.java) {
-            minioService.upload(BUCKET, "not-existing", Path(RESOURCES, "unknown.file").toFileObject())
-        }
-    }
-
-    @Test
-    fun `upload folder`() {
-        Assertions.assertThrows(AccessDeniedException::class.java) {
-            minioService.upload(BUCKET, "folder", Path(RESOURCES, "test-files").toFileObject())
+            minioService.upload(BUCKET, Path(RESOURCES, "unknown.file").toFileObject())
         }
     }
 
     @Order(2)
-    @Test
-    fun `download valid`() {
-        Assertions.assertEquals(3, minioService.listInBucket(BUCKET, "existing").size)
+    @ParameterizedTest
+    @ValueSource(strings = ["test-files/1.test"])
+    fun `download valid`(file: String) {
+        Assertions.assertEquals(3, minioService.listInBucket(BUCKET).size)
 
-        val downloaded = minioService.downloadFile(BUCKET, "existing", "1.test")
+        val filename = Path(file).name
+        val downloaded = minioService.downloadFile(BUCKET, filename)
 
-        Assertions.assertTrue("1.test" in downloaded.name)
+        Assertions.assertTrue(filename in downloaded.name)
         Assertions.assertTrue(downloaded.size > 0)
         Assertions.assertNotEquals(-1, downloaded.data.read())
 
-        Assertions.assertEquals(3, minioService.listInBucket(BUCKET, "existing").size)
+        Assertions.assertEquals(3, minioService.listInBucket(BUCKET).size)
     }
 
     @Order(2)
     @Test
     fun `download invalid`() {
-        Assertions.assertTrue(minioService.listInBucket(BUCKET, "not-existing").isEmpty())
+        Assertions.assertEquals(3, minioService.listInBucket(BUCKET).size)
 
         Assertions.assertThrows(ErrorResponseException::class.java) {
-            minioService.downloadFile(BUCKET, "not-existing", "unknown.file")
+            minioService.downloadFile(BUCKET, "unknown.file")
         }
 
-        Assertions.assertTrue(minioService.listInBucket(BUCKET, "not-existing").isEmpty())
+        Assertions.assertEquals(3, minioService.listInBucket(BUCKET).size)
     }
 
     @Test
-    fun `download folder`() {
+    fun `download invalid bucket`() {
         Assertions.assertThrows(ErrorResponseException::class.java) {
-            minioService.downloadFile(BUCKET, null, "existing")
+            minioService.downloadFile("invalid", "existing")
         }
     }
 
-    @Test
-    fun `download bucket`() {
-        Assertions.assertThrows(IllegalArgumentException::class.java) {
-            minioService.downloadFile(BUCKET, null, "")
-        }
-    }
 
     @Order(2)
     @Test
     fun `list in bucket`() {
-        Assertions.assertEquals(3, minioService.listInBucket(BUCKET, null).size)
+        Assertions.assertEquals(3, minioService.listInBucket(BUCKET).size)
     }
 
     @Test
     fun `list in bucket (not existing)`() {
         Assertions.assertThrows(ErrorResponseException::class.java) {
-            minioService.listInBucket("unknown", "")
+            minioService.listInBucket("unknown")
         }
-    }
-
-    @Test
-    fun `list in not a bucket`() {
-        Assertions.assertEquals(3, minioService.listInBucket(BUCKET, "existing").size)
-
-        Assertions.assertTrue(minioService.listInBucket(BUCKET, "").isEmpty())
-
-        Assertions.assertTrue(minioService.listInBucket(BUCKET, "not-existing").isEmpty())
     }
 }

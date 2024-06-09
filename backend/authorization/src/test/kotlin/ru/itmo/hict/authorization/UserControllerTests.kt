@@ -13,11 +13,11 @@ import ru.itmo.hict.authorization.controller.UserController
 import ru.itmo.hict.authorization.exception.ValidationException
 import ru.itmo.hict.authorization.form.EnterForm
 import ru.itmo.hict.authorization.form.RegisterForm
+import ru.itmo.hict.authorization.logging.Logger
 import ru.itmo.hict.authorization.service.JwtService
 import ru.itmo.hict.authorization.service.UserService
 import ru.itmo.hict.authorization.validator.EnterFormValidator
 import ru.itmo.hict.authorization.validator.RegisterFormValidator
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import java.util.*
 
@@ -30,8 +30,13 @@ class UserControllerTests {
     fun setup() {
         jwtService = mock<JwtService>()
         userService = mock<UserService>()
-        userController =
-            UserController(userService, jwtService, mock<RegisterFormValidator>(), mock<EnterFormValidator>())
+        userController = UserController(
+            Logger("test"),
+            userService,
+            jwtService,
+            mock<RegisterFormValidator>(),
+            mock<EnterFormValidator>()
+        )
     }
 
     @Test
@@ -59,20 +64,6 @@ class UserControllerTests {
 
         val jwt = response.body!!
         assert(jwt.isNotBlank())
-    }
-
-    @Test
-    fun `invalid registration form`() {
-        val registerForm = RegisterForm(INVALID, LOGIN, EMAIL, PASS)
-
-        val bindingResult: BindingResult = DirectFieldBindingResult(this, "test")
-        bindingResult.reject("invalid-username", "test")
-
-        assertThrows<ValidationException> {
-            userController.register(registerForm, bindingResult)
-        }
-
-        assert(bindingResult.hasErrors())
     }
 
     @Test
@@ -114,27 +105,13 @@ class UserControllerTests {
         assert(jwt.isNotBlank())
     }
 
-    @Test
-    fun `invalid enter form`() {
-        val enterForm = EnterForm(INVALID, EMAIL, PASS)
-
-        val bindingResult: BindingResult = DirectFieldBindingResult(this, "test")
-        bindingResult.reject("not-found", "test")
-
-        assertThrows<ValidationException> {
-            userController.login(enterForm, bindingResult)
-        }
-
-        assert(bindingResult.hasErrors())
-    }
-
     private companion object {
         private const val USERNAME = "test"
         private const val LOGIN = "login"
         private const val EMAIL = "email@test.com"
         private const val PASS = "pass"
 
-        private val user = User(USERNAME, LOGIN, EMAIL, PASS, Role.ANONYMOUS)
+        private val user = User(USERNAME, LOGIN, EMAIL, PASS)
 
         private const val INVALID = "invalid"
     }

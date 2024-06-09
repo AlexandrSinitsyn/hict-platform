@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.test.context.ContextConfiguration
@@ -14,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import ru.itmo.hict.entity.Role
 import ru.itmo.hict.entity.User
 import ru.itmo.hict.server.config.RequestUserInfo
 import ru.itmo.hict.server.controller.UserController
@@ -30,6 +30,7 @@ import kotlin.random.Random
 @ContextConfiguration(
     classes = [UserController::class, UserService::class, UpdateUserInfoFormValidator::class, UserRestTests.RestTestBeans::class]
 )
+@Import(LoggerConfig::class)
 class UserRestTests {
     @Autowired
     private lateinit var mvc: MockMvc
@@ -311,6 +312,8 @@ class UserRestTests {
 
         @Test
         fun `empty field form`() {
+            whenever(userRepository.findByLoginAndPassword(any(), any())) doReturn Optional.of(user)
+
             expectValidationException("update/password",
                 jsonBody("", NEW_PASS) throws IS_BLANK or INVALID_SIZE,
                 jsonBody(PASS, "") throws IS_BLANK or INVALID_SIZE,
@@ -319,6 +322,8 @@ class UserRestTests {
 
         @Test
         fun `blank field form`() {
+            whenever(userRepository.findByLoginAndPassword(any(), any())) doReturn Optional.of(user)
+
             expectValidationException("update/password",
                 jsonBody("    ", NEW_PASS) throws IS_BLANK,
                 jsonBody(PASS, "    ") throws IS_BLANK,
@@ -327,6 +332,8 @@ class UserRestTests {
 
         @Test
         fun `invalid length field form`() {
+            whenever(userRepository.findByLoginAndPassword(any(), any())) doReturn Optional.of(user)
+
             expectValidationException("update/password",
                 jsonBody("x", NEW_PASS) throws INVALID_SIZE,
                 jsonBody(PASS, "x") throws INVALID_SIZE,
@@ -342,9 +349,9 @@ class UserRestTests {
     }
 
     private companion object {
-        private const val USER_ID = 1L
+        private val USER_ID = UUID.randomUUID()
         private val user = User(
-            "username", "login", "email@test.com", "pass", Role.USER,
+            "username", "login", "email@test.com", "pass",
             id = USER_ID, creationTime = Timestamp(System.currentTimeMillis())
         )
 

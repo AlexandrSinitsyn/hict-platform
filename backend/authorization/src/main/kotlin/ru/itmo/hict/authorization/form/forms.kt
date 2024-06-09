@@ -21,9 +21,5 @@ class EnterForm(
     @field:[Nullable NotBlankIfPresent Email                  ] val email: String?,
     @field:[NotNull  NotBlank          Size(min = 4, max = 32)] val password: String,
 ) {
-    init {
-        require(login != null || email != null) { "expected at least one non-null argument of [login, email]" }
-    }
-
     override fun toString() = "EnterForm(login=$login, email=$email, password=***)"
 }

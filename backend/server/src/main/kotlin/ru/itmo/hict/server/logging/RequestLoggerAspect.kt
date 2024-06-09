@@ -1,11 +1,15 @@
 package ru.itmo.hict.server.logging
 
 import org.aspectj.lang.JoinPoint
+import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.After
+import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.springframework.stereotype.Component
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
+import ru.itmo.hict.server.exception.ValidationException
 
 @Aspect
 @Component
@@ -46,6 +50,15 @@ class RequestLoggerAspect(
     fun exceptionHandleBefore(jp: JoinPoint, eh: ExceptionHandler) =
         logger.error("exceptionHandler", eh.value.joinToString { it.simpleName ?: "j:${it.java.simpleName}" },
             "%s(%s)".format(jp.signature.name, jp.args.joinToString { (it as? Exception)?.message ?: "?" }))
+
+    @Around("execution(* ru.itmo.hict.server.controller.*.*(..)) && args(.., bindingResult)")
+    fun validatedController(jp: ProceedingJoinPoint, bindingResult: BindingResult): Any? {
+        if (bindingResult.hasErrors()) {
+            throw ValidationException(bindingResult)
+        }
+
+        return jp.proceed()
+    }
 
     private fun before(method: String, paths: Array<String>, jp: JoinPoint) =
         logRequest(method, paths.joinToString(), "before", jp.signature.name)
