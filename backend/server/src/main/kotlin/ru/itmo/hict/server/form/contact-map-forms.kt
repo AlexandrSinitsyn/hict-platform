@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*
 import java.util.*
 
 class ContactMapCreationForm(
-    @field:[NotNull org.hibernate.validator.constraints.UUID] val experimentId: UUID,
+    @field:[NotNull] val experimentId: UUID,
 )
 
 class ContactMapNameUpdateForm(

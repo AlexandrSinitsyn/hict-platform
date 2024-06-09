@@ -21,9 +21,13 @@ class ExperimentService(
     private val fileService: FileService,
 ) {
     fun getAll(groups: List<Group>?): List<Experiment> = experimentRepository.findAll().run {
-        groups ?: return@run this
+        val public = this.filter { it.visibilityGroup.name == "public" }
 
-        this.filter { it.visibilityGroup in groups }
+        if (groups.isNullOrEmpty()) {
+                return@run public
+        }
+
+        public + this.filter { it.visibilityGroup in groups }
     }
 
     fun getByName(name: String): Experiment? = experimentRepository.findByName(name).getOrNull()
@@ -33,7 +37,7 @@ class ExperimentService(
     fun create(author: User, groupName: String): Experiment {
         val group = groupService.getByName(groupName) ?: throw NoGroupFoundException(groupName)
 
-        if (!author.groups.contains(group)) {
+        if (groupName != "public" && !author.groups.contains(group)) {
             throw NotGroupMemberException(author.username, groupName)
         }
 

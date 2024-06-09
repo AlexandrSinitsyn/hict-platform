@@ -8,7 +8,7 @@
             <button type="button" class="btn btn-light" style="color: black">
                 {{ user.username }}
             </button>
-            <button type="button" class="btn btn-danger" @click="logout">Logout</button>
+            <button type="button" class="btn btn-danger" @click="logoutSubmit">Logout</button>
         </div>
         <div v-else>
             <button
@@ -43,6 +43,7 @@ import { getAuthorizedUser, login, logout, register } from '@/core/authenticatio
 import { useAuthStore } from '@/stores/auth-store';
 import { storeToRefs } from 'pinia';
 import type { LoginForm, RegisterForm } from '@types';
+import router from '@/router';
 
 const { user } = storeToRefs(useAuthStore());
 const authStore = useAuthStore();
@@ -55,6 +56,14 @@ function loginSubmit(form: LoginForm) {
 
 function registerSubmit(form: RegisterForm) {
     register(form, () => getAuthorizedUser(authStore.login));
+}
+
+function logoutSubmit() {
+    logout();
+
+    router.push({
+        name: 'home',
+    });
 }
 
 function anonymous() {

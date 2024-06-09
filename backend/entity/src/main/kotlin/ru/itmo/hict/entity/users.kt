@@ -51,7 +51,7 @@ class User(
 
     @NotNull
     @ManyToMany(
-        fetch = FetchType.LAZY,
+        fetch = FetchType.EAGER,
         cascade = [CascadeType.DETACH],
         mappedBy = "users"
     )

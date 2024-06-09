@@ -26,25 +26,28 @@ class DindService(
         val filepath = Path(id, FILENAME)
 
         withContext(Dispatchers.IO) {
+            if (filepath.exists()) {
+                return@withContext
+            }
+
             filepath.createParentDirectories()
 
             filepath.bufferedWriter().use {
                 it.write(DOCKER_COMPOSE.format(id, imageName, port))
+                logger.info("process", "fileWriter", filepath.pathString)
             }
         }
 
-        logger.info("process", "fileWriter", filepath.pathString)
-
         val result = runProcess(
             "docker", "compose",
-            "-f", "\"${filepath.pathString}\"",
+            "-f", filepath.pathString,
             "-p", "hict-server-cluster",
             "up", "-d"
         )
 
-        withContext(Dispatchers.IO) {
-            filepath.deleteExisting()
-        }
+        // withContext(Dispatchers.IO) {
+        //     filepath.deleteExisting()
+        // }
 
         logger.info("process", "cleanup", filepath.pathString)
 
@@ -52,7 +55,7 @@ class DindService(
     }
 
     suspend fun stopDocker(id: String): Result<Boolean> =
-        runProcess("docker", "compose", "-f", "\"${Path(id, FILENAME).pathString}\"", "down")
+        runProcess("docker", "compose", "-f", Path(id, FILENAME).pathString, "down")
 
     private suspend fun runProcess(vararg command: String): Result<Boolean> = runCatching {
         val process = ProcessBuilder(*consoleCommandPrefix, *command).start()

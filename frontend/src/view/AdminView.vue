@@ -67,6 +67,7 @@ const allUsers: Ref<User[]> = ref([]);
 onMounted(() => {
     getAllUsers((us) => {
         allUsers.value = us;
+        loading.value = false;
     });
 });
 
