@@ -65,7 +65,7 @@ onMounted(() => {
         const hicMap = map.hict;
 
         if (!hicMap) {
-            notify('error', 'Nothing to show! No Hi-C map attached for this experiment!')
+            notify('error', 'Nothing to show! No Hi-C map attached for this experiment!');
             return;
         }
 
@@ -100,10 +100,10 @@ function mapInfo(): { columnName: string; value: string }[] {
 }
 
 .main-screen {
-    position: absolute;
+    position: inherit;
+    margin-top: -2rem;
     top: 0;
     right: 0;
-    left: calc(15vw + 3rem); // header width
 
     padding-right: 1rem;
 }
