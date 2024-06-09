@@ -9,14 +9,7 @@ import {
 } from '@/core/server-requests';
 import { __SERVER_HOST__ } from '@/core/config';
 import axios, { type AxiosResponse } from 'axios';
-import type {
-    Group,
-    GroupCreationForm,
-    UpdateUserInfo,
-    UpdateUserPassword,
-    UpdateUserRole,
-    User,
-} from '@types';
+import type { Group, GroupCreationForm, UpdateUserInfo, UpdateUserPassword, User } from '@types';
 
 export function updateUserInfo(form: UpdateUserInfo): void {
     authorizedRequest(
@@ -31,15 +24,6 @@ export function updateUserPassword(form: UpdateUserPassword): void {
     authorizedRequest(
         axios.patch,
         `${__SERVER_HOST__.value}/users/update/password`,
-        form,
-        updateNotify
-    );
-}
-
-export function updateUserRole(form: UpdateUserRole): void {
-    authorizedRequest(
-        axios.patch,
-        `${__SERVER_HOST__.value}/users/update/role`,
         form,
         updateNotify
     );
