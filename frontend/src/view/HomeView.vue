@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, type Ref, watch } from 'vue';
-import type { ContactMap, Experiment, Group } from '@types';
+import type {ContactMap, Experiment, ExperimentCreationForm, Group} from '@types';
 import { getAllExperiments, publishExperiment } from '@/core/experiment-requests';
 import NewExperimentView from '@/view/NewExperimentView.vue';
 import router from '@/router';
@@ -66,8 +66,8 @@ watch(
                     return e;
                 }
 
-                const maps = e.contactMaps.filter(({ name }) => name.includes(value));
-                const assemblies = e.assemblies.filter(({ name }) => name.includes(value));
+                const maps = e.contactMaps?.filter(({ name }) => name.includes(value)) ?? [];
+                const assemblies = e.assemblies?.filter(({ name }) => name.includes(value)) ?? [];
 
                 if (maps.length === 0 && assemblies.length === 0) {
                     return undefined;
@@ -90,8 +90,8 @@ onMounted(() => {
     });
 });
 
-function newExperiment(group: Group) {
-    publishExperiment(group, (experiment: Experiment) => {
+function newExperiment(form: ExperimentCreationForm) {
+    publishExperiment(form, (experiment: Experiment) => {
         selectedExperiment.value = experiment;
     });
 }

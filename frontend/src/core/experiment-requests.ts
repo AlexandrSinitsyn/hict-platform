@@ -10,7 +10,6 @@ import axios from 'axios';
 import type {
     ContactMap,
     Experiment,
-    Group,
     ExperimentCreationForm,
     UpdateContactMapInfo,
     UpdateContactMapName,
@@ -22,13 +21,14 @@ export function getAllExperiments(onSuccess: SuccessCallback<Experiment[]>): voi
     authorizedGetRequest(`${__SERVER_HOST__.value}/experiment/all`, onSuccess);
 }
 
-export function publishExperiment(group: Group, onSuccess: SuccessCallback<Experiment>): void {
+export function publishExperiment(
+    form: ExperimentCreationForm,
+    onSuccess: SuccessCallback<Experiment>
+): void {
     authorizedRequest<ExperimentCreationForm, Experiment>(
         axios.post,
         `${__SERVER_HOST__.value}/experiment/new`,
-        {
-            groupName: group.name,
-        },
+        form,
         onSuccess
     );
 }

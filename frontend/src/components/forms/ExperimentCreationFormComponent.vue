@@ -15,7 +15,7 @@
         >
             <div class="experiment-creation">
                 <span class="fs-4 mx-3">Group</span>
-                <select class="form-select" aria-label=".form-select example">
+                <select class="form-select" aria-label=".form-select example" v-model="group">
                     <option value="public" selected>public</option>
                     <option v-for="group in user.groups" :key="group.name" :value="group.name">
                         {{ group.name }}
@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import AbstractFormComponent from '@/components/forms/AbstractFormComponent.vue';
 import { type Ref, ref } from 'vue';
-import type { ExperimentCreationForm, Group } from '@types';
+import type { ExperimentCreationForm } from '@types';
 import { useAuthStore } from '@/stores/auth-store';
 import { storeToRefs } from 'pinia';
 
@@ -37,16 +37,14 @@ const emit = defineEmits<{
     (e: 'submit', form: ExperimentCreationForm): void;
 }>();
 
-const group: Ref<Group> = ref({
-    name: 'public',
-});
+const group: Ref<string> = ref('public');
 const { user } = storeToRefs(useAuthStore());
 
 function submit() {
     const groupValue = group.value;
 
     emit('submit', {
-        groupName: groupValue.name,
+        groupName: groupValue,
     });
 }
 </script>
